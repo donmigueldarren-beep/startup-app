@@ -55,16 +55,11 @@ function Field({ label, value, onChange, step = 1, suffix = 'kr' }) {
 }
 
 function BilKalkulator() {
-  // Bil
   const [bilpris, setBilpris] = useState(400000);
   const [antallBiler, setAntallBiler] = useState(1);
   const [bilType, setBilType] = useState('bensin');
-
-  // Inntekt
   const [dagspris, setDagspris] = useState(800);
   const [utnyttelsesgrad, setUtnyttelsesgrad] = useState(60);
-
-  // Kostnader
   const [forsikringAar, setForsikringAar] = useState(25000);
   const [serviceAar, setServiceAar] = useState(8000);
   const [drivstoffMnd, setDrivstoffMnd] = useState(2000);
@@ -75,11 +70,11 @@ function BilKalkulator() {
   const fmt = (n) => Math.round(n).toLocaleString('no-NO') + ' kr';
   const fmtMnd = (n) => (n >= 0 ? '+' : '') + Math.round(n).toLocaleString('no-NO') + ' kr/mnd';
 
-  // Beregninger
   const totalBilpris = bilpris * antallBiler;
   const laan = Math.max(0, totalBilpris - egenkapital);
   const renteMnd = laan * (renteSats / 100) / 12;
-  const avskrivningMnd = (totalBilpris * 0.17) / 12; // 17% avskrivning per år
+  const avskrivningsSats = bilType === 'varebil' ? 24 : 17;
+  const avskrivningAar = totalBilpris * (avskrivningsSats / 100);
   const dagerPerMnd = 30 * (utnyttelsesgrad / 100);
   const inntektMnd = dagspris * dagerPerMnd * antallBiler;
   const forsikringMnd = (forsikringAar * antallBiler) / 12;
@@ -92,11 +87,7 @@ function BilKalkulator() {
   const harRaad = egenkapital >= totalBilpris * 0.25;
   const breakEvenDager = totalKostMnd / (dagspris * antallBiler);
   const breakEvenPst = (breakEvenDager / 30) * 100;
-  const roiAar = totalBilpris > 0 ? (nettoMnd * 12) / egenkapital * 100 : 0;
-
-  // Avskrivning info
-  const avskrivningsSats = bilType === 'varebil' ? 24 : 17;
-  const avskrivningAar = totalBilpris * (avskrivningsSats / 100);
+  const roiAar = egenkapital > 0 ? (nettoMnd * 12) / egenkapital * 100 : 0;
 
   let verdiktKlasse = 'green';
   let verdiktTekst = '';
@@ -115,7 +106,6 @@ function BilKalkulator() {
     verdiktTekst = `Ser lønnsomt ut! Du tjener ${fmt(nettoMnd)} netto per måned etter skatt. Break-even er ${Math.ceil(breakEvenPst)}% utnyttelse – du har god margin med ${utnyttelsesgrad}%.`;
   }
 
-  // Flåtescenarioer
   const scenarioer = [1, 2, 3, 5].map(n => {
     const laan2 = Math.max(0, bilpris * n - egenkapital);
     const rente2 = laan2 * (renteSats / 100) / 12;
@@ -129,14 +119,13 @@ function BilKalkulator() {
     <div className="bil-wrap">
       <style>{styles}</style>
 
-      {/* Steg 1 – Om bilen */}
       <div className="bil-step">
         <div className="bil-step-header">
           <div className="bil-step-num">1</div>
           <div className="bil-step-title">Om bilen / flåten</div>
         </div>
         <div className="bil-info">
-          Bilutleie i Norge krever ingen særskilt tillatelse, men du må registrere et AS eller ENK, ha ansvarsforsikring på hver bil, og registrere bilene som næringskjøretøy. Biler til utleie kan <strong>ikke</strong> bruke private bilforsikringer.
+          Bilutleie i Norge krever ingen særskilt tillatelse, men du må registrere et AS eller ENK, ha ansvarsforsikring på hver bil, og registrere bilene som næringskjøretøy. Biler til utleie kan ikke bruke private bilforsikringer.
         </div>
         <div className="bil-grid">
           <Field label="Pris per bil" value={bilpris} onChange={setBilpris} step={50000} />
@@ -173,7 +162,6 @@ function BilKalkulator() {
         </div>
       </div>
 
-      {/* Steg 2 – Inntekt */}
       <div className="bil-step">
         <div className="bil-step-header">
           <div className="bil-step-num">2</div>
@@ -210,7 +198,6 @@ function BilKalkulator() {
         </div>
       </div>
 
-      {/* Steg 3 – Kostnader */}
       <div className="bil-step">
         <div className="bil-step-header">
           <div className="bil-step-num">3</div>
@@ -246,7 +233,6 @@ function BilKalkulator() {
         </div>
       </div>
 
-      {/* Steg 4 – Nøkkeltall */}
       <div className="bil-step">
         <div className="bil-step-header">
           <div className="bil-step-num">4</div>
