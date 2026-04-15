@@ -89,6 +89,25 @@ const styles = `
   .hvorfor-tekst-title { font-size: 14px; font-weight: 500; color: var(--cream); margin-bottom: 4px; }
   .hvorfor-tekst-desc { font-size: 13px; color: #9aaa9e; line-height: 1.6; }
 
+  .om-oss-hero { background: var(--dark); padding: 120px 48px 80px; position: relative; }
+  .om-oss-hero .hero-accent { position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--gold); }
+  .om-oss-inner { max-width: 800px; margin: 0 auto; }
+  .om-oss-tag { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
+  .om-oss-title { font-family: 'Playfair Display', serif; font-size: clamp(32px, 5vw, 56px); line-height: 1.1; color: var(--cream); margin-bottom: 0; }
+  .om-oss-body { max-width: 800px; margin: 0 auto; padding: 64px 48px; }
+  .om-oss-tekst { font-size: 16px; color: var(--muted); line-height: 1.9; margin-bottom: 24px; font-weight: 300; }
+  .om-oss-sitat { font-family: 'Playfair Display', serif; font-size: 20px; font-style: italic; color: var(--text); border-left: 3px solid var(--gold); padding: 16px 24px; margin: 40px 0; line-height: 1.6; }
+  .om-oss-verdier { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--cream-dark); margin: 48px 0; }
+  .om-oss-verdi { background: white; padding: 28px; }
+  .om-oss-verdi-num { font-family: 'Playfair Display', serif; font-size: 11px; color: var(--gold); letter-spacing: 0.1em; margin-bottom: 12px; }
+  .om-oss-verdi-title { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--dark); margin-bottom: 8px; }
+  .om-oss-verdi-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .om-oss-kontakt { background: var(--brg); padding: 48px; margin-top: 0; }
+  .om-oss-kontakt-inner { max-width: 800px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 40px; }
+  .om-oss-kontakt-title { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--cream); margin-bottom: 8px; }
+  .om-oss-kontakt-desc { font-size: 14px; color: #9fc9a8; line-height: 1.6; }
+  .om-oss-kontakt-epost { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--gold); text-decoration: none; display: block; margin-top: 8px; }
+
   .kalkulator-view { padding: 100px 48px 80px; max-width: 900px; margin: 0 auto; }
   .kalkulator-back { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); cursor: pointer; margin-bottom: 32px; background: none; border: none; font-family: 'Inter', sans-serif; letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.2s; }
   .kalkulator-back:hover { color: var(--text); }
@@ -103,34 +122,10 @@ const styles = `
 `;
 
 const bransjer = [
-  {
-    id: 'eiendom', num: '01',
-    navn: 'Eiendomsutleie',
-    desc: 'Sammenlign privat kjøp vs AS, BRRR-strategi og porteføljevekst over tid.',
-    tags: ['Utleie', 'BRRR', 'AS vs privat'],
-    coming: false
-  },
-  {
-    id: 'bil', num: '02',
-    navn: 'Bilutleie',
-    desc: 'Fra enkeltbil til flåte – finn break-even og avkastning på kapitalen.',
-    tags: ['Flåte', 'ROI', 'Break-even'],
-    coming: false
-  },
-  {
-    id: 'salong', num: '03',
-    navn: 'Salong',
-    desc: 'Frisør, negler, hudpleie – finn lønnsomheten før du signerer leiekontrakten.',
-    tags: ['Leie', 'Bemanning'],
-    coming: true
-  },
-  {
-    id: 'korttid', num: '04',
-    navn: 'Korttidsutleie',
-    desc: 'Airbnb og korttidsutleie – sammenlign mot langtidsleie og finn beste strategi.',
-    tags: ['Airbnb', 'Sesong'],
-    coming: true
-  }
+  { id: 'eiendom', num: '01', navn: 'Eiendomsutleie', desc: 'Sammenlign privat kjøp vs AS, BRRR-strategi og porteføljevekst over tid.', tags: ['Utleie', 'BRRR', 'AS vs privat'], coming: false },
+  { id: 'bil', num: '02', navn: 'Bilutleie', desc: 'Fra enkeltbil til flåte, finn break-even og avkastning på kapitalen.', tags: ['Flåte', 'ROI', 'Break-even'], coming: false },
+  { id: 'salong', num: '03', navn: 'Salong', desc: 'Frisør, negler, hudpleie, finn lønnsomheten før du signerer leiekontrakten.', tags: ['Leie', 'Bemanning'], coming: true },
+  { id: 'korttid', num: '04', navn: 'Korttidsutleie', desc: 'Airbnb og korttidsutleie, sammenlign mot langtidsleie og finn beste strategi.', tags: ['Airbnb', 'Sesong'], coming: true }
 ];
 
 export default function App() {
@@ -144,20 +139,102 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const gaaHjem = () => {
+    setSide('hjem');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  if (side === 'om-oss') {
+    return (
+      <div className="app">
+        <style>{styles}</style>
+        <nav className="nav">
+          <div className="nav-logo" onClick={gaaHjem}>Startup<em>Smart</em></div>
+          <div className="nav-links">
+            <span className="nav-link" onClick={gaaHjem}>Hjem</span>
+            <span className="nav-link" onClick={() => { gaaHjem(); setTimeout(() => document.getElementById('bransjer')?.scrollIntoView({ behavior: 'smooth' }), 300); }}>Bransjer</span>
+            <span className="nav-link" style={{ color: 'var(--cream)' }}>Om oss</span>
+          </div>
+          <button className="nav-cta" onClick={() => aapneBransje(bransjer[0])}>Kom i gang</button>
+        </nav>
+
+        <div className="om-oss-hero">
+          <div className="hero-accent"></div>
+          <div className="om-oss-inner">
+            <div className="om-oss-tag">Om oss</div>
+            <h1 className="om-oss-title">Bygget av en gründer<br />for gründere</h1>
+          </div>
+        </div>
+
+        <div className="om-oss-body">
+          <p className="om-oss-tekst">
+            StartupSmart ble til fordi vi selv opplevde hvor vanskelig det er å finne ærlige, konkrete tall når man vurderer en ny bedriftsidé. Informasjonen finnes, men den er spredt, utdatert og sjelden tilpasset din situasjon.
+          </p>
+          <p className="om-oss-tekst">
+            Vi tror at alle som vurderer å starte noe nytt fortjener de samme kvalitetstallene som profesjonelle investorer og revisorer bruker, uten å måtte betale for en konsultasjon først.
+          </p>
+          <p className="om-oss-tekst">
+            StartupSmart er gratis, konfidensielt og alltid oppdatert med gjeldende norske regler og satser.
+          </p>
+
+          <div className="om-oss-sitat">
+            Dette er ikke finansiell rådgivning, men det er et godt sted å starte.
+          </div>
+
+          <div className="om-oss-verdier">
+            {[
+              { num: '01', tittel: 'Ærlig', desc: 'Vi viser deg de reelle tallene, ikke de optimistiske. Du fortjener å vite hva det faktisk koster.' },
+              { num: '02', tittel: 'Konfidensielt', desc: 'Tallene du legger inn forblir hos deg. Vi lagrer ingenting og selger ingenting.' },
+              { num: '03', tittel: 'Oppdatert', desc: 'Norske skatteregler, renter og krav endres. Vi holder kalkulatorene oppdaterte så du slipper.' }
+            ].map((v, i) => (
+              <div className="om-oss-verdi" key={i}>
+                <div className="om-oss-verdi-num">{v.num}</div>
+                <div className="om-oss-verdi-title">{v.tittel}</div>
+                <div className="om-oss-verdi-desc">{v.desc}</div>
+              </div>
+            ))}
+          </div>
+
+          <button className="btn-primary" onClick={() => aapneBransje(bransjer[0])}>
+            Start beregning
+          </button>
+        </div>
+
+        <div className="om-oss-kontakt">
+          <div className="om-oss-kontakt-inner">
+            <div>
+              <div className="om-oss-kontakt-title">Mangler din bransje?</div>
+              <div className="om-oss-kontakt-desc">Ta kontakt hvis du ønsker en kalkulator for en bransje som ikke er her ennå. Vi jobber kontinuerlig med nye bransjer.</div>
+            </div>
+            <div>
+              <div style={{ fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9fc9a8', marginBottom: '8px' }}>Send oss en e-post</div>
+              <a href="mailto:kontakt@startupsmart.no" className="om-oss-kontakt-epost">kontakt@startupsmart.no</a>
+            </div>
+          </div>
+        </div>
+
+        <footer>
+          <div className="footer-logo">Startup<em>Smart</em></div>
+          <div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning. Konsulter en regnskapsfører før du tar beslutninger.</div>
+        </footer>
+      </div>
+    );
+  }
+
   if (side === 'kalkulator' && aktivBransje) {
     return (
       <div className="app">
         <style>{styles}</style>
         <nav className="nav">
-          <div className="nav-logo" onClick={() => setSide('hjem')}>Startup<em>Smart</em></div>
+          <div className="nav-logo" onClick={gaaHjem}>Startup<em>Smart</em></div>
           <div className="nav-links">
-            <span className="nav-link" onClick={() => setSide('hjem')}>Hjem</span>
-            <span className="nav-link" onClick={() => { setSide('hjem'); setTimeout(() => document.getElementById('bransjer')?.scrollIntoView({ behavior: 'smooth' }), 100); }}>Bransjer</span>
+            <span className="nav-link" onClick={gaaHjem}>Hjem</span>
+            <span className="nav-link" onClick={() => setSide('om-oss')}>Om oss</span>
           </div>
-          <button className="nav-cta" onClick={() => setSide('hjem')}>Alle bransjer</button>
+          <button className="nav-cta" onClick={gaaHjem}>Alle bransjer</button>
         </nav>
         <div className="kalkulator-view">
-          <button className="kalkulator-back" onClick={() => setSide('hjem')}>← Tilbake</button>
+          <button className="kalkulator-back" onClick={gaaHjem}>← Tilbake</button>
           <div className="kalkulator-header">
             <div className="kalkulator-header-tag">Kalkulator</div>
             <div className="kalkulator-header-title">{aktivBransje.navn}</div>
@@ -178,10 +255,10 @@ export default function App() {
       <style>{styles}</style>
 
       <nav className="nav">
-        <div className="nav-logo">Startup<em>Smart</em></div>
+        <div className="nav-logo" onClick={gaaHjem}>Startup<em>Smart</em></div>
         <div className="nav-links">
           <span className="nav-link" onClick={() => document.getElementById('bransjer')?.scrollIntoView({ behavior: 'smooth' })}>Bransjer</span>
-          <span className="nav-link">Om oss</span>
+          <span className="nav-link" onClick={() => setSide('om-oss')}>Om oss</span>
         </div>
         <button className="nav-cta" onClick={() => aapneBransje(bransjer[0])}>Kom i gang</button>
       </nav>
@@ -227,14 +304,14 @@ export default function App() {
             ))}
           </div>
           <div className="cards-row2">
-            <div className={`card coming`}>
+            <div className="card coming">
               <div className="coming-pill">Kommer snart</div>
               <div className="card-title">{bransjer[3].navn}</div>
               <div className="card-desc">{bransjer[3].desc}</div>
               <div className="card-tags">{bransjer[3].tags.map(t => <span key={t} className="card-tag">{t}</span>)}</div>
             </div>
             <div className="more-card">
-              <div className="more-card-text">Flere bransjer kommer snart — franchise, konsulent, nettbutikk og mer</div>
+              <div className="more-card-text">Flere bransjer kommer snart, franchise, konsulent, nettbutikk og mer</div>
               <div style={{ marginLeft: 'auto', fontSize: '20px', color: 'var(--cream-dark)' }}>→</div>
             </div>
           </div>
@@ -245,14 +322,15 @@ export default function App() {
         <div className="hvorfor-inner">
           <div>
             <h2 className="hvorfor-title">Hvorfor <em>StartupSmart?</em></h2>
-            <p className="hvorfor-sub">De fleste starter bedrift uten et realistisk bilde av hva det faktisk koster. Vi gir deg tallene – ærlig og tydelig.</p>
+            <p className="hvorfor-sub">De fleste starter bedrift uten et realistisk bilde av hva det faktisk koster. Vi gir deg tallene, ærlig og tydelig.</p>
           </div>
           <div className="hvorfor-items">
             {[
               { tittel: 'Helt konfidensielt', desc: 'Tallene du legger inn forblir hos deg. Vi lagrer ingenting.' },
               { tittel: 'Oppdatert informasjon', desc: 'Gjeldende skatteregler, renter og lovkrav.' },
-              { tittel: 'Konkrete anbefalinger', desc: 'Ikke bare tall – men hva som lønner seg for deg.' },
-              { tittel: 'Langsiktig perspektiv', desc: 'Se porteføljen vokse over 10 år.' }
+              { tittel: 'Konkrete anbefalinger', desc: 'Ikke bare tall, men hva som lønner seg for deg.' },
+              { tittel: 'Langsiktig perspektiv', desc: 'Se porteføljen vokse over 10 år.' },
+              { tittel: 'Ta kontakt', desc: 'Mangler din bransje? Send oss en e-post på kontakt@startupsmart.no og vi ser på det.' }
             ].map((p, i) => (
               <div className="hvorfor-punkt" key={i}>
                 <div className="hvorfor-dot"></div>
