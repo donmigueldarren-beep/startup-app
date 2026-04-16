@@ -75,7 +75,7 @@ function SalongKalkulator() {
   const [kundesPerStol, setKundesPerStol] = useState(4);
   const [arbeidsdagerMnd, setArbeidsdagerMnd] = useState(22);
   const [husleie, setHusleie] = useState(15000);
-  const [produkter, setprodukter] = useState(5000);
+  const [produkter, setProdukt] = useState(5000);
   const [lonn, setLonn] = useState(35000);
   const [antallAnsatte, setAntallAnsatte] = useState(1);
   const [forsikring, setForsikring] = useState(2000);
@@ -88,7 +88,6 @@ function SalongKalkulator() {
   const fmt = (n) => Math.round(n).toLocaleString('no-NO') + ' kr';
   const fmtMnd = (n) => (n >= 0 ? '+' : '') + Math.round(n).toLocaleString('no-NO') + ' kr/mnd';
 
-  const inntektMnd = antallStoler * kundesPerStol * arbeidsdagerMnd * prisPerKunde / arbeidsdagerMnd * arbeidsdagerMnd;
   const inntektMndReal = antallStoler * kundesPerStol * prisPerKunde;
   const lonnTotal = lonn * antallAnsatte;
   const arbeidsgiveravgift = lonnTotal * 0.141;
@@ -114,10 +113,10 @@ function SalongKalkulator() {
   let verdiktTekst = '';
   if (!harRaad) {
     verdiktKlasse = 'red';
-    verdiktTekst = `Du har ikke nok kapital til oppstart. Du trenger minimum ${fmt(totalOppstart)} – du mangler ${fmt(totalOppstart - egenkapital)}.`;
+    verdiktTekst = `Du har ikke nok kapital til oppstart. Du trenger minimum ${fmt(totalOppstart)} og mangler ${fmt(totalOppstart - egenkapital)}.`;
   } else if (nettoMnd < 0) {
     verdiktKlasse = 'red';
-    verdiktTekst = `Negativ kontantstrøm med disse tallene. Du trenger minst ${breakEvenKunder} kunder per måned for å gå i null, det vil si ${breakEvenPerStol} per stol per dag.`;
+    verdiktTekst = `Negativ kontantstrøm. Du trenger minst ${breakEvenKunder} kunder per måned for å gå i null, det vil si ${breakEvenPerStol} per stol per dag.`;
   } else if (nettoMnd < 10000) {
     verdiktKlasse = 'amber';
     verdiktTekst = `Marginalt lønnsomt. Du tjener ${fmt(nettoMnd)} netto per måned. Vurder om du kan øke prisene, fylle flere timer eller redusere kostnader.`;
@@ -220,7 +219,7 @@ function SalongKalkulator() {
         </div>
         <div className="sal-grid">
           <Field label="Husleie / mnd" value={husleie} onChange={setHusleie} step={1000} />
-          <Field label="Produkter og forbruksmateriell" value={produkter} onChange={setProdukt => setProdukt(setProdukt)} step={500} suffix="kr/mnd" />
+          <Field label="Produkter og forbruksmateriell" value={produkter} onChange={setProdukt} step={500} suffix="kr/mnd" />
           <Field label="Forsikring / mnd" value={forsikring} onChange={setForsikring} step={500} />
           <Field label="Regnskapsfører / år" value={regnskapKost} onChange={setRegnskapKost} step={1000} />
         </div>
