@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&display=swap');
@@ -68,6 +68,23 @@ const styles = `
   .ep-toggle { display: flex; gap: 1px; background: var(--cream-dark); }
   .ep-toggle-btn { padding: 8px 16px; background: var(--cream); border: none; font-family: 'Inter', sans-serif; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; color: var(--muted); transition: all 0.2s; }
   .ep-toggle-btn.active { background: var(--brg); color: var(--cream); }
+  .ep-graf-wrap { background: white; border: 1px solid var(--cream-dark); padding: 28px; margin-bottom: 12px; }
+  .ep-graf-title { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--dark); margin-bottom: 4px; }
+  .ep-graf-sub { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+  .ep-graf-legend { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+  .ep-graf-legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+  .ep-graf-legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+  .ep-graf-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--cream-dark); margin-bottom: 20px; }
+  .ep-graf-metric { background: var(--cream); padding: 14px 16px; }
+  .ep-graf-metric-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 6px; }
+  .ep-graf-metric-val { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--dark); }
+  .ep-graf-controls { display: flex; gap: 24px; margin-bottom: 20px; flex-wrap: wrap; align-items: flex-end; }
+  .ep-refi-box { background: var(--brg-pale); border-left: 3px solid var(--brg); padding: 14px 18px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .ep-refi-title { font-size: 13px; font-weight: 500; color: var(--brg); margin-bottom: 4px; }
+  .ep-refi-desc { font-size: 12px; color: var(--brg-light); }
+  .ep-refi-num { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--brg); white-space: nowrap; }
+  .ep-refi-num-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brg-light); }
+  .ep-no-refi { background: #fdf6e8; border-left: 3px solid var(--gold); padding: 12px 16px; font-size: 13px; color: #7a5a1e; margin-bottom: 20px; }
 `;
 
 function fmt(n) { return Math.round(n).toLocaleString('no-NO') + ' kr'; }
@@ -86,16 +103,178 @@ function InputFelt({ label, value, onChange, step = 1000, suffix = 'kr', hint = 
   );
 }
 
+function EiendomGraf({ boligpris, nettoPrivat, nettoAS, renteAS, ekProsentAS, restKapitalPrivat, restKapitalAS }) {
+  const canvasRef = useRef(null);
+  const chartRef = useRef(null);
+  const [visType, setVisType] = useState('as');
+  const [prisvekst, setPrisvekst] = useState(3);
+  const [refiInfo, setRefiInfo] = useState(null);
+  const [grafMetrics, setGrafMetrics] = useState({ bolig: 0, ek: 0, netto: 0 });
+
+  function getEKKrav(y, erAS) {
+    if (!erAS) return 0.10;
+    if (y <= 2) return 0.30;
+    if (y <= 4) return 0.25;
+    if (y <= 7) return 0.20;
+    return 0.15;
+  }
+
+  const beregnData = useCallback((pv, erAS) => {
+    const nettoMnd = erAS ? nettoAS : nettoPrivat;
+    const ekStart = Math.max(0, erAS ? restKapitalAS : restKapitalPrivat);
+    const labels = [], boligVerdier = [], ekVerdier = [], laanVerdier = [];
+    let laan = boligpris * (erAS ? ekProsentAS / 100 : 0.90);
+    let boligverdi = boligpris;
+    let akkNetto = ekStart;
+    let forsteRefi = null;
+    for (let y = 1; y <= 10; y++) {
+      boligverdi *= (1 + pv / 100);
+      laan = Math.max(0, laan * 0.98);
+      akkNetto += nettoMnd * 12;
+      const ek = boligverdi - laan;
+      const refi = Math.max(0, boligverdi * 0.75 - laan);
+      const ekKrav = getEKKrav(y, erAS);
+      const maks = refi / ekKrav;
+      if (!forsteRefi && refi > boligpris * 0.25) {
+        forsteRefi = { aar: y, refi: Math.round(refi), maks: Math.round(maks), ekKrav };
+      }
+      labels.push('År ' + y);
+      boligVerdier.push(Math.round(boligverdi));
+      ekVerdier.push(Math.round(ek));
+      laanVerdier.push(Math.round(laan));
+    }
+    return { labels, boligVerdier, ekVerdier, laanVerdier, akkNetto: Math.round(akkNetto), forsteRefi };
+  }, [boligpris, nettoPrivat, nettoAS, ekProsentAS, restKapitalPrivat, restKapitalAS]);
+
+  const oppdaterMetrics = useCallback((d) => {
+    setRefiInfo(d.forsteRefi);
+    setGrafMetrics({ bolig: d.boligVerdier[9], ek: d.ekVerdier[9], netto: d.akkNetto });
+  }, []);
+
+  const oppdaterChart = useCallback(() => {
+    if (!chartRef.current) return;
+    const d = beregnData(prisvekst, visType === 'as');
+    chartRef.current.data.labels = d.labels;
+    chartRef.current.data.datasets[0].data = d.boligVerdier;
+    chartRef.current.data.datasets[1].data = d.ekVerdier;
+    chartRef.current.data.datasets[2].data = d.laanVerdier;
+    chartRef.current.update();
+    oppdaterMetrics(d);
+  }, [prisvekst, visType, beregnData, oppdaterMetrics]);
+
+  const initChart = useCallback(() => {
+    if (!window.Chart || !canvasRef.current) return;
+    const d = beregnData(prisvekst, visType === 'as');
+    chartRef.current = new window.Chart(canvasRef.current, {
+      type: 'line',
+      data: {
+        labels: d.labels,
+        datasets: [
+          { label: 'Boligverdi', data: d.boligVerdier, borderColor: '#1f4e2e', backgroundColor: 'rgba(31,78,46,0.05)', borderWidth: 2, fill: true, pointRadius: 3, pointBackgroundColor: '#1f4e2e', tension: 0.3 },
+          { label: 'Egenkapital', data: d.ekVerdier, borderColor: '#c9a84c', backgroundColor: 'rgba(201,168,76,0.04)', borderWidth: 2, fill: false, pointRadius: 3, pointBackgroundColor: '#c9a84c', tension: 0.3 },
+          { label: 'Gjenstående lån', data: d.laanVerdier, borderColor: '#b4b2a9', borderDash: [5, 4], borderWidth: 1.5, fill: false, pointRadius: 2, pointBackgroundColor: '#b4b2a9', tension: 0.3 }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: c => ' ' + c.dataset.label + ': ' + Math.round(c.raw).toLocaleString('no-NO') + ' kr' } }
+        },
+        scales: {
+          y: { ticks: { font: { size: 11 }, color: '#5a6e5e', callback: v => v >= 1000000 ? (v / 1000000).toFixed(1) + 'M' : (v / 1000) + 'k' }, grid: { color: 'rgba(0,0,0,0.04)' }, border: { display: false } },
+          x: { ticks: { font: { size: 11 }, color: '#5a6e5e' }, grid: { display: false }, border: { display: false } }
+        }
+      }
+    });
+    oppdaterMetrics(d);
+  }, [beregnData, oppdaterMetrics, prisvekst, visType]);
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js';
+    script.onload = () => initChart();
+    document.head.appendChild(script);
+    return () => { if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; } };
+  }, [initChart]);
+
+  useEffect(() => {
+    if (chartRef.current) oppdaterChart();
+  }, [oppdaterChart]);
+
+  return (
+    <div className="ep-graf-wrap">
+      <div className="ep-graf-title">Utvikling over 10 år</div>
+      <div className="ep-graf-sub">Boligverdi, egenkapital og gjenstående lån</div>
+      <div className="ep-graf-legend">
+        <div className="ep-graf-legend-item"><div className="ep-graf-legend-dot" style={{ background: '#1f4e2e' }}></div>Boligverdi</div>
+        <div className="ep-graf-legend-item"><div className="ep-graf-legend-dot" style={{ background: '#c9a84c' }}></div>Egenkapital</div>
+        <div className="ep-graf-legend-item"><div className="ep-graf-legend-dot" style={{ background: '#b4b2a9', border: '1px dashed #888' }}></div>Gjenstående lån</div>
+      </div>
+      <div className="ep-graf-controls">
+        <div>
+          <div className="ep-label">Vis for</div>
+          <div className="ep-toggle">
+            <button className={`ep-toggle-btn ${visType === 'as' ? 'active' : ''}`} onClick={() => setVisType('as')}>Via AS</button>
+            <button className={`ep-toggle-btn ${visType === 'privat' ? 'active' : ''}`} onClick={() => setVisType('privat')}>Privat</button>
+          </div>
+        </div>
+        <div>
+          <div className="ep-label">Prisvekst: {prisvekst}%</div>
+          <input type="range" min="0" max="8" step="0.5" value={prisvekst} onChange={e => setPrisvekst(+e.target.value)} style={{ width: '160px', accentColor: 'var(--brg)', display: 'block', marginTop: '8px' }} />
+        </div>
+      </div>
+      <div className="ep-graf-metrics">
+        <div className="ep-graf-metric">
+          <div className="ep-graf-metric-lbl">Boligverdi år 10</div>
+          <div className="ep-graf-metric-val">{fmt(grafMetrics.bolig)}</div>
+        </div>
+        <div className="ep-graf-metric">
+          <div className="ep-graf-metric-lbl">Egenkapital år 10</div>
+          <div className="ep-graf-metric-val">{fmt(grafMetrics.ek)}</div>
+        </div>
+        <div className="ep-graf-metric">
+          <div className="ep-graf-metric-lbl">Akkumulert netto</div>
+          <div className="ep-graf-metric-val">{fmt(grafMetrics.netto)}</div>
+        </div>
+      </div>
+      {refiInfo ? (
+        <div className="ep-refi-box">
+          <div>
+            <div className="ep-refi-title">Du kan refinansiere i år {refiInfo.aar}</div>
+            <div className="ep-refi-desc">{visType === 'as' ? `AS med ${refiInfo.aar} års historikk får bedre lånevilkår. Hent ut kapital til neste kjøp.` : 'Boligen har steget nok til at du kan hente ut egenkapital til neste kjøp.'}</div>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <div className="ep-refi-num-lbl">Tilgjengelig kapital</div>
+            <div className="ep-refi-num">{fmt(refiInfo.refi)}</div>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <div className="ep-refi-num-lbl">Maks neste bolig</div>
+            <div className="ep-refi-num">{fmt(refiInfo.maks)}</div>
+          </div>
+        </div>
+      ) : (
+        <div className="ep-no-refi">Refinansiering ikke mulig innen 10 år med disse tallene. Prøv å øke prisveksten.</div>
+      )}
+      <div style={{ position: 'relative', width: '100%', height: '300px' }}>
+        <canvas ref={canvasRef} role="img" aria-label="Linjegraf som viser boligverdi, egenkapital og gjenstående lån over 10 år">Grafen viser utvikling over 10 år.</canvas>
+      </div>
+    </div>
+  );
+}
+
 function EiendomPrognose({ boligpris, nettoPrivat, nettoAS, totPrivat, totAS, rentePrivat, renteAS, ekProsentAS, restKapitalPrivat, restKapitalAS }) {
   const [prisvekst, setPrisvekst] = useState(3);
   const [visType, setVisType] = useState('as');
   const [oppussingPrivat, setOppussingPrivat] = useState(0);
   const [privatSparingPrivat, setPrivatSparingPrivat] = useState(10000);
-  const [arligInnskuddPrivat, setArligInnskuddPrivat] = useState(privatSparingPrivat * 12);
+  const [arligInnskuddPrivat, setArligInnskuddPrivat] = useState(120000);
   const [restJustertPrivat, setRestJustertPrivat] = useState(restKapitalPrivat);
   const [oppussingAS, setOppussingAS] = useState(0);
   const [privatSparingAS, setPrivatSparingAS] = useState(10000);
-  const [arligInnskuddAS, setArligInnskuddAS] = useState(privatSparingAS * 12);
+  const [arligInnskuddAS, setArligInnskuddAS] = useState(120000);
   const [restJustertAS, setRestJustertAS] = useState(restKapitalAS);
 
   const aar = 10;
@@ -158,6 +337,16 @@ function EiendomPrognose({ boligpris, nettoPrivat, nettoAS, totPrivat, totAS, re
     <div className="ep-wrap">
       <style>{styles}</style>
 
+      <EiendomGraf
+        boligpris={boligpris}
+        nettoPrivat={nettoPrivat}
+        nettoAS={nettoAS}
+        renteAS={renteAS}
+        ekProsentAS={ekProsentAS}
+        restKapitalPrivat={restKapitalPrivat}
+        restKapitalAS={restKapitalAS}
+      />
+
       <div className="ep-step">
         <div className="ep-step-header">
           <div className="ep-step-num">5</div>
@@ -177,9 +366,7 @@ function EiendomPrognose({ boligpris, nettoPrivat, nettoAS, totPrivat, totAS, re
             </div>
           ))}
         </div>
-        <div className="ep-info">
-          BRRR lar deg resirkulere egenkapitalen din. Når boligen har steget i verdi refinansierer du og henter ut kapital til neste kjøp uten å selge den første.
-        </div>
+        <div className="ep-info">BRRR lar deg resirkulere egenkapitalen din. Når boligen har steget i verdi refinansierer du og henter ut kapital til neste kjøp uten å selge den første.</div>
       </div>
 
       <div className="ep-step">
@@ -187,18 +374,12 @@ function EiendomPrognose({ boligpris, nettoPrivat, nettoAS, totPrivat, totAS, re
           <div className="ep-step-num">6</div>
           <div className="ep-step-title">Historikk og lånevilkår i AS over tid</div>
         </div>
-        <div className="ep-info">
-          Et AS med stabil kontantstrøm behandles svært annerledes av banken enn et nystartet AS. Historikken akkumuleres og gir bedre betingelser for hvert nye kjøp.
-        </div>
+        <div className="ep-info">Et AS med stabil kontantstrøm behandles svært annerledes av banken enn et nystartet AS. Historikken akkumuleres og gir bedre betingelser for hvert nye kjøp.</div>
         <div style={{ overflowX: 'auto', marginBottom: '24px' }}>
           <table className="ep-historikk-table">
             <thead>
               <tr>
-                <th>Periode</th>
-                <th>Fase</th>
-                <th>EK-krav</th>
-                <th>Rente</th>
-                <th>Bankens vurdering</th>
+                <th>Periode</th><th>Fase</th><th>EK-krav</th><th>Rente</th><th>Bankens vurdering</th>
               </tr>
             </thead>
             <tbody>
@@ -222,7 +403,7 @@ function EiendomPrognose({ boligpris, nettoPrivat, nettoAS, totPrivat, totAS, re
               { tittel: 'Driftsselskap bygger historikk', desc: 'Eier eiendommene, tar opp lån og viser overskudd år for år. Bedre betingelser etter 2 til 3 år.', future: false },
               { tittel: 'År 3: Første refinansiering', desc: 'Banken senker EK-krav og rente. Kapital hentes ut til neste kjøp.', future: true },
               { tittel: 'År 5 og oppover: Porteføljeinvestor', desc: 'Med 2 til 3 enheter og solid historikk er driftsselskapet en attraktiv låntaker.', future: true }
-            ].map((item, i, arr) => (
+            ].map((item, i) => (
               <div className="ep-timeline-item" key={i}>
                 <div className={`ep-timeline-dot ${item.future ? 'future' : ''}`}></div>
                 <div className="ep-timeline-title">{item.tittel}</div>
@@ -238,7 +419,6 @@ function EiendomPrognose({ boligpris, nettoPrivat, nettoAS, totPrivat, totAS, re
           <div className="ep-step-num">7</div>
           <div className="ep-step-title">År for år prognose</div>
         </div>
-
         <div className="ep-controls">
           <div>
             <label className="ep-label">Vis for</label>
@@ -255,14 +435,9 @@ function EiendomPrognose({ boligpris, nettoPrivat, nettoAS, totPrivat, totAS, re
             <input type="range" min="0" max="8" step="0.5" value={prisvekst} onChange={e => setPrisvekst(+e.target.value)} style={{ width: '160px', accentColor: 'var(--brg)', display: 'block', marginTop: '8px' }} />
           </div>
         </div>
-
         <div className="ep-kapital-box">
-          <div style={{ fontSize: '12px', fontWeight: '500', color: 'var(--dark)', marginBottom: '4px' }}>
-            Kapital til prognosen
-          </div>
-          <div style={{ fontSize: '12px', color: 'var(--muted)', marginBottom: '12px' }}>
-            Restkapital er hentet fra kalkulatoren men kan justeres. Du kan sette av noe til oppussing.
-          </div>
+          <div style={{ fontSize: '12px', fontWeight: '500', color: 'var(--dark)', marginBottom: '4px' }}>Kapital til prognosen</div>
+          <div style={{ fontSize: '12px', color: 'var(--muted)', marginBottom: '12px' }}>Restkapital er hentet fra kalkulatoren men kan justeres.</div>
           {visType === 'privat' ? (
             <div className="ep-kapital-grid">
               <InputFelt label="Restkapital etter kjøp" value={restJustertPrivat} onChange={setRestJustertPrivat} hint={`Beregnet: ${fmt(restKapitalPrivat)}`} />
@@ -291,18 +466,11 @@ function EiendomPrognose({ boligpris, nettoPrivat, nettoAS, totPrivat, totAS, re
             </div>
           </div>
         </div>
-
         <div style={{ overflowX: 'auto' }}>
           <table className="ep-table">
             <thead>
               <tr>
-                <th>År</th>
-                <th>Boligverdi</th>
-                <th>Gjenstående lån</th>
-                <th>Egenkapital</th>
-                <th>Netto / år</th>
-                <th>Innskudd / år</th>
-                <th>Total kapital</th>
+                <th>År</th><th>Boligverdi</th><th>Gjenstående lån</th><th>Egenkapital</th><th>Netto / år</th><th>Innskudd / år</th><th>Total kapital</th>
                 {visType === 'as' && <th>EK-krav neste</th>}
                 <th>Kan refinansiere</th>
               </tr>
@@ -335,30 +503,12 @@ function EiendomPrognose({ boligpris, nettoPrivat, nettoAS, totPrivat, totAS, re
         <div className="ep-next">
           <div className="ep-next-title">Neste leilighet, når har du råd?</div>
           <div className="ep-next-grid">
-            <div className="ep-next-item">
-              <div className="lbl">Tidligst refinansiering</div>
-              <div className="val">År {forsteRefinansiering.aar}</div>
-            </div>
-            <div className="ep-next-item">
-              <div className="lbl">Kapital fra refinansiering</div>
-              <div className="val">{fmt(forsteRefinansiering.refinansiering)}</div>
-            </div>
-            <div className="ep-next-item">
-              <div className="lbl">EK-krav neste kjøp</div>
-              <div className="val">{Math.round(forsteRefinansiering.ekKravNeste * 100)}%</div>
-            </div>
-            <div className="ep-next-item">
-              <div className="lbl">Maks boligpris</div>
-              <div className="val">{fmt(forsteRefinansiering.maksNesteBolig)}</div>
-            </div>
-            <div className="ep-next-item">
-              <div className="lbl">Total kapital akkumulert</div>
-              <div className="val">{fmt(forsteRefinansiering.totalKapital)}</div>
-            </div>
-            <div className="ep-next-item">
-              <div className="lbl">Herav privat sparing</div>
-              <div className="val">{fmt(forsteRefinansiering.eksternKapital)}</div>
-            </div>
+            <div className="ep-next-item"><div className="lbl">Tidligst refinansiering</div><div className="val">År {forsteRefinansiering.aar}</div></div>
+            <div className="ep-next-item"><div className="lbl">Kapital fra refinansiering</div><div className="val">{fmt(forsteRefinansiering.refinansiering)}</div></div>
+            <div className="ep-next-item"><div className="lbl">EK-krav neste kjøp</div><div className="val">{Math.round(forsteRefinansiering.ekKravNeste * 100)}%</div></div>
+            <div className="ep-next-item"><div className="lbl">Maks boligpris</div><div className="val">{fmt(forsteRefinansiering.maksNesteBolig)}</div></div>
+            <div className="ep-next-item"><div className="lbl">Total kapital akkumulert</div><div className="val">{fmt(forsteRefinansiering.totalKapital)}</div></div>
+            <div className="ep-next-item"><div className="lbl">Herav privat sparing</div><div className="val">{fmt(forsteRefinansiering.eksternKapital)}</div></div>
           </div>
           <p style={{ fontSize: '12px', color: '#6a7a6e', marginTop: '16px' }}>
             {visType === 'as'
