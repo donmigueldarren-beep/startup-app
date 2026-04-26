@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&display=swap');
@@ -109,19 +109,13 @@ function InputFelt({ label, value, onChange, step = 1000, suffix = 'kr', hint = 
   );
 }
 
-function EiendomGraf({ boligpris, nettoPrivat, nettoAS, renteAS, ekProsentAS, restKapitalPrivat, restKapitalAS }) {
+function EiendomGraf({ boligpris, nettoPrivat, nettoAS, ekProsentAS, restKapitalPrivat, restKapitalAS }) {
   const canvasRef = useRef(null);
   const chartRef = useRef(null);
   const [visType, setVisType] = useState('as');
   const [prisvekst, setPrisvekst] = useState(3);
   const [refiInfo, setRefiInfo] = useState(null);
   const [grafMetrics, setGrafMetrics] = useState({ bolig: 0, ek: 0, netto: 0 });
-  const visTypeRef = useRef('as');
-  const prisvekstRef = useRef(3);
-  const chartInitialized = useRef(false);
-
-  visTypeRef.current = visType;
-  prisvekstRef.current = prisvekst;
 
   function getEKKrav(y, erAS) {
     if (!erAS) return 0.10;
@@ -164,9 +158,9 @@ function EiendomGraf({ boligpris, nettoPrivat, nettoAS, renteAS, ekProsentAS, re
   }
 
   function lagChart() {
-    if (!window.Chart || !canvasRef.current || chartInitialized.current) return;
-    chartInitialized.current = true;
-    const d = beregnData(prisvekstRef.current, visTypeRef.current === 'as');
+    if (!window.Chart || !canvasRef.current) return;
+    if (chartRef.current) { chartRef.current.destroy(); }
+    const d = beregnData(prisvekst, visType === 'as');
     chartRef.current = new window.Chart(canvasRef.current, {
       type: 'line',
       data: {
@@ -195,7 +189,7 @@ function EiendomGraf({ boligpris, nettoPrivat, nettoAS, renteAS, ekProsentAS, re
 
   function oppdaterChart() {
     if (!chartRef.current) return;
-    const d = beregnData(prisvekstRef.current, visTypeRef.current === 'as');
+    const d = beregnData(prisvekst, visType === 'as');
     chartRef.current.data.labels = d.labels;
     chartRef.current.data.datasets[0].data = d.boligVerdier;
     chartRef.current.data.datasets[1].data = d.ekVerdier;
@@ -204,25 +198,17 @@ function EiendomGraf({ boligpris, nettoPrivat, nettoAS, renteAS, ekProsentAS, re
     oppdaterMetrics(d);
   }
 
-  if (!chartInitialized.current && canvasRef.current) {
-    if (window.Chart) {
-      lagChart();
-    } else {
-      const existing = document.querySelector('script[src*="Chart.js"]');
-      if (!existing) {
-        const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js';
-        script.onload = () => lagChart();
-        document.head.appendChild(script);
-      } else {
-        existing.addEventListener('load', () => lagChart());
-      }
-    }
-  }
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js';
+    script.onload = () => lagChart();
+    document.head.appendChild(script);
+    return () => { if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; } };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (chartRef.current) {
-    oppdaterChart();
-  }
+  useEffect(() => {
+    if (chartRef.current) oppdaterChart();
+  }, [visType, prisvekst, boligpris, nettoPrivat, nettoAS]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="ep-graf-wrap">
@@ -361,7 +347,6 @@ function EiendomPrognose({ boligpris, nettoPrivat, nettoAS, totPrivat, totAS, re
         boligpris={boligpris}
         nettoPrivat={nettoPrivat}
         nettoAS={nettoAS}
-        renteAS={renteAS}
         ekProsentAS={ekProsentAS}
         restKapitalPrivat={restKapitalPrivat}
         restKapitalAS={restKapitalAS}
