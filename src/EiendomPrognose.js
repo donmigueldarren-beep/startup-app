@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useRef } from 'react';
 
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&display=swap');
@@ -14,7 +14,7 @@ const styles = `
     --text: #1a2e1e;
     --muted: #5a6e5e;
   }
-  .ep-wrap { font-family: 'Inter', sans-serif; color: var(--text); margin-top: 12px; }
+  .ep-wrap { font-family: 'Inter', sans-serif; color: var(--text); }
   .ep-step { background: white; border: 1px solid var(--cream-dark); padding: 28px; margin-bottom: 12px; }
   .ep-step-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
   .ep-step-num { width: 28px; height: 28px; background: var(--brg); color: var(--cream); display: flex; align-items: center; justify-content: center; font-size: 12px; font-family: 'Playfair Display', serif; flex-shrink: 0; }
@@ -87,8 +87,14 @@ const styles = `
   .ep-no-refi { background: #fdf6e8; border-left: 3px solid var(--gold); padding: 12px 16px; font-size: 13px; color: #7a5a1e; margin-bottom: 20px; }
 `;
 
-function fmt(n) { return Math.round(n).toLocaleString('no-NO') + ' kr'; }
-function fmtMnd(n) { return (n >= 0 ? '+' : '') + Math.round(n).toLocaleString('no-NO') + ' kr'; }
+function fmt(n) {
+  if (n >= 1000000) return (n / 1000000).toFixed(1).replace('.', ',') + ' mill kr';
+  return Math.round(n / 1000) + ' 000 kr';
+}
+
+function fmtMnd(n) {
+  return (n >= 0 ? '+' : '') + Math.round(n).toLocaleString('no-NO') + ' kr';
+}
 
 function InputFelt({ label, value, onChange, step = 1000, suffix = 'kr', hint = '' }) {
   return (
@@ -110,6 +116,12 @@ function EiendomGraf({ boligpris, nettoPrivat, nettoAS, renteAS, ekProsentAS, re
   const [prisvekst, setPrisvekst] = useState(3);
   const [refiInfo, setRefiInfo] = useState(null);
   const [grafMetrics, setGrafMetrics] = useState({ bolig: 0, ek: 0, netto: 0 });
+  const visTypeRef = useRef('as');
+  const prisvekstRef = useRef(3);
+  const chartInitialized = useRef(false);
+
+  visTypeRef.current = visType;
+  prisvekstRef.current = prisvekst;
 
   function getEKKrav(y, erAS) {
     if (!erAS) return 0.10;
@@ -119,13 +131,13 @@ function EiendomGraf({ boligpris, nettoPrivat, nettoAS, renteAS, ekProsentAS, re
     return 0.15;
   }
 
-  const beregnData = useCallback((pv, erAS) => {
+  function beregnData(pv, erAS) {
     const nettoMnd = erAS ? nettoAS : nettoPrivat;
-    const ekStart = Math.max(0, erAS ? restKapitalAS : restKapitalPrivat);
+    const ekStart = erAS ? restKapitalAS : restKapitalPrivat;
     const labels = [], boligVerdier = [], ekVerdier = [], laanVerdier = [];
     let laan = boligpris * (erAS ? ekProsentAS / 100 : 0.90);
     let boligverdi = boligpris;
-    let akkNetto = ekStart;
+    let akkNetto = Math.max(0, ekStart);
     let forsteRefi = null;
     for (let y = 1; y <= 10; y++) {
       boligverdi *= (1 + pv / 100);
@@ -144,27 +156,17 @@ function EiendomGraf({ boligpris, nettoPrivat, nettoAS, renteAS, ekProsentAS, re
       laanVerdier.push(Math.round(laan));
     }
     return { labels, boligVerdier, ekVerdier, laanVerdier, akkNetto: Math.round(akkNetto), forsteRefi };
-  }, [boligpris, nettoPrivat, nettoAS, ekProsentAS, restKapitalPrivat, restKapitalAS]);
+  }
 
-  const oppdaterMetrics = useCallback((d) => {
+  function oppdaterMetrics(d) {
     setRefiInfo(d.forsteRefi);
     setGrafMetrics({ bolig: d.boligVerdier[9], ek: d.ekVerdier[9], netto: d.akkNetto });
-  }, []);
+  }
 
-  const oppdaterChart = useCallback(() => {
-    if (!chartRef.current) return;
-    const d = beregnData(prisvekst, visType === 'as');
-    chartRef.current.data.labels = d.labels;
-    chartRef.current.data.datasets[0].data = d.boligVerdier;
-    chartRef.current.data.datasets[1].data = d.ekVerdier;
-    chartRef.current.data.datasets[2].data = d.laanVerdier;
-    chartRef.current.update();
-    oppdaterMetrics(d);
-  }, [prisvekst, visType, beregnData, oppdaterMetrics]);
-
-  const initChart = useCallback(() => {
-    if (!window.Chart || !canvasRef.current) return;
-    const d = beregnData(prisvekst, visType === 'as');
+  function lagChart() {
+    if (!window.Chart || !canvasRef.current || chartInitialized.current) return;
+    chartInitialized.current = true;
+    const d = beregnData(prisvekstRef.current, visTypeRef.current === 'as');
     chartRef.current = new window.Chart(canvasRef.current, {
       type: 'line',
       data: {
@@ -189,20 +191,38 @@ function EiendomGraf({ boligpris, nettoPrivat, nettoAS, renteAS, ekProsentAS, re
       }
     });
     oppdaterMetrics(d);
-  }, [beregnData, oppdaterMetrics, prisvekst, visType]);
+  }
 
-  useEffect(() => {
-    if (!canvasRef.current) return;
-    const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js';
-    script.onload = () => initChart();
-    document.head.appendChild(script);
-    return () => { if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; } };
-  }, [initChart]);
+  function oppdaterChart() {
+    if (!chartRef.current) return;
+    const d = beregnData(prisvekstRef.current, visTypeRef.current === 'as');
+    chartRef.current.data.labels = d.labels;
+    chartRef.current.data.datasets[0].data = d.boligVerdier;
+    chartRef.current.data.datasets[1].data = d.ekVerdier;
+    chartRef.current.data.datasets[2].data = d.laanVerdier;
+    chartRef.current.update();
+    oppdaterMetrics(d);
+  }
 
-  useEffect(() => {
-    if (chartRef.current) oppdaterChart();
-  }, [oppdaterChart]);
+  if (!chartInitialized.current && canvasRef.current) {
+    if (window.Chart) {
+      lagChart();
+    } else {
+      const existing = document.querySelector('script[src*="Chart.js"]');
+      if (!existing) {
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js';
+        script.onload = () => lagChart();
+        document.head.appendChild(script);
+      } else {
+        existing.addEventListener('load', () => lagChart());
+      }
+    }
+  }
+
+  if (chartRef.current) {
+    oppdaterChart();
+  }
 
   return (
     <div className="ep-graf-wrap">
@@ -470,7 +490,7 @@ function EiendomPrognose({ boligpris, nettoPrivat, nettoAS, totPrivat, totAS, re
           <table className="ep-table">
             <thead>
               <tr>
-                <th>År</th><th>Boligverdi</th><th>Gjenstående lån</th><th>Egenkapital</th><th>Netto / år</th><th>Innskudd / år</th><th>Total kapital</th>
+                <th>År</th><th>Boligverdi</th><th>Gjenstående lån</th><th>Egenkapital</th><th>Netto / år</th><th>Total kapital</th>
                 {visType === 'as' && <th>EK-krav neste</th>}
                 <th>Kan refinansiere</th>
               </tr>
@@ -483,7 +503,6 @@ function EiendomPrognose({ boligpris, nettoPrivat, nettoAS, totPrivat, totAS, re
                   <td className="ep-red">{fmt(r.gjenvaerende)}</td>
                   <td className="ep-bold">{fmt(r.egenkapital)}</td>
                   <td className={r.aarligNetto >= 0 ? 'ep-green' : 'ep-red'}>{fmtMnd(r.aarligNetto)}</td>
-                  <td className="ep-green">+{fmt(visType === 'privat' ? arligInnskuddPrivat : arligInnskuddAS)}</td>
                   <td className="ep-bold">{fmt(r.totalKapital)}</td>
                   {visType === 'as' && <td><span className="ep-badge blue">{Math.round(r.ekKravNeste * 100)}%</span></td>}
                   <td>
@@ -510,20 +529,6 @@ function EiendomPrognose({ boligpris, nettoPrivat, nettoAS, totPrivat, totAS, re
             <div className="ep-next-item"><div className="lbl">Total kapital akkumulert</div><div className="val">{fmt(forsteRefinansiering.totalKapital)}</div></div>
             <div className="ep-next-item"><div className="lbl">Herav privat sparing</div><div className="val">{fmt(forsteRefinansiering.eksternKapital)}</div></div>
           </div>
-          <p style={{ fontSize: '12px', color: '#6a7a6e', marginTop: '16px' }}>
-            {visType === 'as'
-              ? `AS med ${forsteRefinansiering.aar} års historikk får estimert ${Math.round(forsteRefinansiering.ekKravNeste * 100)}% EK-krav og ${forsteRefinansiering.renteNeste.toFixed(1)}% rente på neste lån.`
-              : 'Refinansiering beregnet ved 75% belåningsgrad. Faktisk godkjenning avhenger av banken.'
-            }
-          </p>
-        </div>
-      )}
-
-      {!forsteRefinansiering && (
-        <div className="ep-step">
-          <p style={{ fontSize: '14px', color: 'var(--muted)', fontStyle: 'italic' }}>
-            Med disse tallene er ikke refinansiering mulig innen 10 år. Prøv å øke prisvekst, oppussingsverdi eller månedssparing.
-          </p>
         </div>
       )}
 
