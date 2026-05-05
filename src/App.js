@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import EiendomKalkulator from './EiendomKalkulator';
 import BilKalkulator from './BilKalkulator';
 import SalongKalkulator from './SalongKalkulator';
@@ -137,8 +138,8 @@ const bransjer = [
     id: 'bil', num: '02', navn: 'Bilutleie',
     desc: 'Fra enkeltbil til flåte, finn break-even og avkastning på kapitalen.',
     tags: ['Flåte', 'ROI', 'Break-even'],
-    img: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&q=80',
-    kalkulatorImg: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=1200&q=80',
+    img: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=80',
+    kalkulatorImg: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1200&q=80',
     coming: false
   },
   {
@@ -361,6 +362,7 @@ export default function App() {
         <div className="footer-logo">Startup<em>Smart</em></div>
         <div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning. Konsulter en regnskapsfører.</div>
       </footer>
+      <Analytics />
     </div>
   );
 }
