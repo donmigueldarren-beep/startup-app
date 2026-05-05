@@ -382,6 +382,7 @@ export default function App() {
         <div className="footer-logo">Startup<em>Smart</em></div>
         <div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning. Konsulter en regnskapsfører.</div>
       </footer>
+      <Analytics />
     </div>
   );
 }
