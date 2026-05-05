@@ -25,8 +25,14 @@ const styles = `
   .app { font-family: 'Inter', sans-serif; background: var(--cream); min-height: 100vh; color: var(--text); }
 
   .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: var(--dark); padding: 16px 48px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1a2e1e; }
-  .nav-logo { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--cream); letter-spacing: 0.02em; cursor: pointer; }
-  .nav-logo em { font-style: italic; color: var(--gold); }
+  .nav-logo { display: flex; align-items: center; gap: 14px; cursor: pointer; }
+  .nav-logo-icon { position: relative; width: 36px; height: 36px; }
+  .nav-logo-d { font-family: 'Playfair Display', serif; font-size: 40px; font-weight: 700; color: var(--gold); opacity: 0.12; position: absolute; top: -4px; left: 2px; line-height: 1; pointer-events: none; }
+  .nav-logo-a { font-family: 'Playfair Display', serif; font-size: 40px; font-weight: 700; color: var(--gold); position: absolute; top: -4px; left: 0; line-height: 1; }
+  .nav-logo-text { display: flex; flex-direction: column; gap: 2px; }
+  .nav-logo-name { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; color: var(--cream); letter-spacing: 0.2em; text-transform: uppercase; line-height: 1; }
+  .nav-logo-sub { font-family: 'Inter', sans-serif; font-size: 7px; color: #3a6a46; letter-spacing: 0.16em; text-transform: uppercase; line-height: 1; }
+  .nav-logo-by { font-family: 'Inter', sans-serif; font-size: 6px; color: #2a3a2e; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1; margin-top: 1px; }
   .nav-links { display: flex; gap: 28px; }
   .nav-link { font-size: 11px; color: #6a8a6e; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: color 0.2s; }
   .nav-link:hover { color: var(--cream); }
@@ -122,10 +128,42 @@ const styles = `
   .kalkulator-hero-title { font-family: 'Playfair Display', serif; font-size: 44px; color: var(--cream); }
 
   footer { border-top: 1px solid #1a2e1e; padding: 28px 80px; display: flex; justify-content: space-between; align-items: center; background: var(--dark2); }
-  .footer-logo { font-family: 'Playfair Display', serif; font-size: 15px; color: var(--cream); }
-  .footer-logo em { color: var(--gold); font-style: italic; }
+  .footer-logo { display: flex; align-items: center; gap: 12px; }
+  .footer-logo-icon { position: relative; width: 28px; height: 28px; }
+  .footer-logo-d { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 700; color: var(--gold); opacity: 0.1; position: absolute; top: -3px; left: 2px; line-height: 1; }
+  .footer-logo-a { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 700; color: var(--gold); position: absolute; top: -3px; left: 0; line-height: 1; }
+  .footer-logo-text { display: flex; flex-direction: column; gap: 2px; }
+  .footer-logo-name { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500; color: var(--cream); letter-spacing: 0.18em; text-transform: uppercase; }
+  .footer-logo-by { font-family: 'Inter', sans-serif; font-size: 6px; color: #2a3a2e; letter-spacing: 0.12em; text-transform: uppercase; }
   .footer-disclaimer { font-size: 11px; color: #2a3a2e; max-width: 400px; text-align: right; }
 `;
+
+const NavLogo = ({ onClick }) => (
+  <div className="nav-logo" onClick={onClick}>
+    <div className="nav-logo-icon">
+      <span className="nav-logo-d">D</span>
+      <span className="nav-logo-a">A</span>
+    </div>
+    <div className="nav-logo-text">
+      <span className="nav-logo-name">Invest Tools</span>
+      <span className="nav-logo-sub">Professional Investment Analysis</span>
+      <span className="nav-logo-by">by ADDON</span>
+    </div>
+  </div>
+);
+
+const FooterLogo = () => (
+  <div className="footer-logo">
+    <div className="footer-logo-icon">
+      <span className="footer-logo-d">D</span>
+      <span className="footer-logo-a">A</span>
+    </div>
+    <div className="footer-logo-text">
+      <span className="footer-logo-name">Invest Tools</span>
+      <span className="footer-logo-by">by ADDON</span>
+    </div>
+  </div>
+);
 
 const bransjer = [
   {
@@ -198,7 +236,7 @@ export default function App() {
       <div className="app">
         <style>{styles}</style>
         <nav className="nav">
-          <div className="nav-logo" onClick={gaaHjem}>Startup<em>Smart</em></div>
+          <NavLogo onClick={gaaHjem} />
           <div className="nav-links">
             <span className="nav-link" onClick={gaaHjem}>Hjem</span>
             <span className="nav-link" onClick={() => { gaaHjem(); setTimeout(() => document.getElementById('bransjer')?.scrollIntoView({ behavior: 'smooth' }), 300); }}>Bransjer</span>
@@ -214,9 +252,9 @@ export default function App() {
           </div>
         </div>
         <div className="om-oss-body">
-          <p className="om-oss-tekst">StartupSmart ble til fordi vi selv opplevde hvor vanskelig det er å finne ærlige, konkrete tall når man vurderer en ny bedriftsidé. Informasjonen finnes, men den er spredt, utdatert og sjelden tilpasset din situasjon.</p>
+          <p className="om-oss-tekst">Invest Tools ble til fordi vi selv opplevde hvor vanskelig det er å finne ærlige, konkrete tall når man vurderer en ny bedriftsidé. Informasjonen finnes, men den er spredt, utdatert og sjelden tilpasset din situasjon.</p>
           <p className="om-oss-tekst">Vi tror at alle som vurderer å starte noe nytt fortjener de samme kvalitetstallene som profesjonelle investorer og revisorer bruker, uten å måtte betale for en konsultasjon først.</p>
-          <p className="om-oss-tekst">StartupSmart er gratis, konfidensielt og alltid oppdatert med gjeldende norske regler og satser.</p>
+          <p className="om-oss-tekst">Invest Tools er gratis, konfidensielt og alltid oppdatert med gjeldende norske regler og satser.</p>
           <div className="om-oss-sitat">Dette er ikke finansiell rådgivning, men det er et godt sted å starte.</div>
           <div className="om-oss-verdier">
             {[
@@ -241,12 +279,12 @@ export default function App() {
             </div>
             <div>
               <div style={{ fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9fc9a8', marginBottom: '8px' }}>Send oss en e-post</div>
-              <a href="mailto:kontakt@startupsmart.no" className="om-oss-kontakt-epost">kontakt@startupsmart.no</a>
+              <a href="mailto:kontakt@addoninvest.no" className="om-oss-kontakt-epost">kontakt@addoninvest.no</a>
             </div>
           </div>
         </div>
         <footer>
-          <div className="footer-logo">Startup<em>Smart</em></div>
+          <FooterLogo />
           <div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning.</div>
         </footer>
       </div>
@@ -258,7 +296,7 @@ export default function App() {
       <div className="app">
         <style>{styles}</style>
         <nav className="nav">
-          <div className="nav-logo" onClick={gaaHjem}>Startup<em>Smart</em></div>
+          <NavLogo onClick={gaaHjem} />
           <div className="nav-links">
             <span className="nav-link" onClick={gaaHjem}>Hjem</span>
             <span className="nav-link" onClick={() => setSide('om-oss')}>Om oss</span>
@@ -282,7 +320,7 @@ export default function App() {
           {aktivBransje.id === 'salong' && <SalongKalkulator />}
         </div>
         <footer>
-          <div className="footer-logo">Startup<em>Smart</em></div>
+          <FooterLogo />
           <div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning.</div>
         </footer>
       </div>
@@ -293,7 +331,7 @@ export default function App() {
     <div className="app">
       <style>{styles}</style>
       <nav className="nav">
-        <div className="nav-logo" onClick={gaaHjem}>Startup<em>Smart</em></div>
+        <NavLogo onClick={gaaHjem} />
         <div className="nav-links">
           <span className="nav-link" onClick={() => document.getElementById('bransjer')?.scrollIntoView({ behavior: 'smooth' })}>Bransjer</span>
           <span className="nav-link" onClick={() => setSide('om-oss')}>Om oss</span>
@@ -307,7 +345,7 @@ export default function App() {
         <div className="hero-content">
           <div className="hero-tag">Gratis beslutningsverktøy</div>
           <h1 className="hero-title">Finn ut om ideen din<br /><em>faktisk</em> er lønnsom</h1>
-          <p className="hero-sub">StartupSmart gir deg tallene du trenger før du investerer tid og penger i din neste bedrift.</p>
+          <p className="hero-sub">Invest Tools gir deg tallene du trenger før du investerer tid og penger i din neste bedrift.</p>
           <div className="hero-btns">
             <button className="btn-primary" onClick={() => aapneBransje(bransjer[0])}>Start beregning</button>
             <button className="btn-secondary" onClick={() => document.getElementById('bransjer')?.scrollIntoView({ behavior: 'smooth' })}>Se alle bransjer</button>
@@ -356,7 +394,7 @@ export default function App() {
           <div className="hvorfor-img-frame"></div>
         </div>
         <div className="hvorfor-content">
-          <div className="hvorfor-tag">Hvorfor StartupSmart</div>
+          <div className="hvorfor-tag">Hvorfor Invest Tools</div>
           <h2 className="hvorfor-title">Bygget av en gründer,<br />for <em>gründere</em></h2>
           <div className="hvorfor-items">
             {[
@@ -364,7 +402,7 @@ export default function App() {
               { tittel: 'Oppdatert informasjon', desc: 'Gjeldende skatteregler, renter og lovkrav.' },
               { tittel: 'Konkrete anbefalinger', desc: 'Ikke bare tall, men hva som lønner seg for deg.' },
               { tittel: 'Langsiktig perspektiv', desc: 'Se porteføljen vokse over 10 år.' },
-              { tittel: 'Ta kontakt', desc: 'Mangler din bransje? Send oss en e-post på kontakt@startupsmart.no' }
+              { tittel: 'Ta kontakt', desc: 'Mangler din bransje? Send oss en e-post på kontakt@addoninvest.no' }
             ].map((p, i) => (
               <div className="hvorfor-item" key={i}>
                 <div className="hvorfor-dot"></div>
@@ -379,7 +417,7 @@ export default function App() {
       </section>
 
       <footer>
-        <div className="footer-logo">Startup<em>Smart</em></div>
+        <FooterLogo />
         <div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning. Konsulter en regnskapsfører.</div>
       </footer>
       <Analytics />
