@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Analytics } from '@vercel/analytics/react';
-import EiendomKalkulator from './EiendomKalkulator';
+import EiendomPrivat from './EiendomPrivat';
+import EiendomAS from './EiendomAS';
+import EiendomSammenlign from './EiendomSammenlign';
 import BilKalkulator from './BilKalkulator';
 import SalongKalkulator from './SalongKalkulator';
 import './App.css';
@@ -127,23 +129,39 @@ const styles = `
 
 const bransjer = [
   {
-    id: 'eiendom', num: '01', navn: 'Eiendomsutleie',
-    desc: 'Sammenlign privat kjøp vs AS, BRRR-strategi og porteføljevekst over tid.',
-    tags: ['Utleie', 'BRRR', 'AS vs privat'],
+    id: 'eiendom-privat', num: '01', navn: 'Eiendom privat',
+    desc: 'Kjøp utleiebolig i eget navn. Lavere terskel, enklere oppstart.',
+    tags: ['Utleie', 'Boliglån', 'Kontantstrøm'],
     img: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80',
     kalkulatorImg: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&q=80',
     coming: false
   },
   {
-    id: 'bil', num: '02', navn: 'Bilutleie',
-    desc: 'Fra enkeltbil til flåte, finn break-even og avkastning på kapitalen.',
-    tags: ['Flåte', 'ROI', 'Break-even'],
-    img: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&q=80',
-    kalkulatorImg: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1200&q=80',
+    id: 'eiendom-as', num: '02', navn: 'Eiendom via AS',
+    desc: 'Kjøp via aksjeselskap. Bedre for portefølje og reinvestering av overskudd.',
+    tags: ['AS', 'Næringslån', 'Portefølje'],
+    img: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80',
+    kalkulatorImg: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80',
     coming: false
   },
   {
-    id: 'salong', num: '03', navn: 'Salong',
+    id: 'eiendom-sammenlign', num: '03', navn: 'Privat vs AS',
+    desc: 'Sammenlign begge alternativene side om side med dine egne tall.',
+    tags: ['Sammenligning', 'AS vs privat', 'Analyse'],
+    img: 'https://images.unsplash.com/photo-1554469384-e58fac16e23a?w=800&q=80',
+    kalkulatorImg: 'https://images.unsplash.com/photo-1554469384-e58fac16e23a?w=1200&q=80',
+    coming: false
+  },
+  {
+    id: 'bil', num: '04', navn: 'Bilutleie',
+    desc: 'Fra enkeltbil til flåte, finn break-even og avkastning på kapitalen.',
+    tags: ['Flåte', 'ROI', 'Break-even'],
+    img: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&q=80',
+    kalkulatorImg: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=1200&q=80',
+    coming: false
+  },
+  {
+    id: 'salong', num: '05', navn: 'Salong',
     desc: 'Frisør, negler, hudpleie, finn lønnsomheten før du signerer leiekontrakten.',
     tags: ['Frisør', 'Negler', 'Break-even'],
     img: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&q=80',
@@ -151,7 +169,7 @@ const bransjer = [
     coming: false
   },
   {
-    id: 'korttid', num: '04', navn: 'Korttidsutleie',
+    id: 'korttid', num: '06', navn: 'Korttidsutleie',
     desc: 'Airbnb og korttidsutleie, sammenlign mot langtidsleie og finn beste strategi.',
     tags: ['Airbnb', 'Sesong'],
     img: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80',
@@ -257,7 +275,9 @@ export default function App() {
               <div className="kalkulator-hero-title">{aktivBransje.navn}</div>
             </div>
           </div>
-          {aktivBransje.id === 'eiendom' && <EiendomKalkulator />}
+          {aktivBransje.id === 'eiendom-privat' && <EiendomPrivat />}
+          {aktivBransje.id === 'eiendom-as' && <EiendomAS />}
+          {aktivBransje.id === 'eiendom-sammenlign' && <EiendomSammenlign />}
           {aktivBransje.id === 'bil' && <BilKalkulator />}
           {aktivBransje.id === 'salong' && <SalongKalkulator />}
         </div>
@@ -295,7 +315,7 @@ export default function App() {
         </div>
         <div className="hero-scroll">↓ Scroll</div>
         <div className="hero-stats">
-          {[{ num: '3', lbl: 'Bransjer' }, { num: '0 kr', lbl: 'Kostnad' }, { num: '100%', lbl: 'Konfidensielt' }].map((s, i) => (
+          {[{ num: '5', lbl: 'Bransjer' }, { num: '0 kr', lbl: 'Kostnad' }, { num: '100%', lbl: 'Konfidensielt' }].map((s, i) => (
             <div className="hero-stat" key={i}>
               <span className="hero-stat-num">{s.num}</span>
               <span className="hero-stat-lbl">{s.lbl}</span>
@@ -308,7 +328,7 @@ export default function App() {
         <div className="section-tag">Velg bransje</div>
         <div className="section-title">Hva vil du starte?</div>
         <div className="bransje-grid">
-          {bransjer.slice(0, 3).map(b => (
+          {bransjer.map(b => (
             <div key={b.id} className={`bransje-card ${b.coming ? 'coming' : ''}`} onClick={() => aapneBransje(b)}>
               <div className="bransje-img-wrap">
                 <img className="bransje-img" src={b.img} alt={b.navn} />
@@ -362,7 +382,6 @@ export default function App() {
         <div className="footer-logo">Startup<em>Smart</em></div>
         <div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning. Konsulter en regnskapsfører.</div>
       </footer>
-      <Analytics />
     </div>
   );
 }
