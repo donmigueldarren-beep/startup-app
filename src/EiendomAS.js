@@ -138,7 +138,6 @@ export default function EiendomAS() {
   const restKapital = Math.max(0, kapital - tot);
 
   const getEKKrav = (y) => { if (y <= 2) return 0.30; if (y <= 4) return 0.25; if (y <= 7) return 0.20; return 0.15; };
-  const getRente = (y) => { if (y <= 2) return rente; if (y <= 4) return rente - 0.3; if (y <= 7) return rente - 0.5; return rente - 0.7; };
 
   const rader = (() => {
     const res = [];
