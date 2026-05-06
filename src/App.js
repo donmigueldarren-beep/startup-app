@@ -24,8 +24,8 @@ const styles = `
   }
   .app { font-family: 'Inter', sans-serif; background: var(--cream); min-height: 100vh; color: var(--text); }
 
-  .side-innhold { animation: fadeIn 0.3s ease-in-out; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .side-innhold { animation: slideOpp 0.4s cubic-bezier(0.4,0,0.2,1); }
+  @keyframes slideOpp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
   .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: var(--dark); padding: 16px 48px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1a2e1e; }
   .nav-logo { display: flex; align-items: center; gap: 14px; cursor: pointer; }
@@ -237,11 +237,13 @@ function getBransjeFromUrl() {
 export default function App() {
   const [side, setSide] = useState(getSideFromUrl);
   const [aktivBransje, setAktivBransje] = useState(getBransjeFromUrl);
+  const [animKey, setAnimKey] = useState(0);
 
   useEffect(() => {
     const handlePop = () => {
       setSide(getSideFromUrl());
       setAktivBransje(getBransjeFromUrl());
+      setAnimKey(k => k + 1);
       window.scrollTo({ top: 0 });
     };
     window.addEventListener('popstate', handlePop);
@@ -252,6 +254,7 @@ export default function App() {
     if (bransje.coming) return;
     setAktivBransje(bransje);
     setSide('kalkulator');
+    setAnimKey(k => k + 1);
     window.history.pushState({}, '', `/kalkulator/${bransje.id}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -259,12 +262,14 @@ export default function App() {
   const gaaHjem = () => {
     setSide('hjem');
     setAktivBransje(null);
+    setAnimKey(k => k + 1);
     window.history.pushState({}, '', '/');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const gaaOmOss = () => {
     setSide('om-oss');
+    setAnimKey(k => k + 1);
     window.history.pushState({}, '', '/om-oss');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -282,7 +287,7 @@ export default function App() {
           </div>
           <button className="nav-cta" onClick={() => aapneBransje(bransjer[0])}>Kom i gang</button>
         </nav>
-        <div className="side-innhold">
+        <div className="side-innhold" key={animKey}>
           <div className="om-oss-hero">
             <div className="om-oss-hero-accent"></div>
             <div className="om-oss-inner">
@@ -343,7 +348,7 @@ export default function App() {
           </div>
           <button className="nav-cta" onClick={gaaHjem}>Alle bransjer</button>
         </nav>
-        <div className="side-innhold">
+        <div className="side-innhold" key={animKey}>
           <div className="kalkulator-view">
             <button className="kalkulator-back" onClick={gaaHjem}>← Tilbake</button>
             <div className="kalkulator-hero">
@@ -381,7 +386,7 @@ export default function App() {
         <button className="nav-cta" onClick={() => aapneBransje(bransjer[0])}>Kom i gang</button>
       </nav>
 
-      <div className="side-innhold">
+      <div className="side-innhold" key={animKey}>
         <section className="hero">
           <div className="hero-bg" id="hero-bg"></div>
           <div className="hero-overlay"></div>
