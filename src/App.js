@@ -390,7 +390,7 @@ export default function App() {
 
       <section className="hvorfor-section">
         <div className="hvorfor-img-wrap">
-          <img className="hvorfor-img" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80" alt="Gründer" />
+          <img className="hvorfor-img" src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80" alt="Investor med finansdata" />
           <div className="hvorfor-img-frame"></div>
         </div>
         <div className="hvorfor-content">
