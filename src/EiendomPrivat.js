@@ -114,22 +114,29 @@ function InputFelt({ label, value, onChange, step = 1000, suffix = 'kr', hint = 
 }
 
 async function kallClaude(meldinger) {
-  const svar = await fetch('/api/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
-      system: `Du er en norsk eiendomsinvesteringsrådgiver hos Invest Tools by ADDON.
+  try {
+    const svar = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: `Du er en norsk eiendomsinvesteringsrådgiver hos Invest Tools by ADDON.
 Du gir konkrete, ærlige råd om eiendomsinvestering i privat regi i Norge.
 Svar alltid på norsk. Vær direkte og konkret. Ikke bruk finansielle klisjeer.
 Aldri si at du er en AI. Presenter deg som Invest Tools-rådgiver.
 Hold svar under 200 ord med mindre brukeren ber om mer.`,
-      messages: meldinger
-    })
-  });
-  const data = await svar.json();
-  return data.content[0].text;
+        messages: meldinger
+      })
+    });
+    console.log('Status:', svar.status);
+    const data = await svar.json();
+    console.log('Data:', JSON.stringify(data));
+    return data.content[0].text;
+  } catch (e) {
+    console.error('Feil:', e);
+    throw e;
+  }
 }
 
 function AIAssistent({ tall }) {
