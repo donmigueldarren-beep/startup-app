@@ -47,6 +47,9 @@ const styles = `
   .ep-hint { font-size: 11px; color: var(--muted); margin-top: 4px; font-style: italic; }
   .ep-kapital-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
   .ep-kapital-box { background: var(--cream); border: 1px solid var(--cream-dark); padding: 20px; margin-bottom: 20px; }
+  .ep-restkapital-banner { background: var(--brg-pale); border: 1px solid var(--brg); padding: 12px 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+  .ep-restkapital-lbl { font-size: 12px; color: var(--brg); font-weight: 500; }
+  .ep-restkapital-val { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--brg); }
   .ep-table { width: 100%; border-collapse: collapse; font-size: 13px; }
   .ep-table th { text-align: left; padding: 8px 12px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); border-bottom: 1px solid var(--cream-dark); font-weight: 500; }
   .ep-table td { padding: 10px 12px; border-bottom: 1px solid var(--cream-dark); }
@@ -121,7 +124,7 @@ export default function EiendomAS() {
   const [regnskapKost, setRegnskapKost] = useState(10000);
   const [prisvekst, setPrisvekst] = useState(3);
   const [oppussing, setOppussing] = useState(0);
-  const [maanedligSparing, setMaanedligSparing] = useState(10000);
+  const [maanedligSparing, setMaanedligSparing] = useState(0);
 
   const fmtK = (n) => Math.round(n).toLocaleString('no-NO') + ' kr';
   const fmtMndK = (n) => (n >= 0 ? '+' : '') + Math.round(n).toLocaleString('no-NO') + ' kr/mnd';
@@ -293,13 +296,19 @@ export default function EiendomAS() {
           <div style={{fontSize:'12px', fontWeight:'500', color:'var(--dark)', marginBottom:'12px'}}>Forutsetninger for prognosen</div>
           <div className="ep-kapital-grid">
             <InputFelt label="Oppussing" value={oppussing} onChange={setOppussing} hint="Øker boligverdi fra start" />
-            <InputFelt label="Månedlig sparing" value={maanedligSparing} onChange={setMaanedligSparing} suffix="kr/mnd" hint="Skytes inn i AS" />
+            <InputFelt label="Ekstra månedlig sparing" value={maanedligSparing} onChange={setMaanedligSparing} suffix="kr/mnd" hint="Utover leieinntekt" />
             <div>
               <label className="ep-label">Prisvekst: {prisvekst}%</label>
               <input type="range" min="0" max="8" step="0.5" value={prisvekst} onChange={e => setPrisvekst(+e.target.value)} style={{width:'100%', accentColor:'var(--brg)', marginTop:'8px', display:'block'}} />
             </div>
           </div>
         </div>
+        {harRaad && restKapital > 0 && (
+          <div className="ep-restkapital-banner">
+            <span className="ep-restkapital-lbl">Restkapital inkludert som startkapital i prognosen</span>
+            <span className="ep-restkapital-val">{fmtK(restKapital)}</span>
+          </div>
+        )}
         <div style={{overflowX:'auto'}}>
           <table className="ep-table">
             <thead>
