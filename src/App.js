@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Analytics } from '@vercel/analytics/react';
 import EiendomPrivat from './EiendomPrivat';
 import EiendomAS from './EiendomAS';
@@ -23,6 +23,9 @@ const styles = `
     --muted: #5a6e5e;
   }
   .app { font-family: 'Inter', sans-serif; background: var(--cream); min-height: 100vh; color: var(--text); }
+
+  .side-innhold { animation: fadeIn 0.3s ease-in-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
   .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: var(--dark); padding: 16px 48px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1a2e1e; }
   .nav-logo { display: flex; align-items: center; gap: 14px; cursor: pointer; }
@@ -215,19 +218,54 @@ const bransjer = [
   }
 ];
 
+function getSideFromUrl() {
+  const path = window.location.pathname;
+  if (path === '/om-oss') return 'om-oss';
+  if (path.startsWith('/kalkulator/')) return 'kalkulator';
+  return 'hjem';
+}
+
+function getBransjeFromUrl() {
+  const path = window.location.pathname;
+  if (path.startsWith('/kalkulator/')) {
+    const id = path.replace('/kalkulator/', '');
+    return bransjer.find(b => b.id === id) || null;
+  }
+  return null;
+}
+
 export default function App() {
-  const [side, setSide] = useState('hjem');
-  const [aktivBransje, setAktivBransje] = useState(null);
+  const [side, setSide] = useState(getSideFromUrl);
+  const [aktivBransje, setAktivBransje] = useState(getBransjeFromUrl);
+
+  useEffect(() => {
+    const handlePop = () => {
+      setSide(getSideFromUrl());
+      setAktivBransje(getBransjeFromUrl());
+      window.scrollTo({ top: 0 });
+    };
+    window.addEventListener('popstate', handlePop);
+    return () => window.removeEventListener('popstate', handlePop);
+  }, []);
 
   const aapneBransje = (bransje) => {
     if (bransje.coming) return;
     setAktivBransje(bransje);
     setSide('kalkulator');
+    window.history.pushState({}, '', `/kalkulator/${bransje.id}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const gaaHjem = () => {
     setSide('hjem');
+    setAktivBransje(null);
+    window.history.pushState({}, '', '/');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const gaaOmOss = () => {
+    setSide('om-oss');
+    window.history.pushState({}, '', '/om-oss');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -244,49 +282,51 @@ export default function App() {
           </div>
           <button className="nav-cta" onClick={() => aapneBransje(bransjer[0])}>Kom i gang</button>
         </nav>
-        <div className="om-oss-hero">
-          <div className="om-oss-hero-accent"></div>
-          <div className="om-oss-inner">
-            <div className="om-oss-tag">Om oss</div>
-            <h1 className="om-oss-title">Bygget av en gründer<br />for gründere</h1>
+        <div className="side-innhold">
+          <div className="om-oss-hero">
+            <div className="om-oss-hero-accent"></div>
+            <div className="om-oss-inner">
+              <div className="om-oss-tag">Om oss</div>
+              <h1 className="om-oss-title">Bygget av en gründer<br />for gründere</h1>
+            </div>
           </div>
-        </div>
-        <div className="om-oss-body">
-          <p className="om-oss-tekst">Invest Tools ble til fordi vi selv opplevde hvor vanskelig det er å finne ærlige, konkrete tall når man vurderer en ny bedriftsidé. Informasjonen finnes, men den er spredt, utdatert og sjelden tilpasset din situasjon.</p>
-          <p className="om-oss-tekst">Vi tror at alle som vurderer å starte noe nytt fortjener de samme kvalitetstallene som profesjonelle investorer og revisorer bruker, uten å måtte betale for en konsultasjon først.</p>
-          <p className="om-oss-tekst">Invest Tools er gratis, konfidensielt og alltid oppdatert med gjeldende norske regler og satser.</p>
-          <div className="om-oss-sitat">Dette er ikke finansiell rådgivning, men det er et godt sted å starte.</div>
-          <div className="om-oss-verdier">
-            {[
-              { num: '01', tittel: 'Ærlig', desc: 'Vi viser deg de reelle tallene, ikke de optimistiske.' },
-              { num: '02', tittel: 'Konfidensielt', desc: 'Tallene du legger inn forblir hos deg. Vi lagrer ingenting.' },
-              { num: '03', tittel: 'Oppdatert', desc: 'Vi holder kalkulatorene oppdaterte med gjeldende regler.' }
-            ].map((v, i) => (
-              <div className="om-oss-verdi" key={i}>
-                <div className="om-oss-verdi-num">{v.num}</div>
-                <div className="om-oss-verdi-title">{v.tittel}</div>
-                <div className="om-oss-verdi-desc">{v.desc}</div>
+          <div className="om-oss-body">
+            <p className="om-oss-tekst">Invest Tools ble til fordi vi selv opplevde hvor vanskelig det er å finne ærlige, konkrete tall når man vurderer en ny bedriftsidé. Informasjonen finnes, men den er spredt, utdatert og sjelden tilpasset din situasjon.</p>
+            <p className="om-oss-tekst">Vi tror at alle som vurderer å starte noe nytt fortjener de samme kvalitetstallene som profesjonelle investorer og revisorer bruker, uten å måtte betale for en konsultasjon først.</p>
+            <p className="om-oss-tekst">Invest Tools er gratis, konfidensielt og alltid oppdatert med gjeldende norske regler og satser.</p>
+            <div className="om-oss-sitat">Dette er ikke finansiell rådgivning, men det er et godt sted å starte.</div>
+            <div className="om-oss-verdier">
+              {[
+                { num: '01', tittel: 'Ærlig', desc: 'Vi viser deg de reelle tallene, ikke de optimistiske.' },
+                { num: '02', tittel: 'Konfidensielt', desc: 'Tallene du legger inn forblir hos deg. Vi lagrer ingenting.' },
+                { num: '03', tittel: 'Oppdatert', desc: 'Vi holder kalkulatorene oppdaterte med gjeldende regler.' }
+              ].map((v, i) => (
+                <div className="om-oss-verdi" key={i}>
+                  <div className="om-oss-verdi-num">{v.num}</div>
+                  <div className="om-oss-verdi-title">{v.tittel}</div>
+                  <div className="om-oss-verdi-desc">{v.desc}</div>
+                </div>
+              ))}
+            </div>
+            <button className="btn-primary" onClick={() => aapneBransje(bransjer[0])}>Start beregning</button>
+          </div>
+          <div className="om-oss-kontakt">
+            <div className="om-oss-kontakt-inner">
+              <div>
+                <div className="om-oss-kontakt-title">Mangler din bransje?</div>
+                <div className="om-oss-kontakt-desc">Ta kontakt hvis du ønsker en kalkulator for en bransje som ikke er her ennå.</div>
               </div>
-            ))}
-          </div>
-          <button className="btn-primary" onClick={() => aapneBransje(bransjer[0])}>Start beregning</button>
-        </div>
-        <div className="om-oss-kontakt">
-          <div className="om-oss-kontakt-inner">
-            <div>
-              <div className="om-oss-kontakt-title">Mangler din bransje?</div>
-              <div className="om-oss-kontakt-desc">Ta kontakt hvis du ønsker en kalkulator for en bransje som ikke er her ennå.</div>
-            </div>
-            <div>
-              <div style={{ fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9fc9a8', marginBottom: '8px' }}>Send oss en e-post</div>
-              <a href="mailto:kontakt@addoninvest.no" className="om-oss-kontakt-epost">kontakt@addoninvest.no</a>
+              <div>
+                <div style={{ fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9fc9a8', marginBottom: '8px' }}>Send oss en e-post</div>
+                <a href="mailto:kontakt@addoninvest.no" className="om-oss-kontakt-epost">kontakt@addoninvest.no</a>
+              </div>
             </div>
           </div>
+          <footer>
+            <FooterLogo />
+            <div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning.</div>
+          </footer>
         </div>
-        <footer>
-          <FooterLogo />
-          <div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning.</div>
-        </footer>
       </div>
     );
   }
@@ -299,30 +339,32 @@ export default function App() {
           <NavLogo onClick={gaaHjem} />
           <div className="nav-links">
             <span className="nav-link" onClick={gaaHjem}>Hjem</span>
-            <span className="nav-link" onClick={() => setSide('om-oss')}>Om oss</span>
+            <span className="nav-link" onClick={gaaOmOss}>Om oss</span>
           </div>
           <button className="nav-cta" onClick={gaaHjem}>Alle bransjer</button>
         </nav>
-        <div className="kalkulator-view">
-          <button className="kalkulator-back" onClick={gaaHjem}>← Tilbake</button>
-          <div className="kalkulator-hero">
-            <div className="kalkulator-hero-bg" style={{ backgroundImage: `url('${aktivBransje.kalkulatorImg}')` }}></div>
-            <div className="kalkulator-hero-overlay"></div>
-            <div className="kalkulator-hero-content">
-              <div className="kalkulator-hero-tag">Kalkulator</div>
-              <div className="kalkulator-hero-title">{aktivBransje.navn}</div>
+        <div className="side-innhold">
+          <div className="kalkulator-view">
+            <button className="kalkulator-back" onClick={gaaHjem}>← Tilbake</button>
+            <div className="kalkulator-hero">
+              <div className="kalkulator-hero-bg" style={{ backgroundImage: `url('${aktivBransje.kalkulatorImg}')` }}></div>
+              <div className="kalkulator-hero-overlay"></div>
+              <div className="kalkulator-hero-content">
+                <div className="kalkulator-hero-tag">Kalkulator</div>
+                <div className="kalkulator-hero-title">{aktivBransje.navn}</div>
+              </div>
             </div>
+            {aktivBransje.id === 'eiendom-privat' && <EiendomPrivat />}
+            {aktivBransje.id === 'eiendom-as' && <EiendomAS />}
+            {aktivBransje.id === 'eiendom-sammenlign' && <EiendomSammenlign />}
+            {aktivBransje.id === 'bil' && <BilKalkulator />}
+            {aktivBransje.id === 'salong' && <SalongKalkulator />}
           </div>
-          {aktivBransje.id === 'eiendom-privat' && <EiendomPrivat />}
-          {aktivBransje.id === 'eiendom-as' && <EiendomAS />}
-          {aktivBransje.id === 'eiendom-sammenlign' && <EiendomSammenlign />}
-          {aktivBransje.id === 'bil' && <BilKalkulator />}
-          {aktivBransje.id === 'salong' && <SalongKalkulator />}
+          <footer>
+            <FooterLogo />
+            <div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning.</div>
+          </footer>
         </div>
-        <footer>
-          <FooterLogo />
-          <div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning.</div>
-        </footer>
       </div>
     );
   }
@@ -334,92 +376,94 @@ export default function App() {
         <NavLogo onClick={gaaHjem} />
         <div className="nav-links">
           <span className="nav-link" onClick={() => document.getElementById('bransjer')?.scrollIntoView({ behavior: 'smooth' })}>Bransjer</span>
-          <span className="nav-link" onClick={() => setSide('om-oss')}>Om oss</span>
+          <span className="nav-link" onClick={gaaOmOss}>Om oss</span>
         </div>
         <button className="nav-cta" onClick={() => aapneBransje(bransjer[0])}>Kom i gang</button>
       </nav>
 
-      <section className="hero">
-        <div className="hero-bg" id="hero-bg"></div>
-        <div className="hero-overlay"></div>
-        <div className="hero-content">
-          <div className="hero-tag">Gratis beslutningsverktøy</div>
-          <h1 className="hero-title">Finn ut om ideen din<br /><em>faktisk</em> er lønnsom</h1>
-          <p className="hero-sub">Invest Tools gir deg tallene du trenger før du investerer tid og penger i din neste bedrift.</p>
-          <div className="hero-btns">
-            <button className="btn-primary" onClick={() => aapneBransje(bransjer[0])}>Start beregning</button>
-            <button className="btn-secondary" onClick={() => document.getElementById('bransjer')?.scrollIntoView({ behavior: 'smooth' })}>Se alle bransjer</button>
+      <div className="side-innhold">
+        <section className="hero">
+          <div className="hero-bg" id="hero-bg"></div>
+          <div className="hero-overlay"></div>
+          <div className="hero-content">
+            <div className="hero-tag">Gratis beslutningsverktøy</div>
+            <h1 className="hero-title">Finn ut om ideen din<br /><em>faktisk</em> er lønnsom</h1>
+            <p className="hero-sub">Invest Tools gir deg tallene du trenger før du investerer tid og penger i din neste bedrift.</p>
+            <div className="hero-btns">
+              <button className="btn-primary" onClick={() => aapneBransje(bransjer[0])}>Start beregning</button>
+              <button className="btn-secondary" onClick={() => document.getElementById('bransjer')?.scrollIntoView({ behavior: 'smooth' })}>Se alle bransjer</button>
+            </div>
           </div>
-        </div>
-        <div className="hero-scroll">↓ Scroll</div>
-        <div className="hero-stats">
-          {[{ num: '5', lbl: 'Bransjer' }, { num: '0 kr', lbl: 'Kostnad' }, { num: '100%', lbl: 'Konfidensielt' }].map((s, i) => (
-            <div className="hero-stat" key={i}>
-              <span className="hero-stat-num">{s.num}</span>
-              <span className="hero-stat-lbl">{s.lbl}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="bransjer-section" id="bransjer">
-        <div className="section-tag">Velg bransje</div>
-        <div className="section-title">Hva vil du starte?</div>
-        <div className="bransje-grid">
-          {bransjer.map(b => (
-            <div key={b.id} className={`bransje-card ${b.coming ? 'coming' : ''}`} onClick={() => aapneBransje(b)}>
-              <div className="bransje-img-wrap">
-                <img className="bransje-img" src={b.img} alt={b.navn} />
-                <div className="bransje-img-overlay"></div>
-                {b.coming && <div className="coming-pill">Kommer snart</div>}
+          <div className="hero-scroll">↓ Scroll</div>
+          <div className="hero-stats">
+            {[{ num: '5', lbl: 'Bransjer' }, { num: '0 kr', lbl: 'Kostnad' }, { num: '100%', lbl: 'Konfidensielt' }].map((s, i) => (
+              <div className="hero-stat" key={i}>
+                <span className="hero-stat-num">{s.num}</span>
+                <span className="hero-stat-lbl">{s.lbl}</span>
               </div>
-              <div className="bransje-body">
-                <div className="bransje-num">{b.num}</div>
-                <div className="bransje-name">{b.navn}{!b.coming && <span className="bransje-arrow">↗</span>}</div>
-                <div className="bransje-desc">{b.desc}</div>
-                <div className="bransje-tags">{b.tags.map(t => <span key={t} className="bransje-tag">{t}</span>)}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="bransje-more">
-          <div className="bransje-more-text">Korttidsutleie, franchise, konsulent og mer kommer snart</div>
-          <span style={{ color: 'var(--cream-dark)', fontSize: '20px' }}>→</span>
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
 
-      <section className="hvorfor-section">
-        <div className="hvorfor-img-wrap">
-          <img className="hvorfor-img" src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80" alt="Investor med finansdata" />
-          <div className="hvorfor-img-frame"></div>
-        </div>
-        <div className="hvorfor-content">
-          <div className="hvorfor-tag">Hvorfor Invest Tools</div>
-          <h2 className="hvorfor-title">Bygget av en gründer,<br />for <em>gründere</em></h2>
-          <div className="hvorfor-items">
-            {[
-              { tittel: 'Helt konfidensielt', desc: 'Tallene du legger inn forblir hos deg. Vi lagrer ingenting.' },
-              { tittel: 'Oppdatert informasjon', desc: 'Gjeldende skatteregler, renter og lovkrav.' },
-              { tittel: 'Konkrete anbefalinger', desc: 'Ikke bare tall, men hva som lønner seg for deg.' },
-              { tittel: 'Langsiktig perspektiv', desc: 'Se porteføljen vokse over 10 år.' },
-              { tittel: 'Ta kontakt', desc: 'Mangler din bransje? Send oss en e-post på kontakt@addoninvest.no' }
-            ].map((p, i) => (
-              <div className="hvorfor-item" key={i}>
-                <div className="hvorfor-dot"></div>
-                <div>
-                  <div className="hvorfor-item-title">{p.tittel}</div>
-                  <div className="hvorfor-item-desc">{p.desc}</div>
+        <section className="bransjer-section" id="bransjer">
+          <div className="section-tag">Velg bransje</div>
+          <div className="section-title">Hva vil du starte?</div>
+          <div className="bransje-grid">
+            {bransjer.map(b => (
+              <div key={b.id} className={`bransje-card ${b.coming ? 'coming' : ''}`} onClick={() => aapneBransje(b)}>
+                <div className="bransje-img-wrap">
+                  <img className="bransje-img" src={b.img} alt={b.navn} />
+                  <div className="bransje-img-overlay"></div>
+                  {b.coming && <div className="coming-pill">Kommer snart</div>}
+                </div>
+                <div className="bransje-body">
+                  <div className="bransje-num">{b.num}</div>
+                  <div className="bransje-name">{b.navn}{!b.coming && <span className="bransje-arrow">↗</span>}</div>
+                  <div className="bransje-desc">{b.desc}</div>
+                  <div className="bransje-tags">{b.tags.map(t => <span key={t} className="bransje-tag">{t}</span>)}</div>
                 </div>
               </div>
             ))}
           </div>
-        </div>
-      </section>
+          <div className="bransje-more">
+            <div className="bransje-more-text">Korttidsutleie, franchise, konsulent og mer kommer snart</div>
+            <span style={{ color: 'var(--cream-dark)', fontSize: '20px' }}>→</span>
+          </div>
+        </section>
 
-      <footer>
-        <FooterLogo />
-        <div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning. Konsulter en regnskapsfører.</div>
-      </footer>
+        <section className="hvorfor-section">
+          <div className="hvorfor-img-wrap">
+            <img className="hvorfor-img" src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80" alt="Investor med finansdata" />
+            <div className="hvorfor-img-frame"></div>
+          </div>
+          <div className="hvorfor-content">
+            <div className="hvorfor-tag">Hvorfor Invest Tools</div>
+            <h2 className="hvorfor-title">Bygget av en gründer,<br />for <em>gründere</em></h2>
+            <div className="hvorfor-items">
+              {[
+                { tittel: 'Helt konfidensielt', desc: 'Tallene du legger inn forblir hos deg. Vi lagrer ingenting.' },
+                { tittel: 'Oppdatert informasjon', desc: 'Gjeldende skatteregler, renter og lovkrav.' },
+                { tittel: 'Konkrete anbefalinger', desc: 'Ikke bare tall, men hva som lønner seg for deg.' },
+                { tittel: 'Langsiktig perspektiv', desc: 'Se porteføljen vokse over 10 år.' },
+                { tittel: 'Ta kontakt', desc: 'Mangler din bransje? Send oss en e-post på kontakt@addoninvest.no' }
+              ].map((p, i) => (
+                <div className="hvorfor-item" key={i}>
+                  <div className="hvorfor-dot"></div>
+                  <div>
+                    <div className="hvorfor-item-title">{p.tittel}</div>
+                    <div className="hvorfor-item-desc">{p.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <footer>
+          <FooterLogo />
+          <div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning. Konsulter en regnskapsfører.</div>
+        </footer>
+      </div>
       <Analytics />
     </div>
   );
