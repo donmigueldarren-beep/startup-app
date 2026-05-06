@@ -119,7 +119,7 @@ async function kallClaude(meldinger) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 1000,
         system: `Du er en norsk eiendomsinvesteringsrådgiver hos Invest Tools by ADDON.
 Du gir konkrete, ærlige råd om eiendomsinvestering i privat regi i Norge.
@@ -129,9 +129,7 @@ Hold svar under 200 ord med mindre brukeren ber om mer.`,
         messages: meldinger
       })
     });
-    console.log('Status:', svar.status);
     const data = await svar.json();
-    console.log('Data:', JSON.stringify(data));
     return data.content[0].text;
   } catch (e) {
     console.error('Feil:', e);
