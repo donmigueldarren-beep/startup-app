@@ -78,6 +78,28 @@ const styles = `
   .ep-timeline-dot.future { background: var(--cream-dark); border: 2px solid var(--brg); }
   .ep-timeline-title { font-weight: 500; font-size: 14px; color: var(--dark); margin-bottom: 4px; }
   .ep-timeline-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .ai-seksjon { background: var(--dark); border: 1px solid #1a2e1e; padding: 28px; margin-bottom: 12px; }
+  .ai-seksjon-tittel { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--cream); margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+  .ai-seksjon-sub { font-size: 12px; color: #3a6a46; margin-bottom: 20px; }
+  .ai-analyse-knapp { background: var(--gold); color: var(--dark); border: none; padding: 12px 28px; font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; font-weight: 500; }
+  .ai-analyse-knapp:hover { background: #b8943c; }
+  .ai-analyse-knapp:disabled { opacity: 0.5; cursor: not-allowed; }
+  .ai-analyse-resultat { background: #0a1a0c; border: 1px solid #1a3a1e; padding: 20px; margin-top: 16px; font-size: 14px; color: #9fc9a8; line-height: 1.8; white-space: pre-wrap; }
+  .ai-chat { margin-top: 24px; border-top: 1px solid #1a2e1e; padding-top: 20px; }
+  .ai-chat-tittel { font-size: 12px; color: #3a6a46; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 14px; }
+  .ai-chat-meldinger { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; max-height: 320px; overflow-y: auto; }
+  .ai-chat-melding { padding: 12px 16px; font-size: 13px; line-height: 1.6; max-width: 85%; }
+  .ai-chat-melding.bruker { background: #1a3a1e; color: var(--cream); align-self: flex-end; }
+  .ai-chat-melding.ai { background: #0a1a0c; color: #9fc9a8; align-self: flex-start; border: 1px solid #1a3a1e; }
+  .ai-chat-melding.laster { color: #3a6a46; font-style: italic; }
+  .ai-chat-input-wrap { display: flex; gap: 8px; }
+  .ai-chat-input { flex: 1; padding: 10px 14px; background: #0a1a0c; border: 1px solid #1a3a1e; color: var(--cream); font-family: 'Inter', sans-serif; font-size: 13px; outline: none; }
+  .ai-chat-input::placeholder { color: #2a4a2e; }
+  .ai-chat-input:focus { border-color: var(--gold); }
+  .ai-chat-send { background: var(--brg); color: var(--cream); border: none; padding: 10px 20px; font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; }
+  .ai-chat-send:hover { background: #2a6640; }
+  .ai-chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
+  .ai-spark { font-size: 16px; }
 `;
 
 function fmt(n) {
@@ -106,6 +128,134 @@ function InputFelt({ label, value, onChange, step = 1000, suffix = 'kr', hint = 
         <span style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', fontSize: '13px', color: 'var(--muted)', pointerEvents: 'none' }}>{suffix}</span>
       </div>
       {hint && <div className="ep-hint">{hint}</div>}
+    </div>
+  );
+}
+
+async function kallClaude(meldinger) {
+  const svar = await fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 1000,
+      system: `Du er en norsk eiendomsinvesteringsrådgiver hos Invest Tools by ADDON.
+Du gir konkrete, ærlige råd om eiendomsinvestering via aksjeselskap i Norge.
+Svar alltid på norsk. Vær direkte og konkret. Ikke bruk finansielle klisjeer.
+Aldri si at du er en AI. Presenter deg som Invest Tools-rådgiver.
+Hold svar under 200 ord med mindre brukeren ber om mer.`,
+      messages: meldinger
+    })
+  });
+  const data = await svar.json();
+  return data.content[0].text;
+}
+
+function AIAssistent({ tall }) {
+  const [analyse, setAnalyse] = useState('');
+  const [lasterAnalyse, setLasterAnalyse] = useState(false);
+  const [chat, setChat] = useState([]);
+  const [melding, setMelding] = useState('');
+  const [lasterChat, setLasterChat] = useState(false);
+
+  const hentAnalyse = async () => {
+    setLasterAnalyse(true);
+    setAnalyse('');
+    try {
+      const prompt = `Analyser denne eiendomsinvesteringen via AS:
+
+Boligpris: ${tall.boligpris.toLocaleString('no-NO')} kr
+Leieinntekt: ${tall.leie.toLocaleString('no-NO')} kr/mnd
+Felleskostnader: ${tall.felles.toLocaleString('no-NO')} kr/mnd
+Vedlikehold: ${tall.vedlikehold.toLocaleString('no-NO')} kr/mnd
+Rente næringslån: ${tall.rente}%
+Egenkapitalkrav: ${tall.ekProsent}%
+Regnskapsfører: ${tall.regnskapKost.toLocaleString('no-NO')} kr/år
+Månedlig nettoresultat: ${tall.netto.toLocaleString('no-NO')} kr
+Restkapital etter kjøp: ${tall.restKapital.toLocaleString('no-NO')} kr
+Kan refinansiere: ${tall.forsteRefiAar ? 'Ja, fra år ' + tall.forsteRefiAar : 'Ikke innen 10 år'}
+
+Gi en konkret analyse med:
+1. Er dette en god investering via AS?
+2. Hva bør investoren passe på med AS-strukturen?
+3. De to viktigste risikoene
+4. Ett konkret råd for å forbedre avkastningen`;
+
+      const tekst = await kallClaude([{ role: 'user', content: prompt }]);
+      setAnalyse(tekst);
+    } catch (e) {
+      setAnalyse('Kunne ikke hente analyse akkurat nå. Prøv igjen.');
+    }
+    setLasterAnalyse(false);
+  };
+
+  const sendMelding = async () => {
+    if (!melding.trim() || lasterChat) return;
+    const nyMelding = { role: 'user', content: melding };
+    const oppdatertChat = [...chat, { type: 'bruker', tekst: melding }];
+    setChat(oppdatertChat);
+    setMelding('');
+    setLasterChat(true);
+
+    try {
+      const kontekst = `Brukeren analyserer en eiendomsinvestering via AS med disse tallene:
+Boligpris: ${tall.boligpris.toLocaleString('no-NO')} kr, Leie: ${tall.leie.toLocaleString('no-NO')} kr/mnd, Netto: ${tall.netto.toLocaleString('no-NO')} kr/mnd, Rente: ${tall.rente}%, EK: ${tall.ekProsent}%.`;
+
+      const historikk = chat
+        .filter(m => m.type === 'bruker' || m.type === 'ai')
+        .map(m => ({ role: m.type === 'bruker' ? 'user' : 'assistant', content: m.tekst }));
+
+      const tekst = await kallClaude([
+        { role: 'user', content: kontekst + '\n\nSpørsmål: ' + melding },
+        ...historikk.slice(-6),
+        nyMelding
+      ]);
+
+      setChat(prev => [...prev, { type: 'ai', tekst }]);
+    } catch (e) {
+      setChat(prev => [...prev, { type: 'ai', tekst: 'Kunne ikke svare akkurat nå. Prøv igjen.' }]);
+    }
+    setLasterChat(false);
+  };
+
+  return (
+    <div className="ai-seksjon">
+      <div className="ai-seksjon-tittel">
+        <span className="ai-spark">✦</span> AI-rådgiver
+      </div>
+      <div className="ai-seksjon-sub">Få en personlig analyse av dine tall, eller still spørsmål om eiendomsinvestering via AS</div>
+
+      <button className="ai-analyse-knapp" onClick={hentAnalyse} disabled={lasterAnalyse}>
+        {lasterAnalyse ? 'Analyserer...' : 'Analyser mine tall'}
+      </button>
+
+      {analyse && (
+        <div className="ai-analyse-resultat">{analyse}</div>
+      )}
+
+      <div className="ai-chat">
+        <div className="ai-chat-tittel">Still et spørsmål</div>
+        {chat.length > 0 && (
+          <div className="ai-chat-meldinger">
+            {chat.map((m, i) => (
+              <div key={i} className={`ai-chat-melding ${m.type}`}>{m.tekst}</div>
+            ))}
+            {lasterChat && <div className="ai-chat-melding ai laster">Tenker...</div>}
+          </div>
+        )}
+        <div className="ai-chat-input-wrap">
+          <input
+            className="ai-chat-input"
+            placeholder="F.eks. hva er fordelene med å eie via AS?"
+            value={melding}
+            onChange={e => setMelding(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && sendMelding()}
+          />
+          <button className="ai-chat-send" onClick={sendMelding} disabled={lasterChat || !melding.trim()}>
+            Send
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -161,15 +311,7 @@ export default function EiendomAS() {
   })();
 
   const forsteRefi = rader.find(r => r.kanRefinansiere);
-
-  const historikkFaser = [
-    { aar: 'År 1 til 2', fase: 'Nystartet AS', ekKrav: '30%', rente: `${rente.toFixed(1)}%`, beskrivelse: 'Ingen historikk. Høyt EK-krav og markedsrente.' },
-    { aar: 'År 3 til 4', fase: 'Etablert', ekKrav: '25%', rente: `${(rente - 0.3).toFixed(1)}%`, beskrivelse: '2 godkjente skattemeldinger med overskudd. Bedre betingelser.' },
-    { aar: 'År 5 til 7', fase: 'Solid track record', ekKrav: '20%', rente: `${(rente - 0.5).toFixed(1)}%`, beskrivelse: 'Stabil leieinntekt over flere år. Lavere EK-krav.' },
-    { aar: 'År 8 og oppover', fase: 'Porteføljeinvestor', ekKrav: '15%', rente: `${(rente - 0.7).toFixed(1)}%`, beskrivelse: 'Beste betingelser som profesjonell investor.' }
-  ];
-  const fasefarger = ['#fdf6e8', '#e8f0f8', 'var(--brg-pale)', '#f0e8f8'];
-  const fasetekst = ['#7a5a1e', '#1a3a5e', 'var(--brg)', '#5a1a7a'];
+  const aiTall = { boligpris, leie, felles, vedlikehold, rente, ekProsent, regnskapKost, netto, restKapital, forsteRefiAar: forsteRefi?.aar };
 
   return (
     <div className="ek-wrap">
@@ -256,10 +398,15 @@ export default function EiendomAS() {
               <tr><th>Periode</th><th>Fase</th><th>EK-krav</th><th>Rente</th><th>Bankens vurdering</th></tr>
             </thead>
             <tbody>
-              {historikkFaser.map((f, i) => (
+              {[
+                { aar: 'År 1 til 2', fase: 'Nystartet AS', ekKrav: '30%', rente: `${rente.toFixed(1)}%`, beskrivelse: 'Ingen historikk. Høyt EK-krav og markedsrente.' },
+                { aar: 'År 3 til 4', fase: 'Etablert', ekKrav: '25%', rente: `${(rente - 0.3).toFixed(1)}%`, beskrivelse: '2 godkjente skattemeldinger med overskudd. Bedre betingelser.' },
+                { aar: 'År 5 til 7', fase: 'Solid track record', ekKrav: '20%', rente: `${(rente - 0.5).toFixed(1)}%`, beskrivelse: 'Stabil leieinntekt over flere år. Lavere EK-krav.' },
+                { aar: 'År 8 og oppover', fase: 'Porteføljeinvestor', ekKrav: '15%', rente: `${(rente - 0.7).toFixed(1)}%`, beskrivelse: 'Beste betingelser som profesjonell investor.' }
+              ].map((f, i) => (
                 <tr key={i}>
                   <td style={{fontWeight:'500'}}>{f.aar}</td>
-                  <td><span className="ep-badge" style={{background: fasefarger[i], color: fasetekst[i]}}>{f.fase}</span></td>
+                  <td><span className="ep-badge" style={{background: ['#fdf6e8','#e8f0f8','var(--brg-pale)','#f0e8f8'][i], color: ['#7a5a1e','#1a3a5e','var(--brg)','#5a1a7a'][i]}}>{f.fase}</span></td>
                   <td style={{fontWeight:'500'}}>{f.ekKrav}</td>
                   <td>{f.rente}</td>
                   <td style={{fontSize:'12px', color:'var(--muted)'}}>{f.beskrivelse}</td>
@@ -345,6 +492,8 @@ export default function EiendomAS() {
           </div>
         </div>
       )}
+
+      <AIAssistent tall={aiTall} />
 
       <p className="ek-disclaimer">Tallene er estimater og ikke finansiell rådgivning. Konsulter en regnskapsfører.</p>
     </div>
