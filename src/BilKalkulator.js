@@ -45,7 +45,7 @@ const styles = `
   .bil-table td { padding: 10px 12px; border-bottom: 1px solid var(--cream-dark); }
   .bil-table tr:last-child td { border-bottom: none; }
   .bil-table tr:hover td { background: var(--cream); }
-  .bil-type-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
+  .bil-type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
   .bil-type-card { border: 1px solid var(--cream-dark); padding: 14px 10px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--cream); }
   .bil-type-card:hover { border-color: var(--brg); }
   .bil-type-card.active { border-color: var(--brg); background: var(--brg-pale); }
@@ -57,78 +57,75 @@ const styles = `
   .bil-slider-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
   .bil-slider-val { font-size: 16px; font-weight: 500; font-family: 'Playfair Display', serif; color: var(--dark); }
   .bil-highlight { background: var(--brg-pale) !important; }
-  .ai-seksjon { background: var(--dark); border: 1px solid #1a2e1e; padding: 28px; margin-bottom: 12px; }
-  .ai-seksjon-tittel { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--cream); margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
-  .ai-seksjon-sub { font-size: 12px; color: #3a6a46; margin-bottom: 20px; }
-  .ai-analyse-knapp { background: var(--gold); color: var(--dark); border: none; padding: 12px 28px; font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; font-weight: 500; }
-  .ai-analyse-knapp:hover { background: #b8943c; }
-  .ai-analyse-knapp:disabled { opacity: 0.5; cursor: not-allowed; }
-  .ai-analyse-resultat { background: #0a1a0c; border: 1px solid #1a3a1e; padding: 20px; margin-top: 16px; font-size: 14px; color: #9fc9a8; line-height: 1.8; white-space: pre-wrap; }
-  .ai-chat { margin-top: 24px; border-top: 1px solid #1a2e1e; padding-top: 20px; }
-  .ai-chat-tittel { font-size: 12px; color: #3a6a46; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 14px; }
-  .ai-chat-meldinger { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; max-height: 320px; overflow-y: auto; }
-  .ai-chat-melding { padding: 12px 16px; font-size: 13px; line-height: 1.6; max-width: 85%; }
-  .ai-chat-melding.bruker { background: #1a3a1e; color: var(--cream); align-self: flex-end; }
-  .ai-chat-melding.ai { background: #0a1a0c; color: #9fc9a8; align-self: flex-start; border: 1px solid #1a3a1e; }
-  .ai-chat-melding.laster { color: #3a6a46; font-style: italic; }
-  .ai-chat-input-wrap { display: flex; gap: 8px; }
-  .ai-chat-input { flex: 1; padding: 10px 14px; background: #0a1a0c; border: 1px solid #1a3a1e; color: var(--cream); font-family: 'Inter', sans-serif; font-size: 13px; outline: none; }
-  .ai-chat-input::placeholder { color: #2a4a2e; }
-  .ai-chat-input:focus { border-color: var(--gold); }
-  .ai-chat-send { background: var(--brg); color: var(--cream); border: none; padding: 10px 20px; font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; }
-  .ai-chat-send:hover { background: #2a6640; }
-  .ai-chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
-  .ai-spark { font-size: 16px; }
   .bil-disclaimer { font-size: 11px; color: var(--muted); margin-top: 12px; font-style: italic; }
+  .rene-seksjon { background: var(--dark); border: 1px solid #1a2e1e; padding: 28px; margin-bottom: 12px; }
+  .rene-header { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 20px; }
+  .rene-avatar { width: 52px; height: 52px; background: linear-gradient(135deg, #2a6640, #c9a84c); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+  .rene-intro { flex: 1; }
+  .rene-navn { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--cream); margin-bottom: 4px; }
+  .rene-tittel { font-size: 11px; color: var(--gold); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
+  .rene-bio { font-size: 12px; color: #4a6a4e; line-height: 1.6; font-style: italic; }
+  .rene-analyse-knapp { background: var(--gold); color: var(--dark); border: none; padding: 12px 28px; font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; font-weight: 500; }
+  .rene-analyse-knapp:hover { background: #b8943c; }
+  .rene-analyse-knapp:disabled { opacity: 0.5; cursor: not-allowed; }
+  .rene-resultat { background: #0a1a0c; border: 1px solid #1a3a1e; padding: 20px; margin-top: 16px; font-size: 14px; color: #9fc9a8; line-height: 1.8; white-space: pre-wrap; }
+  .rene-chat { margin-top: 24px; border-top: 1px solid #1a2e1e; padding-top: 20px; }
+  .rene-chat-tittel { font-size: 12px; color: #3a6a46; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 14px; }
+  .rene-chat-meldinger { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; max-height: 320px; overflow-y: auto; }
+  .rene-chat-melding { padding: 12px 16px; font-size: 13px; line-height: 1.6; max-width: 85%; }
+  .rene-chat-melding.bruker { background: #1a3a1e; color: var(--cream); align-self: flex-end; }
+  .rene-chat-melding.ai { background: #0a1a0c; color: #9fc9a8; align-self: flex-start; border: 1px solid #1a3a1e; }
+  .rene-chat-melding.laster { color: #3a6a46; font-style: italic; }
+  .rene-chat-input-wrap { display: flex; gap: 8px; }
+  .rene-chat-input { flex: 1; padding: 10px 14px; background: #0a1a0c; border: 1px solid #1a3a1e; color: var(--cream); font-family: 'Inter', sans-serif; font-size: 13px; outline: none; }
+  .rene-chat-input::placeholder { color: #2a4a2e; }
+  .rene-chat-input:focus { border-color: var(--gold); }
+  .rene-chat-send { background: var(--brg); color: var(--cream); border: none; padding: 10px 20px; font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; }
+  .rene-chat-send:hover { background: #2a6640; }
+  .rene-chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
 `;
 
 const BIL_TYPER = {
   kompakt: {
     navn: 'Kompaktbil', ikon: '🚗',
     bilpris: 300000, dagspris: 700, forsikringAar: 20000,
-    serviceAar: 6000, drivstoffMnd: 1500, avskrivning: 17,
-    utnyttelse: 60,
+    serviceAar: 6000, drivstoffMnd: 1500, avskrivning: 17, utnyttelse: 60,
     info: 'Rimelig å kjøpe og drifte. Passer for privatpersoner og kortere turer. Høy etterspørsel på plattformer som Nabobil.',
     eksempler: 'Toyota Yaris, VW Polo, Skoda Fabia'
   },
   mellomklasse: {
     navn: 'Mellomklasse', ikon: '🚙',
     bilpris: 450000, dagspris: 950, forsikringAar: 26000,
-    serviceAar: 8000, drivstoffMnd: 2000, avskrivning: 17,
-    utnyttelse: 60,
+    serviceAar: 8000, drivstoffMnd: 2000, avskrivning: 17, utnyttelse: 60,
     info: 'Mest populære segment for bilutleie. God balanse mellom innkjøpspris og dagspris. Passer for familie og lengre turer.',
     eksempler: 'Toyota Corolla, VW Golf, Skoda Octavia'
   },
   elbil: {
     navn: 'Elbil', ikon: '⚡',
     bilpris: 500000, dagspris: 1050, forsikringAar: 22000,
-    serviceAar: 4000, drivstoffMnd: 600, avskrivning: 20,
-    utnyttelse: 55,
+    serviceAar: 4000, drivstoffMnd: 600, avskrivning: 20, utnyttelse: 55,
     info: 'Lavere driftkostnad men høyere innkjøpspris. Rask avskrivning. Populær i byene. Ladeinfrastruktur er viktig.',
     eksempler: 'Tesla Model 3, VW ID.4, Nissan Leaf'
   },
   suv: {
     navn: 'SUV / Familiebil', ikon: '🚐',
     bilpris: 650000, dagspris: 1300, forsikringAar: 32000,
-    serviceAar: 10000, drivstoffMnd: 2800, avskrivning: 17,
-    utnyttelse: 55,
-    info: 'Høy dagspris og populær for familier og ferie. Høyere alle kostnader. Best i sesonger som sommer og vinter.',
+    serviceAar: 10000, drivstoffMnd: 2800, avskrivning: 17, utnyttelse: 55,
+    info: 'Høy dagspris og populær for familier og ferie. Best i sesonger som sommer og vinter.',
     eksempler: 'Toyota RAV4, VW Tiguan, Volvo XC60'
   },
   varebil: {
     navn: 'Varebil', ikon: '🚚',
     bilpris: 400000, dagspris: 1100, forsikringAar: 28000,
-    serviceAar: 12000, drivstoffMnd: 3000, avskrivning: 24,
-    utnyttelse: 50,
-    info: 'Høy avskrivning (24%) men lav konkurranse. Populær blant håndverkere og folk som skal flytte. Krever næringskjøretøy-registrering.',
+    serviceAar: 12000, drivstoffMnd: 3000, avskrivning: 24, utnyttelse: 50,
+    info: 'Høy avskrivning (24%) men lav konkurranse. Populær blant håndverkere og folk som skal flytte.',
     eksempler: 'VW Transporter, Mercedes Sprinter, Ford Transit'
   },
   premium: {
     navn: 'Premium', ikon: '🏎️',
     bilpris: 900000, dagspris: 2200, forsikringAar: 55000,
-    serviceAar: 20000, drivstoffMnd: 3500, avskrivning: 20,
-    utnyttelse: 35,
-    info: 'Høy dagspris men lav utnyttelsesgrad. Høye alle kostnader. Krevende segment med spesifikk målgruppe. Vurder nøye.',
+    serviceAar: 20000, drivstoffMnd: 3500, avskrivning: 20, utnyttelse: 35,
+    info: 'Høy dagspris men lav utnyttelsesgrad. Krevende segment med spesifikk målgruppe. Vurder nøye.',
     eksempler: 'BMW 5-serie, Mercedes E-klasse, Audi A6'
   }
 };
@@ -146,17 +143,18 @@ function Field({ label, value, onChange, step = 1, suffix = 'kr', hint = '' }) {
   );
 }
 
-async function kallClaude(meldinger) {
+async function kallRene(meldinger) {
   const svar = await fetch('/api/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 1000,
-      system: `Du er en norsk rådgiver for bilutleie-bransjen hos Invest Tools by ADDON.
-Du gir konkrete, ærlige råd om oppstart og drift av bilutleie i Norge.
-Svar alltid på norsk. Vær direkte og konkret.
-Aldri si at du er en AI. Presenter deg som Invest Tools-rådgiver.
+      system: `Du er René, en erfaren bilutleierådgiver hos Invest Tools by ADDON.
+Du har bakgrunn fra bilbransjen og har hjulpet hundrevis av folk med å starte bilutleie i Norge.
+Du er direkte, litt tørrvittig og alltid ærlig – du sier ifra når tallene ikke ser bra ut.
+Du snakker norsk, uformelt men profesjonelt. Aldri klisjeer.
+Presenter deg aldri som en AI. Du er René.
 Hold svar under 200 ord med mindre brukeren ber om mer.`,
       messages: meldinger
     })
@@ -165,7 +163,7 @@ Hold svar under 200 ord med mindre brukeren ber om mer.`,
   return data.content[0].text;
 }
 
-function AIAssistent({ tall }) {
+function Rene({ tall }) {
   const [analyse, setAnalyse] = useState('');
   const [lasterAnalyse, setLasterAnalyse] = useState(false);
   const [chat, setChat] = useState([]);
@@ -176,7 +174,7 @@ function AIAssistent({ tall }) {
     setLasterAnalyse(true);
     setAnalyse('');
     try {
-      const tekst = await kallClaude([{ role: 'user', content: `Analyser denne bilutleievirksomheten:
+      const tekst = await kallRene([{ role: 'user', content: `Analyser denne bilutleievirksomheten:
 
 Biltype: ${tall.bilType}
 Antall biler: ${tall.antallBiler}
@@ -189,7 +187,7 @@ Netto per måned: ${tall.netto.toLocaleString('no-NO')} kr
 Break-even utnyttelse: ${tall.breakEven}%
 ROI år 1: ${tall.roi.toFixed(1)}%
 
-Gi en konkret analyse:
+Gi en konkret analyse som René:
 1. Er dette en levedyktig investering?
 2. Hva er de viktigste risikoene?
 3. Er biltype og prising riktig?
@@ -210,7 +208,7 @@ Gi en konkret analyse:
     try {
       const kontekst = `Brukeren planlegger bilutleie med ${tall.antallBiler} ${tall.bilType}(er), dagspris ${tall.dagspris} kr, netto ${tall.netto.toLocaleString('no-NO')} kr/mnd.`;
       const historikk = chat.filter(m => m.type === 'bruker' || m.type === 'ai').map(m => ({ role: m.type === 'bruker' ? 'user' : 'assistant', content: m.tekst }));
-      const tekst = await kallClaude([{ role: 'user', content: kontekst + '\n\nSpørsmål: ' + melding }, ...historikk.slice(-6), nyMelding]);
+      const tekst = await kallRene([{ role: 'user', content: kontekst + '\n\nSpørsmål: ' + melding }, ...historikk.slice(-6), nyMelding]);
       setChat(prev => [...prev, { type: 'ai', tekst }]);
     } catch (e) {
       setChat(prev => [...prev, { type: 'ai', tekst: 'Kunne ikke svare akkurat nå. Prøv igjen.' }]);
@@ -219,24 +217,30 @@ Gi en konkret analyse:
   };
 
   return (
-    <div className="ai-seksjon">
-      <div className="ai-seksjon-tittel"><span className="ai-spark">✦</span> AI-rådgiver</div>
-      <div className="ai-seksjon-sub">Få en personlig analyse av dine tall, eller still spørsmål om bilutleie-bransjen</div>
-      <button className="ai-analyse-knapp" onClick={hentAnalyse} disabled={lasterAnalyse}>
-        {lasterAnalyse ? 'Analyserer...' : 'Analyser mine tall'}
+    <div className="rene-seksjon">
+      <div className="rene-header">
+        <div className="rene-avatar">🚗</div>
+        <div className="rene-intro">
+          <div className="rene-navn">René</div>
+          <div className="rene-tittel">Bilutleierådgiver</div>
+          <div className="rene-bio">"Jeg har sett alt i bilbransjen. Fortell meg tallene dine, så sier jeg deg ærlig hva jeg mener."</div>
+        </div>
+      </div>
+      <button className="rene-analyse-knapp" onClick={hentAnalyse} disabled={lasterAnalyse}>
+        {lasterAnalyse ? 'René analyserer...' : 'Få Renés vurdering'}
       </button>
-      {analyse && <div className="ai-analyse-resultat">{analyse}</div>}
-      <div className="ai-chat">
-        <div className="ai-chat-tittel">Still et spørsmål</div>
+      {analyse && <div className="rene-resultat">{analyse}</div>}
+      <div className="rene-chat">
+        <div className="rene-chat-tittel">Spør René</div>
         {chat.length > 0 && (
-          <div className="ai-chat-meldinger">
-            {chat.map((m, i) => <div key={i} className={`ai-chat-melding ${m.type}`}>{m.tekst}</div>)}
-            {lasterChat && <div className="ai-chat-melding ai laster">Tenker...</div>}
+          <div className="rene-chat-meldinger">
+            {chat.map((m, i) => <div key={i} className={`rene-chat-melding ${m.type}`}>{m.tekst}</div>)}
+            {lasterChat && <div className="rene-chat-melding ai laster">René tenker...</div>}
           </div>
         )}
-        <div className="ai-chat-input-wrap">
-          <input className="ai-chat-input" placeholder="F.eks. hvilken biltype gir best avkastning?" value={melding} onChange={e => setMelding(e.target.value)} onKeyDown={e => e.key === 'Enter' && sendMelding()} />
-          <button className="ai-chat-send" onClick={sendMelding} disabled={lasterChat || !melding.trim()}>Send</button>
+        <div className="rene-chat-input-wrap">
+          <input className="rene-chat-input" placeholder="F.eks. hvilken biltype gir best avkastning?" value={melding} onChange={e => setMelding(e.target.value)} onKeyDown={e => e.key === 'Enter' && sendMelding()} />
+          <button className="rene-chat-send" onClick={sendMelding} disabled={lasterChat || !melding.trim()}>Send</button>
         </div>
       </div>
     </div>
@@ -249,11 +253,9 @@ export default function BilKalkulator() {
   const [egenkapital, setEgenkapital] = useState(200000);
   const [renteSats, setRenteSats] = useState(6.5);
   const [regnskapKost, setRegnskapKost] = useState(10000);
-
   const [overstyr, setOverstyr] = useState({});
 
   const type = BIL_TYPER[bilType];
-
   const bilpris = overstyr.bilpris ?? type.bilpris;
   const dagspris = overstyr.dagspris ?? type.dagspris;
   const forsikringAar = overstyr.forsikringAar ?? type.forsikringAar;
@@ -261,10 +263,7 @@ export default function BilKalkulator() {
   const drivstoffMnd = overstyr.drivstoffMnd ?? type.drivstoffMnd;
   const utnyttelse = overstyr.utnyttelse ?? type.utnyttelse;
 
-  const byttType = (nyType) => {
-    setBilType(nyType);
-    setOverstyr({});
-  };
+  const byttType = (nyType) => { setBilType(nyType); setOverstyr({}); };
 
   const fmt = (n) => Math.round(n).toLocaleString('no-NO') + ' kr';
   const fmtMnd = (n) => (n >= 0 ? '+' : '') + Math.round(n).toLocaleString('no-NO') + ' kr/mnd';
@@ -304,7 +303,7 @@ export default function BilKalkulator() {
     return { pct, inn, netto: n };
   });
 
-  const aiTall = {
+  const reneTall = {
     bilType: type.navn, antallBiler, bilpris, dagspris, utnyttelse,
     inntekt: inntektMnd, kostnader: totalKostMnd, netto: nettoMnd,
     breakEven: breakEvenPst, roi: roiAar
@@ -466,7 +465,7 @@ export default function BilKalkulator() {
             </thead>
             <tbody>
               {scenarioer.map((s, i) => (
-                <tr key={i} className={s.pct === utnyttelse ? 'bil-highlight' : ''}>
+                <tr key={i} style={{ background: s.pct === utnyttelse ? 'var(--brg-pale)' : 'transparent' }}>
                   <td style={{ fontWeight: s.pct === utnyttelse ? '500' : '400' }}>{s.pct}%{s.pct === utnyttelse ? ' ←' : ''}</td>
                   <td>{Math.round(30 * s.pct / 100)}</td>
                   <td style={{ color: 'var(--brg)' }}>{fmt(s.inn)}</td>
@@ -485,7 +484,7 @@ export default function BilKalkulator() {
             { ikon: '✓', tekst: 'Næringsforsikring (kaskoforsikring) på alle biler', ok: true },
             { ikon: '✓', tekst: 'Biler registrert som næringskjøretøy i Statens vegvesen', ok: true },
             { ikon: '✓', tekst: 'MVA-registrering ved over 50 000 kr omsetning', ok: true },
-            { ikon: '!', tekst: 'Ingen konsesjon kreves for vanlig kortidsutleie', ok: false },
+            { ikon: '!', tekst: 'Ingen konsesjon kreves for vanlig korttidsutleie', ok: false },
             { ikon: '!', tekst: 'Alltid skriftlig leieavtale og dokumentasjon av skader', ok: false }
           ].map((r, i) => (
             <div key={i} style={{ display: 'flex', gap: '8px', padding: '10px 12px', background: 'var(--cream)', border: '1px solid var(--cream-dark)', fontSize: '13px' }}>
@@ -494,11 +493,10 @@ export default function BilKalkulator() {
             </div>
           ))}
         </div>
-
         <p className="bil-disclaimer">Tallene er estimater og ikke finansiell rådgivning. Konsulter en regnskapsfører før du tar beslutninger.</p>
       </div>
 
-      <AIAssistent tall={aiTall} />
+      <Rene tall={reneTall} />
     </div>
   );
 }
