@@ -65,7 +65,7 @@ const styles = `
   .marcel-intro { flex: 1; }
   .marcel-navn { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--cream); margin-bottom: 4px; }
   .marcel-tittel { font-size: 11px; color: var(--gold); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
-  .marcel-bio { font-size: 12px; color: #4a6a4e; line-height: 1.6; font-style: italic; }
+  .marcel-bio { font-size: 12px; color: #4a6a4e; line-height: 1.6; }
   .marcel-knapp { background: var(--gold); color: var(--dark); border: none; padding: 12px 28px; font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; font-weight: 500; }
   .marcel-knapp:hover { background: #b8943c; }
   .marcel-knapp:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -123,11 +123,11 @@ async function kallMarcel(meldinger) {
     body: JSON.stringify({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 1000,
-      system: `Du er Marcel, en erfaren eiendomsinvestor og rådgiver hos Invest Tools by ADDON.
-Du har investert i eiendom i både Frankrike og Norge i over 20 år, og eier selv flere utleieboliger.
-Du er direkte, litt tørrvittig og alltid ærlig. Du sier klart ifra når tallene ikke holder.
-Du snakker norsk, uformelt men presist. Ingen klisjeer, ingen tomme fraser.
-Presenter deg aldri som en AI. Du er Marcel.
+      system: `Du heter Marcel og er en AI-assistent i Invest Tools by ADDON.
+Du hjelper brukere med å forstå tall og muligheter innen eiendomsinvestering i privat regi i Norge.
+Du er IKKE en menneskelig rådgiver og gir IKKE finansiell eller juridisk rådgivning.
+Svar alltid på norsk, direkte og konkret. Ingen klisjeer.
+Minn alltid brukeren på å konsultere en regnskapsfører eller finansiell rådgiver ved viktige beslutninger.
 Hold svar under 200 ord med mindre brukeren ber om mer.`,
       messages: meldinger
     })
@@ -159,11 +159,11 @@ Månedlig nettoresultat: ${tall.netto.toLocaleString('no-NO')} kr
 Restkapital etter kjøp: ${tall.restKapital.toLocaleString('no-NO')} kr
 Kan refinansiere: ${tall.forsteRefiAar ? 'Ja, fra år ' + tall.forsteRefiAar : 'Ikke innen 10 år'}
 
-Gi en konkret analyse som Marcel:
-1. Er dette en god investering?
-2. Hva bør investoren passe på?
+Gi en konkret analyse:
+1. Er dette en god investering basert på tallene?
+2. Hva bør brukeren passe på?
 3. De to viktigste risikoene
-4. Ett konkret råd for å forbedre avkastningen` }]);
+4. Ett konkret råd for å forbedre tallene` }]);
       setAnalyse(tekst);
     } catch (e) {
       setAnalyse('Kunne ikke hente analyse akkurat nå. Prøv igjen.');
@@ -194,12 +194,12 @@ Gi en konkret analyse som Marcel:
         <div className="marcel-avatar">🏠</div>
         <div className="marcel-intro">
           <div className="marcel-navn">Marcel</div>
-          <div className="marcel-tittel">Eiendomsinvestor og rådgiver</div>
-          <div className="marcel-bio">"Jeg har kjøpt og solgt eiendom i to land i 20 år. Legg frem tallene dine, så gir jeg deg en ærlig vurdering."</div>
+          <div className="marcel-tittel">AI-assistent for eiendomsinvestering</div>
+          <div className="marcel-bio">Hjelper deg forstå tallene dine. Erstatter ikke en regnskapsfører eller finansiell rådgiver.</div>
         </div>
       </div>
       <button className="marcel-knapp" onClick={hentAnalyse} disabled={lasterAnalyse}>
-        {lasterAnalyse ? 'Marcel analyserer...' : 'Få Marcels vurdering'}
+        {lasterAnalyse ? 'Analyserer...' : 'Analyser mine tall'}
       </button>
       {analyse && <div className="marcel-resultat">{analyse}</div>}
       <div className="marcel-chat">
@@ -207,7 +207,7 @@ Gi en konkret analyse som Marcel:
         {chat.length > 0 && (
           <div className="marcel-chat-meldinger">
             {chat.map((m, i) => <div key={i} className={`marcel-chat-melding ${m.type}`}>{m.tekst}</div>)}
-            {lasterChat && <div className="marcel-chat-melding ai laster">Marcel tenker...</div>}
+            {lasterChat && <div className="marcel-chat-melding ai laster">Tenker...</div>}
           </div>
         )}
         <div className="marcel-chat-input-wrap">
