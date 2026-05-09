@@ -16,7 +16,6 @@ const styles = `
   .sal-field label { display: block; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
   .sal-field input[type=number] { width: 100%; padding: 10px 12px; border: 1px solid var(--cream-dark); background: var(--cream); font-family: 'Inter', sans-serif; font-size: 14px; outline: none; box-sizing: border-box; transition: border 0.2s; }
   .sal-field input[type=number]:focus { border-color: var(--brg); background: white; }
-  .sal-field input[type=range] { width: 100%; accent-color: var(--brg); margin-top: 8px; display: block; }
   .sal-divider { border: none; border-top: 1px solid var(--cream-dark); margin: 20px 0; }
   .sal-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--cream-dark); margin-bottom: 16px; }
   .sal-col { background: var(--cream); padding: 20px; }
@@ -40,7 +39,6 @@ const styles = `
   .sal-metric .val { font-family: 'Playfair Display', serif; font-size: 20px; }
   .sal-metric .sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
   .sal-info { background: var(--cream); border-left: 3px solid var(--gold); padding: 12px 16px; font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
-  .sal-info.brg { border-left-color: var(--brg); background: var(--brg-pale); color: var(--brg); }
   .sal-section-label { font-size: 10px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin: 16px 0 10px; }
   .sal-table { width: 100%; border-collapse: collapse; font-size: 13px; }
   .sal-table th { text-align: left; padding: 8px 12px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); border-bottom: 1px solid var(--cream-dark); font-weight: 500; }
@@ -48,7 +46,7 @@ const styles = `
   .sal-table tr:last-child td { border-bottom: none; }
   .sal-table tr:hover td { background: var(--cream); }
   .sal-disclaimer { font-size: 11px; color: var(--muted); margin-top: 12px; font-style: italic; }
-  .sal-type-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
+  .sal-type-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 16px; }
   .sal-type-card { border: 1px solid var(--cream-dark); padding: 14px 10px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--cream); }
   .sal-type-card:hover { border-color: var(--brg); }
   .sal-type-card.active { border-color: var(--brg); background: var(--brg-pale); }
@@ -93,75 +91,45 @@ const styles = `
 
 const SALONG_TYPER = {
   frisor: {
-    navn: 'Frisør',
-    ikon: '✂️',
-    prisPerBehandling: 650,
-    behandlingerPerDag: 5,
-    behandlingstidMin: 60,
-    produktProsent: 12,
-    oppstartUtstyr: 120000,
-    oppstartInventar: 100000,
-    husleie: 18000,
+    navn: 'Frisør', ikon: '✂️', prisPerBehandling: 650, behandlingerPerDag: 5,
+    behandlingstidMin: 60, produktProsent: 12, oppstartUtstyr: 120000,
+    oppstartInventar: 100000, husleie: 18000,
     fagkrav: 'Fagbrev kreves for å klippe selv. Du kan ansette faglærte uten fagbrev selv.',
-    typiskPriser: 'Klipp dame: 500-900 kr, Herreклipp: 300-500 kr, Farge: 800-2000 kr',
+    typiskPriser: 'Klipp dame: 500-900 kr, Herreklipp: 300-500 kr, Farge: 800-2000 kr',
     enk_anbefalt: true,
     enk_begrunnelse: 'ENK er vanligst for solosalong. AS lønner seg først ved 2+ ansatte eller høy gjeld.'
   },
   negler: {
-    navn: 'Negler',
-    ikon: '💅',
-    prisPerBehandling: 500,
-    behandlingerPerDag: 6,
-    behandlingstidMin: 60,
-    produktProsent: 18,
-    oppstartUtstyr: 60000,
-    oppstartInventar: 40000,
-    husleie: 8000,
+    navn: 'Negler', ikon: '💅', prisPerBehandling: 500, behandlingerPerDag: 6,
+    behandlingstidMin: 60, produktProsent: 18, oppstartUtstyr: 60000,
+    oppstartInventar: 40000, husleie: 8000,
     fagkrav: 'Ingen formelt fagbrev kreves, men HMS-kurs anbefales. Lokalet må meldes kommunen.',
     typiskPriser: 'Gele negler: 400-700 kr, Neglforlengelse: 600-900 kr, Nailart: 100-300 kr ekstra',
     enk_anbefalt: true,
     enk_begrunnelse: 'Neglesalong drives nesten alltid som ENK eller ENK med leiestoler. Lav kapital kreves.'
   },
   hudpleie: {
-    navn: 'Hudpleie',
-    ikon: '🧖',
-    prisPerBehandling: 850,
-    behandlingerPerDag: 4,
-    behandlingstidMin: 75,
-    produktProsent: 20,
-    oppstartUtstyr: 150000,
-    oppstartInventar: 80000,
-    husleie: 14000,
+    navn: 'Hudpleie', ikon: '🧖', prisPerBehandling: 850, behandlingerPerDag: 4,
+    behandlingstidMin: 75, produktProsent: 20, oppstartUtstyr: 150000,
+    oppstartInventar: 80000, husleie: 14000,
     fagkrav: 'Ingen lovkrav om fagbrev, men autorisasjon fra bransjeorganisasjon anbefales sterkt.',
     typiskPriser: 'Ansiktsbehandling: 700-1200 kr, Kroppsbehandling: 800-1400 kr, Voksing: 200-600 kr',
     enk_anbefalt: true,
     enk_begrunnelse: 'ENK er klart vanligst for soloterapeut. AS er aktuelt ved klinikk med flere ansatte.'
   },
   lash: {
-    navn: 'Lash & Brow',
-    ikon: '👁️',
-    prisPerBehandling: 750,
-    behandlingerPerDag: 4,
-    behandlingstidMin: 90,
-    produktProsent: 15,
-    oppstartUtstyr: 50000,
-    oppstartInventar: 35000,
-    husleie: 7000,
+    navn: 'Lash & Brow', ikon: '👁️', prisPerBehandling: 750, behandlingerPerDag: 4,
+    behandlingstidMin: 90, produktProsent: 15, oppstartUtstyr: 50000,
+    oppstartInventar: 35000, husleie: 7000,
     fagkrav: 'Ingen lovkrav, men kurs og sertifisering fra leverandør er nødvendig. Meld lokalet.',
     typiskPriser: 'Vipper sett: 600-900 kr, Påfyll: 350-500 kr, Bryn laminering: 400-600 kr',
     enk_anbefalt: true,
     enk_begrunnelse: 'Svært ofte ENK. Lav terskel og lave oppstartskostnader gjør ENK til klart beste valg.'
   },
   kombinert: {
-    navn: 'Kombinert',
-    ikon: '💎',
-    prisPerBehandling: 700,
-    behandlingerPerDag: 5,
-    behandlingstidMin: 70,
-    produktProsent: 15,
-    oppstartUtstyr: 200000,
-    oppstartInventar: 150000,
-    husleie: 25000,
+    navn: 'Kombinert', ikon: '💎', prisPerBehandling: 700, behandlingerPerDag: 5,
+    behandlingstidMin: 70, produktProsent: 15, oppstartUtstyr: 200000,
+    oppstartInventar: 150000, husleie: 25000,
     fagkrav: 'Avhenger av hvilke tjenester du tilbyr. Frisør krever fagbrev.',
     typiskPriser: 'Varierer etter tjenester. Kombisalong har gjerne høyere snittbonger.',
     enk_anbefalt: false,
@@ -213,7 +181,6 @@ function AIAssistent({ tall }) {
     setAnalyse('');
     try {
       const tekst = await kallClaude([{ role: 'user', content: `Analyser denne salongvirksomheten:
-
 Type: ${tall.salongType}
 Selskapsform: ${tall.selskapsform}
 Antall behandlingsplasser: ${tall.antallStoler}
@@ -288,29 +255,28 @@ export default function SalongKalkulator() {
   const [belegg, setBelegg] = useState(75);
   const [egenkapital, setEgenkapital] = useState(200000);
 
+  // Overstyrte verdier - nullstilles når type byttes
+  const [overstyr, setOverstyr] = useState({});
+
   const type = SALONG_TYPER[salongType];
 
-  const [prisPerBehandling, setPrisPerBehandling] = useState(type.prisPerBehandling);
-  const [behandlingerPerDag, setBehandlingerPerDag] = useState(type.behandlingerPerDag);
-  const [husleie, setHusleie] = useState(type.husleie);
+  // Hent verdi: bruk overstyrt hvis finnes, ellers default fra type
+  const prisPerBehandling = overstyr.pris ?? type.prisPerBehandling;
+  const behandlingerPerDag = overstyr.behandlinger ?? type.behandlingerPerDag;
+  const husleie = overstyr.husleie ?? type.husleie;
+  const oppstartUtstyr = overstyr.oppstartUtstyr ?? type.oppstartUtstyr;
+  const oppstartInventar = overstyr.oppstartInventar ?? type.oppstartInventar;
+  const depositum = overstyr.depositum ?? (type.husleie * 3);
+
   const [antallAnsatte, setAntallAnsatte] = useState(0);
   const [lonnPerAnsatt, setLonnPerAnsatt] = useState(34000);
-  const [regnskapKost, setRegnskapKost] = useState(selskapsform === 'as' ? 12000 : 0);
   const [forsikring, setForsikring] = useState(1500);
   const [markedsforing, setMarkedsforing] = useState(2000);
-  const [oppstartUtstyr, setOppstartUtstyr] = useState(type.oppstartUtstyr);
-  const [oppstartInventar, setOppstartInventar] = useState(type.oppstartInventar);
-  const [depositum, setDepositum] = useState(type.husleie * 3);
+  const [regnskapKost, setRegnskapKost] = useState(0);
 
   const byttType = (nyType) => {
-    const t = SALONG_TYPER[nyType];
     setSalongType(nyType);
-    setPrisPerBehandling(t.prisPerBehandling);
-    setBehandlingerPerDag(t.behandlingerPerDag);
-    setHusleie(t.husleie);
-    setOppstartUtstyr(t.oppstartUtstyr);
-    setOppstartInventar(t.oppstartInventar);
-    setDepositum(t.husleie * 3);
+    setOverstyr({}); // nullstill alle overstyrte verdier
   };
 
   const fmt = (n) => Math.round(n).toLocaleString('no-NO') + ' kr';
@@ -351,7 +317,7 @@ export default function SalongKalkulator() {
   const verdiktTekst = !harRaad
     ? `Du mangler ${fmt(totalOppstart - egenkapital)} for å komme i gang. Vurder leiemodell (leiestol) for å redusere oppstartskostnaden betydelig.`
     : netto < 0
-    ? `Negativ kontantstrøm. Du trenger ${breakEvenBehandlinger} behandlinger/mnd (${breakEvenPerStol}/dag per plass) for å gå i null. Øk belegg, pris eller reduser kostnader.`
+    ? `Negativ kontantstrøm. Du trenger ${breakEvenBehandlinger} behandlinger/mnd (${breakEvenPerStol}/dag per plass) for å gå i null.`
     : netto < 15000
     ? `Marginalt lønnsomt med ${fmt(netto)}/mnd. For en solosalong kan dette holde, men det er lite buffer mot dårlige måneder.`
     : `Ser godt ut! ${fmt(netto)}/mnd netto. Break-even er ${breakEvenPerStol} behandlinger per plass per dag.`;
@@ -405,8 +371,8 @@ export default function SalongKalkulator() {
         </div>
         <div className="sal-grid">
           <Field label="Antall behandlingsplasser" value={antallStoler} onChange={setAntallStoler} step={1} suffix="stk" hint="Stoler, benker eller kabinetter" />
-          <Field label="Pris per behandling" value={prisPerBehandling} onChange={setPrisPerBehandling} step={50} hint={`Snitt for ${type.navn.toLowerCase()}`} />
-          <Field label="Behandlinger per plass per dag" value={behandlingerPerDag} onChange={setBehandlingerPerDag} step={1} suffix="stk" hint={`Ca. ${Math.round(60 / (type.behandlingstidMin / behandlingerPerDag))} min per behandling`} />
+          <Field label="Pris per behandling" value={prisPerBehandling} onChange={v => setOverstyr(o => ({...o, pris: v}))} step={50} hint={`Snitt for ${type.navn.toLowerCase()}`} />
+          <Field label="Behandlinger per plass per dag" value={behandlingerPerDag} onChange={v => setOverstyr(o => ({...o, behandlinger: v}))} step={1} suffix="stk" />
         </div>
 
         <div className="sal-belegg-wrap">
@@ -414,7 +380,7 @@ export default function SalongKalkulator() {
             <span className="sal-slider-label">Beleggsprosent</span>
             <span className="sal-slider-val">{belegg}%</span>
           </div>
-          <input type="range" min="30" max="100" step="5" value={belegg} onChange={e => setBelegg(+e.target.value)} className="sal-field" style={{ width: '100%', accentColor: 'var(--brg)', display: 'block' }} />
+          <input type="range" min="30" max="100" step="5" value={belegg} onChange={e => setBelegg(+e.target.value)} style={{ width: '100%', accentColor: 'var(--brg)', display: 'block' }} />
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#bbb', marginTop: '6px' }}>
             <span>30% – oppstart</span><span>75% – realistisk</span><span>100% – fullt</span>
           </div>
@@ -429,7 +395,7 @@ export default function SalongKalkulator() {
           <div className="sal-metric">
             <div className="lbl">Månedlig omsetning</div>
             <div className="val" style={{ color: 'var(--brg)' }}>{fmt(omsetning)}</div>
-            <div className="sub">inkl. mva ikke beregnet</div>
+            <div className="sub">eks. mva</div>
           </div>
           <div className="sal-metric">
             <div className="lbl">Produktkostnad</div>
@@ -445,7 +411,7 @@ export default function SalongKalkulator() {
           <div className="sal-step-title">Kostnader</div>
         </div>
         <div className="sal-grid">
-          <Field label="Husleie / mnd" value={husleie} onChange={setHusleie} step={1000} hint="Kan variere mye etter lokasjon" />
+          <Field label="Husleie / mnd" value={husleie} onChange={v => setOverstyr(o => ({...o, husleie: v}))} step={1000} hint="Kan variere mye etter lokasjon" />
           <Field label="Forsikring / mnd" value={forsikring} onChange={setForsikring} step={250} hint="Innbo, ansvar, yrkesskade" />
           <Field label="Markedsføring / mnd" value={markedsforing} onChange={setMarkedsforing} step={500} hint="Instagram, Google, flyers" />
           <Field label="Regnskapsfører / år" value={regnskapKost} onChange={setRegnskapKost} step={1000} hint={selskapsform === 'enk' ? 'Ikke nødvendig for ENK' : 'Påkrevd for AS'} />
@@ -464,9 +430,9 @@ export default function SalongKalkulator() {
 
         <div className="sal-section-label">Oppstartskostnader</div>
         <div className="sal-grid">
-          <Field label="Utstyr og maskiner" value={oppstartUtstyr} onChange={setOppstartUtstyr} step={10000} hint="Stoler, utstyr, kassasystem" />
-          <Field label="Innredning og renovering" value={oppstartInventar} onChange={setOppstartInventar} step={10000} hint="Møbler, belysning, dekor" />
-          <Field label="Depositum leie" value={depositum} onChange={setDepositum} step={5000} hint="Vanligvis 3 måneder husleie" />
+          <Field label="Utstyr og maskiner" value={oppstartUtstyr} onChange={v => setOverstyr(o => ({...o, oppstartUtstyr: v}))} step={10000} hint="Stoler, utstyr, kassasystem" />
+          <Field label="Innredning og renovering" value={oppstartInventar} onChange={v => setOverstyr(o => ({...o, oppstartInventar: v}))} step={10000} hint="Møbler, belysning, dekor" />
+          <Field label="Depositum leie" value={depositum} onChange={v => setOverstyr(o => ({...o, depositum: v}))} step={5000} hint="Vanligvis 3 måneder husleie" />
           <Field label="Din tilgjengelige kapital" value={egenkapital} onChange={setEgenkapital} step={25000} />
         </div>
       </div>
