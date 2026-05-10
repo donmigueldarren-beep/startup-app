@@ -27,6 +27,7 @@ const styles = `
   .ek-result { font-family: 'Playfair Display', serif; font-size: 24px; margin: 10px 0 4px; }
   .ek-badge { display: inline-block; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 10px; margin-top: 6px; }
   .ek-badge.gold { background: #fdf6e8; color: #7a5a1e; }
+  .ek-badge.green { background: var(--brg-pale); color: var(--brg); }
   .ek-badge.red { background: #fce8e8; color: #8b2020; }
   .ek-verdict { padding: 14px 18px; font-size: 13px; line-height: 1.6; margin-bottom: 16px; border-left: 3px solid; }
   .ek-verdict.green { background: var(--brg-pale); color: var(--brg); border-color: var(--brg); }
@@ -70,16 +71,24 @@ const styles = `
   .ep-neste-bolig-metric { background: #0a1a0c; padding: 16px; }
   .ep-neste-bolig-metric .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #3a6a46; margin-bottom: 8px; }
   .ep-neste-bolig-metric .val { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--cream); }
-  .ep-neste-bolig-verdict { padding: 14px 18px; font-size: 13px; line-height: 1.6; border-left: 3px solid; }
+  .ep-neste-bolig-verdict { padding: 14px 18px; font-size: 13px; line-height: 1.6; border-left: 3px solid; margin-bottom: 16px; }
   .ep-neste-bolig-verdict.green { background: #0a1a0c; color: #9fc9a8; border-color: var(--brg); }
-  .ep-neste-bolig-verdict.amber { background: #1a140a; color: #c9a84c; border-color: var(--gold); }
   .ep-neste-bolig-verdict.red { background: #1a0a0a; color: #c84040; border-color: #c84040; }
-  .ep-aar-tabell { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 16px; }
+  .ep-aar-tabell { width: 100%; border-collapse: collapse; font-size: 12px; }
   .ep-aar-tabell th { text-align: left; padding: 6px 10px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #3a6a46; border-bottom: 1px solid #1a3a1e; font-weight: 500; }
   .ep-aar-tabell td { padding: 8px 10px; border-bottom: 1px solid #0f2010; font-size: 12px; color: #6a9a6e; }
-  .ep-aar-tabell tr.kan { background: #0a1a0c; }
-  .ep-aar-tabell tr.kan td { color: #9fc9a8; }
+  .ep-aar-tabell tr.kan td { color: #9fc9a8; background: #0a1a0c; }
   .ep-aar-tabell tr.kan td:first-child { font-weight: 500; }
+  .bank-sjekk { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--cream-dark); margin-bottom: 16px; }
+  .bank-sjekk-col { background: var(--cream); padding: 18px; }
+  .bank-sjekk-tittel { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 12px; font-weight: 500; }
+  .bank-sjekk-linje { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--cream-dark); font-size: 13px; }
+  .bank-sjekk-linje:last-child { border-bottom: none; }
+  .bank-sjekk-linje .k { color: var(--muted); }
+  .bank-sjekk-linje .v { font-weight: 500; }
+  .bank-status { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 13px; font-weight: 500; }
+  .bank-status.ok { color: var(--brg); }
+  .bank-status.ikke-ok { color: #8b2020; }
   .marcel-seksjon { background: var(--dark); border: 1px solid #1a2e1e; padding: 28px; margin-bottom: 12px; }
   .marcel-header { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 20px; }
   .marcel-avatar { width: 52px; height: 52px; background: linear-gradient(135deg, #c9a84c, #2a6640); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
@@ -176,9 +185,12 @@ Felleskostnader: ${tall.felles.toLocaleString('no-NO')} kr/mnd
 Vedlikehold: ${tall.vedlikehold.toLocaleString('no-NO')} kr/mnd
 Rente: ${tall.rente}%
 Egenkapital: ${tall.ekProsent}%
+Brutto årsinntekt: ${tall.aarsinntekt.toLocaleString('no-NO')} kr
+Maks lån (5x inntekt): ${tall.maksLaan.toLocaleString('no-NO')} kr
+Lån som trengs: ${tall.laan.toLocaleString('no-NO')} kr
+Klarer belåningskrav: ${tall.klarerBelaning ? 'Ja' : 'Nei'}
+Klarer stresstest: ${tall.klarerStress ? 'Ja' : 'Nei'}
 Månedlig nettoresultat: ${tall.netto.toLocaleString('no-NO')} kr
-Restkapital etter kjøp: ${tall.restKapital.toLocaleString('no-NO')} kr
-Kan refinansiere: ${tall.forsteRefiAar ? 'Ja, fra år ' + tall.forsteRefiAar : 'Ikke innen 10 år'}
 
 Gi en konkret analyse:
 1. Er dette en god investering basert på tallene?
@@ -199,7 +211,7 @@ Gi en konkret analyse:
     setMelding('');
     setLasterChat(true);
     try {
-      const kontekst = `Brukeren analyserer en eiendomsinvestering i privat regi. Boligpris: ${tall.boligpris.toLocaleString('no-NO')} kr, Leie: ${tall.leie.toLocaleString('no-NO')} kr/mnd, Netto: ${tall.netto.toLocaleString('no-NO')} kr/mnd, Rente: ${tall.rente}%, EK: ${tall.ekProsent}%.`;
+      const kontekst = `Brukeren analyserer en eiendomsinvestering i privat regi. Boligpris: ${tall.boligpris.toLocaleString('no-NO')} kr, Leie: ${tall.leie.toLocaleString('no-NO')} kr/mnd, Netto: ${tall.netto.toLocaleString('no-NO')} kr/mnd, Rente: ${tall.rente}%, EK: ${tall.ekProsent}%, Årsinntekt: ${tall.aarsinntekt.toLocaleString('no-NO')} kr.`;
       const historikk = chat.filter(m => m.type === 'bruker' || m.type === 'ai').map(m => ({ role: m.type === 'bruker' ? 'user' : 'assistant', content: m.tekst }));
       const tekst = await kallMarcel([{ role: 'user', content: kontekst + '\n\nSpørsmål: ' + melding }, ...historikk.slice(-6), nyMelding]);
       setChat(prev => [...prev, { type: 'ai', tekst }]);
@@ -251,6 +263,7 @@ export default function EiendomPrivat() {
   const [rente, setRente] = useState(5.2);
   const [ekProsent, setEkProsent] = useState(10);
   const [skattProsent, setSkattProsent] = useState(22);
+  const [aarsinntekt, setAarsinntekt] = useState(700000);
   const [prisvekst, setPrisvekst] = useState(3);
   const [oppussing, setOppussing] = useState(0);
   const [maanedligSparing, setMaanedligSparing] = useState(0);
@@ -271,6 +284,15 @@ export default function EiendomPrivat() {
   const harRaad = kapital >= tot;
   const restKapital = Math.max(0, kapital - tot);
 
+  // Banksjekk
+  const maksLaan = aarsinntekt * 5;
+  const klarerBelaning = laan <= maksLaan;
+  const stressRente = rente + 3;
+  const stressMndKostnad = laan * (stressRente / 100) / 12;
+  const stressMndInntekt = aarsinntekt / 12;
+  const klarerStress = stressMndKostnad <= stressMndInntekt * 0.5;
+
+  // Neste bolig
   const nesteEkKrav = nesteBoligpris * (nesteEkProsent / 100);
   const nesteDokAvgift = nesteBoligpris * (dokumentavgiftPst / 100);
   const nesteTotalt = nesteEkKrav + nesteDokAvgift + tinglysingKost;
@@ -289,14 +311,14 @@ export default function EiendomPrivat() {
       const kanRefinansiere = refinansiering > tot * 0.8;
       const totalTilgjengelig = refinansiering + akkumulert;
       const harRaadNeste = totalTilgjengelig >= nesteTotalt;
-      res.push({ aar: y, boligverdi, gjenvLaan, egenkapital, akkumulert, refinansiering, kanRefinansiere, maksNesteBolig: refinansiering / (nesteEkProsent / 100), totalTilgjengelig, harRaadNeste });
+      res.push({ aar: y, boligverdi, gjenvLaan, egenkapital, akkumulert, refinansiering, kanRefinansiere, totalTilgjengelig, harRaadNeste });
     }
     return res;
   })();
 
   const forsteRefi = rader.find(r => r.kanRefinansiere);
   const forsteHarRaadNeste = rader.find(r => r.harRaadNeste);
-  const marcelTall = { boligpris, leie, felles, vedlikehold, rente, ekProsent, netto, restKapital, forsteRefiAar: forsteRefi?.aar };
+  const marcelTall = { boligpris, leie, felles, vedlikehold, rente, ekProsent, aarsinntekt, maksLaan, laan, klarerBelaning, klarerStress, netto, restKapital, forsteRefiAar: forsteRefi?.aar };
 
   return (
     <div className="ek-wrap">
@@ -322,10 +344,40 @@ export default function EiendomPrivat() {
         <div className="ek-step-header"><div className="ek-step-num">2</div><div className="ek-step-title">Din økonomi</div></div>
         <div className="ek-grid">
           <Field label="Tilgjengelig kapital" value={kapital} onChange={setKapital} step={50000} />
+          <Field label="Brutto årsinntekt" value={aarsinntekt} onChange={setAarsinntekt} step={50000} />
           <Field label="Boliglånsrente" value={rente} onChange={setRente} step={0.1} suffix="%" />
           <Field label="Egenkapitalkrav" value={ekProsent} onChange={setEkProsent} step={1} suffix="%" />
           <Field label="Skatteprosent" value={skattProsent} onChange={setSkattProsent} step={1} suffix="%" />
         </div>
+
+        <div className="ek-section-label">Banksjekk</div>
+        <div className="bank-sjekk">
+          <div className="bank-sjekk-col">
+            <div className="bank-sjekk-tittel">Belåningsgrad (maks 5x inntekt)</div>
+            <div className="bank-sjekk-linje"><span className="k">Brutto årsinntekt</span><span className="v">{fmtK(aarsinntekt)}</span></div>
+            <div className="bank-sjekk-linje"><span className="k">Maks lån (5x)</span><span className="v">{fmtK(maksLaan)}</span></div>
+            <div className="bank-sjekk-linje"><span className="k">Lån du trenger</span><span className="v" style={{color: klarerBelaning ? 'var(--brg)' : '#8b2020'}}>{fmtK(laan)}</span></div>
+            <div className={`bank-status ${klarerBelaning ? 'ok' : 'ikke-ok'}`}>
+              {klarerBelaning ? '✓ Innenfor grensen' : '✗ Over maks belåning'}
+            </div>
+            {!klarerBelaning && (
+              <div style={{fontSize:'12px', color:'var(--muted)', marginTop:'8px'}}>
+                Du trenger {fmtK(aarsinntekt * 5 / laan * aarsinntekt - aarsinntekt)} mer i inntekt, eller høyere egenkapital.
+              </div>
+            )}
+          </div>
+          <div className="bank-sjekk-col">
+            <div className="bank-sjekk-tittel">Stresstest (rente + 3%)</div>
+            <div className="bank-sjekk-linje"><span className="k">Nåværende rente</span><span className="v">{rente}%</span></div>
+            <div className="bank-sjekk-linje"><span className="k">Stressrente</span><span className="v">{stressRente.toFixed(1)}%</span></div>
+            <div className="bank-sjekk-linje"><span className="k">Månedskostnad v/stress</span><span className="v" style={{color: klarerStress ? 'var(--brg)' : '#8b2020'}}>{fmtK(stressMndKostnad)}</span></div>
+            <div className="bank-sjekk-linje"><span className="k">50% av månedsinntekt</span><span className="v">{fmtK(stressMndInntekt * 0.5)}</span></div>
+            <div className={`bank-status ${klarerStress ? 'ok' : 'ikke-ok'}`}>
+              {klarerStress ? '✓ Klarer stresstesten' : '✗ Klarer ikke stresstesten'}
+            </div>
+          </div>
+        </div>
+
         <hr className="ek-divider" />
         <div className="ek-two-col">
           <div className="ek-col">
@@ -346,9 +398,11 @@ export default function EiendomPrivat() {
             <div className="ek-result" style={{color: netto >= 0 ? 'var(--brg)' : '#8b2020'}}>{fmtMndK(netto)}</div>
           </div>
         </div>
-        <div className={`ek-verdict ${!harRaad ? 'red' : netto >= 0 ? 'green' : 'amber'}`}>
-          {!harRaad ? `Du mangler ${fmtK(tot - kapital)} for å gjennomføre kjøpet.`
-            : netto >= 0 ? `Lønnsomt! Du sitter igjen med ${fmtMndK(netto)} etter alle kostnader og skatt.`
+        <div className={`ek-verdict ${!harRaad || !klarerBelaning || !klarerStress ? 'red' : netto >= 0 ? 'green' : 'amber'}`}>
+          {!harRaad ? `Du mangler ${fmtK(tot - kapital)} i egenkapital.`
+            : !klarerBelaning ? `Lånet på ${fmtK(laan)} overstiger maks belåning på ${fmtK(maksLaan)} (5x inntekt). Øk egenkapital eller inntekt.`
+            : !klarerStress ? `Du klarer ikke stresstesten. Månedskostnaden ved ${stressRente.toFixed(1)}% rente er ${fmtK(stressMndKostnad)}, over 50% av månedsinntekten.`
+            : netto >= 0 ? `Ser bra ut! Du klarer bankens krav og sitter igjen med ${fmtMndK(netto)} netto.`
             : `Negativt resultat på ${fmtMndK(netto)}. Vurder høyere leie eller lavere kjøpspris.`}
         </div>
       </div>
@@ -435,7 +489,7 @@ export default function EiendomPrivat() {
         </div>
         <table className="ep-aar-tabell">
           <thead>
-            <tr><th>År</th><th>Tilgjengelig kapital</th><th>Trenger</th><th>Mangler</th><th>Status</th></tr>
+            <tr><th>År</th><th>Tilgjengelig</th><th>Trenger</th><th>Mangler</th><th>Status</th></tr>
           </thead>
           <tbody>
             {rader.map(r => (
