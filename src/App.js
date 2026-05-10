@@ -122,6 +122,33 @@ const styles = `
   .bransje-more { background: white; padding: 22px 28px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--cream-dark); }
   .bransje-more-text { font-family: 'Playfair Display', serif; font-size: 14px; color: var(--muted); font-style: italic; }
 
+  .pris-section { padding: 120px 80px; background: var(--dark); position: relative; overflow: hidden; }
+  .pris-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(to right, transparent, rgba(201,168,76,0.4), transparent); }
+  .pris-section::after { content: ''; position: absolute; bottom: -300px; left: 50%; transform: translateX(-50%); width: 800px; height: 600px; background: radial-gradient(circle, rgba(31,78,46,0.08) 0%, transparent 70%); pointer-events: none; }
+  .pris-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; background: rgba(31,78,46,0.2); position: relative; z-index: 1; }
+  .pris-kort { background: #0a1a0c; padding: 48px 40px; position: relative; overflow: hidden; transition: background 0.4s; }
+  .pris-kort::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--muted); transition: background 0.4s; }
+  .pris-kort.populær { background: #0d2010; }
+  .pris-kort.populær::before { background: var(--gold); }
+  .pris-kort:hover { background: #0f2614; }
+  .pris-populær-pill { position: absolute; top: 20px; right: 20px; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; background: var(--gold); color: var(--dark); padding: 4px 12px; font-weight: 500; }
+  .pris-plan { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #3a6a46; margin-bottom: 20px; }
+  .pris-pris { font-family: 'Playfair Display', serif; font-size: 52px; color: var(--cream); line-height: 1; margin-bottom: 6px; }
+  .pris-pris span { font-size: 18px; color: #3a6a46; font-family: 'Inter', sans-serif; font-weight: 300; }
+  .pris-desc { font-size: 13px; color: #3a6a46; margin-bottom: 32px; line-height: 1.6; min-height: 40px; }
+  .pris-skillelinje { border: none; border-top: 1px solid rgba(31,78,46,0.4); margin-bottom: 28px; }
+  .pris-liste { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 36px; }
+  .pris-liste li { font-size: 13px; color: #6a9a6e; display: flex; align-items: flex-start; gap: 10px; line-height: 1.5; }
+  .pris-liste li::before { content: '✓'; color: var(--brg-light); font-size: 12px; flex-shrink: 0; margin-top: 1px; }
+  .pris-liste li.nei { color: #2a3a2e; }
+  .pris-liste li.nei::before { content: '–'; color: #2a3a2e; }
+  .pris-knapp { width: 100%; padding: 14px; font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.3s; font-weight: 500; border: 1px solid rgba(31,78,46,0.5); background: transparent; color: #6a9a6e; }
+  .pris-knapp:hover { border-color: var(--brg-light); color: var(--cream); background: rgba(31,78,46,0.2); }
+  .pris-knapp.gull { background: var(--gold); color: var(--dark); border-color: var(--gold); }
+  .pris-knapp.gull:hover { background: #d4b558; transform: translateY(-2px); box-shadow: 0 12px 30px rgba(201,168,76,0.25); }
+  .pris-budsjett-note { text-align: center; margin-top: 32px; font-size: 12px; color: #2a4a2e; position: relative; z-index: 1; }
+  .pris-budsjett-note span { color: var(--gold); }
+
   .hvorfor-section { background: var(--dark); padding: 140px 80px; display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: center; position: relative; overflow: hidden; }
   .hvorfor-section::before { content: ''; position: absolute; bottom: -200px; right: -200px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(31,78,46,0.12) 0%, transparent 70%); pointer-events: none; }
   .hvorfor-img-wrap { position: relative; height: 520px; }
@@ -227,49 +254,33 @@ const FooterLogo = () => (
 
 function Partikler() {
   const canvasRef = useRef(null);
-
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const resize = () => {
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-    };
+    const resize = () => { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; };
     resize();
     window.addEventListener('resize', resize);
-
     const partikler = Array.from({ length: 40 }, () => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      r: Math.random() * 1.2 + 0.2,
-      vx: (Math.random() - 0.5) * 0.25,
-      vy: -Math.random() * 0.35 - 0.1,
-      opacity: Math.random() * 0.4 + 0.05
+      x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+      r: Math.random() * 1.2 + 0.2, vx: (Math.random() - 0.5) * 0.25,
+      vy: -Math.random() * 0.35 - 0.1, opacity: Math.random() * 0.4 + 0.05
     }));
-
     let animId;
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       partikler.forEach(p => {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(201,168,76,${p.opacity})`;
-        ctx.fill();
-        p.x += p.vx;
-        p.y += p.vy;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(201,168,76,${p.opacity})`; ctx.fill();
+        p.x += p.vx; p.y += p.vy;
         if (p.y < -10) { p.y = canvas.height + 10; p.x = Math.random() * canvas.width; }
         if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
       });
       animId = requestAnimationFrame(animate);
     };
     animate();
-    return () => {
-      cancelAnimationFrame(animId);
-      window.removeEventListener('resize', resize);
-    };
+    return () => { cancelAnimationFrame(animId); window.removeEventListener('resize', resize); };
   }, []);
-
   return <canvas ref={canvasRef} className="hero-particles" style={{ width: '100%', height: '100%' }} />;
 }
 
@@ -277,7 +288,6 @@ function Teller({ slutt, suffix = '' }) {
   const [verdi, setVerdi] = useState(0);
   const ref = useRef(null);
   const startet = useRef(false);
-
   useEffect(() => {
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting && !startet.current) {
@@ -296,16 +306,13 @@ function Teller({ slutt, suffix = '' }) {
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, [slutt]);
-
   return <span ref={ref} className="teller">{verdi}{suffix}</span>;
 }
 
 function useScrollReveal() {
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) entry.target.classList.add('synlig');
-      });
+      entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('synlig'); });
     }, { threshold: 0.1 });
     const els = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
     els.forEach(el => observer.observe(el));
@@ -380,6 +387,103 @@ function getBransjeFromUrl() {
     return bransjer.find(b => b.id === id) || null;
   }
   return null;
+}
+
+function PrisSeksjon({ onKomIgang }) {
+  const planer = [
+    {
+      plan: 'Gratis',
+      pris: '0',
+      desc: 'Alle kalkulatorer, for alltid gratis.',
+      populær: false,
+      funksjoner: [
+        'Alle 5 kalkulatorer',
+        '10-års prognose',
+        'Neste bolig kalkulator',
+        'Banksjekk og stresstest',
+      ],
+      ikkeInkludert: [
+        'AI-assistent (Marcel, Colette, René)',
+        'Budsjettark med eksport',
+      ],
+      knappTekst: 'Start gratis',
+      knappType: 'standard',
+    },
+    {
+      plan: 'Basis',
+      pris: '49',
+      desc: 'For deg som vil støtte og ikke trenger AI.',
+      populær: false,
+      funksjoner: [
+        'Alt i gratis',
+        'Støtt videre utvikling',
+        'Tidlig tilgang til nye bransjer',
+      ],
+      ikkeInkludert: [
+        'AI-assistent (Marcel, Colette, René)',
+        'Budsjettark med eksport',
+      ],
+      knappTekst: 'Velg Basis',
+      knappType: 'standard',
+    },
+    {
+      plan: 'Pro',
+      pris: '99',
+      desc: 'Alt du trenger for å ta gode investeringsbeslutninger.',
+      populær: true,
+      funksjoner: [
+        'Alt i gratis',
+        'AI-assistent Marcel for eiendom',
+        'AI-assistent Colette for salong',
+        'AI-assistent René for bilutleie',
+        'Budsjettark forhåndsutfylt med dine tall',
+        'Eksport til Excel og PDF',
+        'Tidlig tilgang til nye bransjer',
+      ],
+      ikkeInkludert: [],
+      knappTekst: 'Velg Pro',
+      knappType: 'gull',
+    },
+  ];
+
+  return (
+    <section className="pris-section">
+      <div style={{ textAlign: 'center', marginBottom: '64px', position: 'relative', zIndex: 1 }}>
+        <div className="section-tag reveal" style={{ justifyContent: 'center', color: 'var(--gold)' }}>
+          <span style={{ display: 'inline-block', width: '24px', height: '1px', background: 'var(--gold)', marginRight: '12px', verticalAlign: 'middle' }}></span>
+          Abonnement
+        </div>
+        <div className="section-title reveal reveal-delay-1" style={{ color: 'var(--cream)', marginBottom: '16px' }}>Velg din plan</div>
+        <div className="reveal reveal-delay-2" style={{ fontSize: '14px', color: '#3a6a46', maxWidth: '480px', margin: '0 auto' }}>
+          Kalkulatorene er alltid gratis. Pro gir deg AI-assistenter og budsjettark.
+        </div>
+      </div>
+      <div className="pris-grid reveal reveal-delay-2">
+        {planer.map((p, i) => (
+          <div key={i} className={`pris-kort ${p.populær ? 'populær' : ''}`}>
+            {p.populær && <div className="pris-populær-pill">Anbefalt</div>}
+            <div className="pris-plan">{p.plan}</div>
+            <div className="pris-pris">{p.pris}<span> kr/mnd</span></div>
+            <div className="pris-desc">{p.desc}</div>
+            <hr className="pris-skillelinje" />
+            <ul className="pris-liste">
+              {p.funksjoner.map((f, j) => <li key={j}>{f}</li>)}
+              {p.ikkeInkludert.map((f, j) => <li key={j} className="nei">{f}</li>)}
+            </ul>
+            <button
+              className={`pris-knapp ${p.knappType === 'gull' ? 'gull' : ''}`}
+              onClick={onKomIgang}
+            >
+              {p.knappTekst}
+            </button>
+          </div>
+        ))}
+      </div>
+      <div className="pris-budsjett-note reveal">
+        Pro inkluderer <span>budsjettark</span> forhåndsutfylt med tallene fra kalkulatoren din. Eksporter til Excel eller PDF.
+      </div>
+    </section>
+  );
 }
 
 export default function App() {
@@ -598,6 +702,8 @@ export default function App() {
             <span style={{ color: 'var(--cream-dark)', fontSize: '20px' }}>→</span>
           </div>
         </section>
+
+        <PrisSeksjon onKomIgang={() => aapneBransje(bransjer[0])} />
 
         <section className="hvorfor-section">
           <div className="hvorfor-img-wrap reveal-left">
