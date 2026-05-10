@@ -509,8 +509,6 @@ export default function EiendomSammenlign() {
     return res;
   })();
 
-  const forsteRefiPrivat = raderPrivat.find(r => r.kanRefi);
-  const forsteRefiAS = raderAS.find(r => r.kanRefi);
   const forsteHarRaadPrivat = raderPrivat.find(r => r.harRaadNeste);
   const forsteHarRaadAS = raderAS.find(r => r.harRaadNeste);
 
