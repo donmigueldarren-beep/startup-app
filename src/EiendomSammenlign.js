@@ -84,28 +84,54 @@ const styles = `
   .ep-refi-num { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--brg); white-space: nowrap; }
   .ep-refi-num-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brg-light); }
   .ep-no-refi { background: #fdf6e8; border-left: 3px solid var(--gold); padding: 12px 16px; font-size: 13px; color: #7a5a1e; margin-bottom: 20px; }
-  .ai-seksjon { background: var(--dark); border: 1px solid #1a2e1e; padding: 28px; margin-bottom: 12px; }
-  .ai-seksjon-tittel { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--cream); margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
-  .ai-seksjon-sub { font-size: 12px; color: #3a6a46; margin-bottom: 20px; }
-  .ai-analyse-knapp { background: var(--gold); color: var(--dark); border: none; padding: 12px 28px; font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; font-weight: 500; }
-  .ai-analyse-knapp:hover { background: #b8943c; }
-  .ai-analyse-knapp:disabled { opacity: 0.5; cursor: not-allowed; }
-  .ai-analyse-resultat { background: #0a1a0c; border: 1px solid #1a3a1e; padding: 20px; margin-top: 16px; font-size: 14px; color: #9fc9a8; line-height: 1.8; white-space: pre-wrap; }
-  .ai-chat { margin-top: 24px; border-top: 1px solid #1a2e1e; padding-top: 20px; }
-  .ai-chat-tittel { font-size: 12px; color: #3a6a46; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 14px; }
-  .ai-chat-meldinger { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; max-height: 320px; overflow-y: auto; }
-  .ai-chat-melding { padding: 12px 16px; font-size: 13px; line-height: 1.6; max-width: 85%; }
-  .ai-chat-melding.bruker { background: #1a3a1e; color: var(--cream); align-self: flex-end; }
-  .ai-chat-melding.ai { background: #0a1a0c; color: #9fc9a8; align-self: flex-start; border: 1px solid #1a3a1e; }
-  .ai-chat-melding.laster { color: #3a6a46; font-style: italic; }
-  .ai-chat-input-wrap { display: flex; gap: 8px; }
-  .ai-chat-input { flex: 1; padding: 10px 14px; background: #0a1a0c; border: 1px solid #1a3a1e; color: var(--cream); font-family: 'Inter', sans-serif; font-size: 13px; outline: none; }
-  .ai-chat-input::placeholder { color: #2a4a2e; }
-  .ai-chat-input:focus { border-color: var(--gold); }
-  .ai-chat-send { background: var(--brg); color: var(--cream); border: none; padding: 10px 20px; font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; }
-  .ai-chat-send:hover { background: #2a6640; }
-  .ai-chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
-  .ai-spark { font-size: 16px; }
+  .ep-neste-bolig { background: var(--dark); padding: 28px; margin-bottom: 12px; }
+  .ep-neste-bolig-title { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--cream); margin-bottom: 6px; }
+  .ep-neste-bolig-sub { font-size: 12px; color: #3a6a46; margin-bottom: 20px; }
+  .ep-neste-bolig-input-wrap { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .ep-neste-bolig-felt label { display: block; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #6a7a6e; margin-bottom: 6px; }
+  .ep-neste-bolig-felt input { width: 100%; padding: 10px 12px; border: 1px solid #1a3a1e; background: #0a1a0c; color: var(--cream); font-family: 'Inter', sans-serif; font-size: 14px; outline: none; box-sizing: border-box; }
+  .ep-neste-bolig-felt input:focus { border-color: var(--gold); }
+  .ep-neste-sammenlign { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: #1a2e1e; margin-bottom: 16px; }
+  .ep-neste-col { background: #0a1a0c; padding: 20px; }
+  .ep-neste-col-tittel { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 14px; }
+  .ep-neste-col-tittel.privat { color: var(--gold); }
+  .ep-neste-col-tittel.as { color: #9fc9a8; }
+  .ep-neste-linje { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #1a2e1e; font-size: 13px; }
+  .ep-neste-linje:last-child { border-bottom: none; }
+  .ep-neste-linje .k { color: #3a6a46; }
+  .ep-neste-linje .v { font-weight: 500; color: var(--cream); }
+  .ep-neste-status { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 13px; font-weight: 500; }
+  .ep-neste-status.ok { color: #9fc9a8; }
+  .ep-neste-status.ikke-ok { color: #c84040; }
+  .ep-aar-tabell { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .ep-aar-tabell th { text-align: left; padding: 6px 10px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #3a6a46; border-bottom: 1px solid #1a3a1e; font-weight: 500; }
+  .ep-aar-tabell td { padding: 8px 10px; border-bottom: 1px solid #0f2010; font-size: 12px; color: #6a9a6e; }
+  .ep-aar-tabell tr.kan td { color: #9fc9a8; background: #0a1a0c; font-weight: 500; }
+  .marcel-seksjon { background: var(--dark); border: 1px solid #1a2e1e; padding: 28px; margin-bottom: 12px; }
+  .marcel-header { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 20px; }
+  .marcel-avatar { width: 52px; height: 52px; background: linear-gradient(135deg, #1f4e2e, #c9a84c); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+  .marcel-intro { flex: 1; }
+  .marcel-navn { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--cream); margin-bottom: 4px; }
+  .marcel-tittel { font-size: 11px; color: var(--gold); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
+  .marcel-bio { font-size: 12px; color: #4a6a4e; line-height: 1.6; }
+  .marcel-knapp { background: var(--gold); color: var(--dark); border: none; padding: 12px 28px; font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; font-weight: 500; }
+  .marcel-knapp:hover { background: #b8943c; }
+  .marcel-knapp:disabled { opacity: 0.5; cursor: not-allowed; }
+  .marcel-resultat { background: #0a1a0c; border: 1px solid #1a3a1e; padding: 20px; margin-top: 16px; font-size: 14px; color: #9fc9a8; line-height: 1.8; white-space: pre-wrap; }
+  .marcel-chat { margin-top: 24px; border-top: 1px solid #1a2e1e; padding-top: 20px; }
+  .marcel-chat-tittel { font-size: 12px; color: #3a6a46; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 14px; }
+  .marcel-chat-meldinger { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; max-height: 320px; overflow-y: auto; }
+  .marcel-chat-melding { padding: 12px 16px; font-size: 13px; line-height: 1.6; max-width: 85%; }
+  .marcel-chat-melding.bruker { background: #1a3a1e; color: var(--cream); align-self: flex-end; }
+  .marcel-chat-melding.ai { background: #0a1a0c; color: #9fc9a8; align-self: flex-start; border: 1px solid #1a3a1e; }
+  .marcel-chat-melding.laster { color: #3a6a46; font-style: italic; }
+  .marcel-chat-input-wrap { display: flex; gap: 8px; }
+  .marcel-chat-input { flex: 1; padding: 10px 14px; background: #0a1a0c; border: 1px solid #1a3a1e; color: var(--cream); font-family: 'Inter', sans-serif; font-size: 13px; outline: none; }
+  .marcel-chat-input::placeholder { color: #2a4a2e; }
+  .marcel-chat-input:focus { border-color: var(--gold); }
+  .marcel-chat-send { background: var(--brg); color: var(--cream); border: none; padding: 10px 20px; font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; }
+  .marcel-chat-send:hover { background: #2a6640; }
+  .marcel-chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
 `;
 
 function fmt(n) {
@@ -138,17 +164,18 @@ function InputFelt({ label, value, onChange, step = 1000, suffix = 'kr', hint = 
   );
 }
 
-async function kallClaude(meldinger) {
+async function kallMarcel(meldinger) {
   const svar = await fetch('/api/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 1000,
-      system: `Du er en norsk eiendomsinvesteringsrådgiver hos Invest Tools by ADDON.
+      system: `Du heter Marcel og er en AI-assistent i Invest Tools by ADDON.
 Du hjelper brukere med å sammenligne privat kjøp vs kjøp via AS i Norge.
-Svar alltid på norsk. Vær direkte og konkret. Ikke bruk finansielle klisjeer.
-Aldri si at du er en AI. Presenter deg som Invest Tools-rådgiver.
+Du er IKKE en menneskelig rådgiver og gir IKKE finansiell eller juridisk rådgivning.
+Svar alltid på norsk, direkte og konkret. Ingen klisjeer.
+Minn alltid brukeren på å konsultere en regnskapsfører ved viktige beslutninger.
 Hold svar under 200 ord med mindre brukeren ber om mer.`,
       messages: meldinger
     })
@@ -157,7 +184,7 @@ Hold svar under 200 ord med mindre brukeren ber om mer.`,
   return data.content[0].text;
 }
 
-function AIAssistent({ tall }) {
+function Marcel({ tall }) {
   const [analyse, setAnalyse] = useState('');
   const [lasterAnalyse, setLasterAnalyse] = useState(false);
   const [chat, setChat] = useState([]);
@@ -168,7 +195,7 @@ function AIAssistent({ tall }) {
     setLasterAnalyse(true);
     setAnalyse('');
     try {
-      const prompt = `Sammenlign disse to alternativene for eiendomsinvestering:
+      const tekst = await kallMarcel([{ role: 'user', content: `Sammenlign disse to alternativene:
 
 PRIVAT KJØP:
 Egenkapital: ${tall.ekProsentPrivat}% = ${tall.ekPrivat.toLocaleString('no-NO')} kr
@@ -185,12 +212,10 @@ Oppstartskostnad: ${tall.totAS.toLocaleString('no-NO')} kr
 Månedlig netto: ${tall.nettoAS.toLocaleString('no-NO')} kr
 Har råd: ${tall.harAS ? 'Ja' : 'Nei'}
 
-Gi en konkret anbefaling:
+Gi en konkret analyse:
 1. Hvilket alternativ passer best og hvorfor?
 2. Hva er den viktigste fordelen med hvert alternativ?
-3. Når bør man velge AS fremfor privat?`;
-
-      const tekst = await kallClaude([{ role: 'user', content: prompt }]);
+3. Når bør man velge AS fremfor privat?` }]);
       setAnalyse(tekst);
     } catch (e) {
       setAnalyse('Kunne ikke hente analyse akkurat nå. Prøv igjen.');
@@ -201,24 +226,13 @@ Gi en konkret anbefaling:
   const sendMelding = async () => {
     if (!melding.trim() || lasterChat) return;
     const nyMelding = { role: 'user', content: melding };
-    const oppdatertChat = [...chat, { type: 'bruker', tekst: melding }];
-    setChat(oppdatertChat);
+    setChat(prev => [...prev, { type: 'bruker', tekst: melding }]);
     setMelding('');
     setLasterChat(true);
-
     try {
       const kontekst = `Brukeren sammenligner privat kjøp (netto ${tall.nettoPrivat.toLocaleString('no-NO')} kr/mnd) vs AS (netto ${tall.nettoAS.toLocaleString('no-NO')} kr/mnd) for en bolig til ${tall.boligpris.toLocaleString('no-NO')} kr.`;
-
-      const historikk = chat
-        .filter(m => m.type === 'bruker' || m.type === 'ai')
-        .map(m => ({ role: m.type === 'bruker' ? 'user' : 'assistant', content: m.tekst }));
-
-      const tekst = await kallClaude([
-        { role: 'user', content: kontekst + '\n\nSpørsmål: ' + melding },
-        ...historikk.slice(-6),
-        nyMelding
-      ]);
-
+      const historikk = chat.filter(m => m.type === 'bruker' || m.type === 'ai').map(m => ({ role: m.type === 'bruker' ? 'user' : 'assistant', content: m.tekst }));
+      const tekst = await kallMarcel([{ role: 'user', content: kontekst + '\n\nSpørsmål: ' + melding }, ...historikk.slice(-6), nyMelding]);
       setChat(prev => [...prev, { type: 'ai', tekst }]);
     } catch (e) {
       setChat(prev => [...prev, { type: 'ai', tekst: 'Kunne ikke svare akkurat nå. Prøv igjen.' }]);
@@ -227,41 +241,30 @@ Gi en konkret anbefaling:
   };
 
   return (
-    <div className="ai-seksjon">
-      <div className="ai-seksjon-tittel">
-        <span className="ai-spark">✦</span> AI-rådgiver
+    <div className="marcel-seksjon">
+      <div className="marcel-header">
+        <div className="marcel-avatar">⚖️</div>
+        <div className="marcel-intro">
+          <div className="marcel-navn">Marcel</div>
+          <div className="marcel-tittel">AI-assistent for sammenligning av kjøpsform</div>
+          <div className="marcel-bio">Hjelper deg sammenligne alternativene dine. Erstatter ikke en regnskapsfører.</div>
+        </div>
       </div>
-      <div className="ai-seksjon-sub">Få en personlig anbefaling basert på dine tall, eller still spørsmål om privat vs AS</div>
-
-      <button className="ai-analyse-knapp" onClick={hentAnalyse} disabled={lasterAnalyse}>
+      <button className="marcel-knapp" onClick={hentAnalyse} disabled={lasterAnalyse}>
         {lasterAnalyse ? 'Analyserer...' : 'Analyser mine tall'}
       </button>
-
-      {analyse && (
-        <div className="ai-analyse-resultat">{analyse}</div>
-      )}
-
-      <div className="ai-chat">
-        <div className="ai-chat-tittel">Still et spørsmål</div>
+      {analyse && <div className="marcel-resultat">{analyse}</div>}
+      <div className="marcel-chat">
+        <div className="marcel-chat-tittel">Spør Marcel</div>
         {chat.length > 0 && (
-          <div className="ai-chat-meldinger">
-            {chat.map((m, i) => (
-              <div key={i} className={`ai-chat-melding ${m.type}`}>{m.tekst}</div>
-            ))}
-            {lasterChat && <div className="ai-chat-melding ai laster">Tenker...</div>}
+          <div className="marcel-chat-meldinger">
+            {chat.map((m, i) => <div key={i} className={`marcel-chat-melding ${m.type}`}>{m.tekst}</div>)}
+            {lasterChat && <div className="marcel-chat-melding ai laster">Tenker...</div>}
           </div>
         )}
-        <div className="ai-chat-input-wrap">
-          <input
-            className="ai-chat-input"
-            placeholder="F.eks. når lønner det seg å kjøpe via AS?"
-            value={melding}
-            onChange={e => setMelding(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && sendMelding()}
-          />
-          <button className="ai-chat-send" onClick={sendMelding} disabled={lasterChat || !melding.trim()}>
-            Send
-          </button>
+        <div className="marcel-chat-input-wrap">
+          <input className="marcel-chat-input" placeholder="F.eks. når lønner det seg å kjøpe via AS?" value={melding} onChange={e => setMelding(e.target.value)} onKeyDown={e => e.key === 'Enter' && sendMelding()} />
+          <button className="marcel-chat-send" onClick={sendMelding} disabled={lasterChat || !melding.trim()}>Send</button>
         </div>
       </div>
     </div>
@@ -435,6 +438,9 @@ export default function EiendomSammenlign() {
   const [prisvekst, setPrisvekst] = useState(3);
   const [oppussing, setOppussing] = useState(0);
   const [maanedligSparing, setMaanedligSparing] = useState(10000);
+  const [nesteBoligpris, setNesteBoligpris] = useState(3500000);
+  const [nesteEkPrivat, setNesteEkPrivat] = useState(10);
+  const [nesteEkAS, setNesteEkAS] = useState(25);
 
   const fmtK = (n) => Math.round(n).toLocaleString('no-NO') + ' kr';
   const fmtMndK = (n) => (n >= 0 ? '+' : '') + Math.round(n).toLocaleString('no-NO') + ' kr/mnd';
@@ -465,6 +471,9 @@ export default function EiendomSammenlign() {
 
   const getEKKrav = (y) => { if (y <= 2) return 0.30; if (y <= 4) return 0.25; if (y <= 7) return 0.20; return 0.15; };
 
+  const nesteTotaltPrivat = nesteBoligpris * (nesteEkPrivat / 100) + nesteBoligpris * (dokumentavgiftPst / 100) + tinglysingKost;
+  const nesteTotaltAS = nesteBoligpris * (nesteEkAS / 100) + nesteBoligpris * (dokumentavgiftPst / 100) + tinglysingKost;
+
   const raderPrivat = (() => {
     const res = [];
     let akk = restPrivat;
@@ -476,7 +485,8 @@ export default function EiendomSammenlign() {
       akk += nettoPrivat * 12 + maanedligSparing * 12;
       const ek = bv - gjenv;
       const refi = Math.max(0, bv * 0.75 - gjenv);
-      res.push({ aar: y, ek, akk, refi, kanRefi: refi > totPrivat * 0.8, maks: refi / 0.10 });
+      const totalTilgjengelig = refi + akk;
+      res.push({ aar: y, ek, akk, refi, kanRefi: refi > totPrivat * 0.8, maks: refi / 0.10, totalTilgjengelig, harRaadNeste: totalTilgjengelig >= nesteTotaltPrivat });
     }
     return res;
   })();
@@ -493,13 +503,16 @@ export default function EiendomSammenlign() {
       const ek = bv - gjenv;
       const refi = Math.max(0, bv * 0.75 - gjenv);
       const ekKrav = getEKKrav(y);
-      res.push({ aar: y, ek, akk, refi, kanRefi: refi > totAS * 0.8, ekKrav, maks: refi / ekKrav });
+      const totalTilgjengelig = refi + akk;
+      res.push({ aar: y, ek, akk, refi, kanRefi: refi > totAS * 0.8, ekKrav, maks: refi / ekKrav, totalTilgjengelig, harRaadNeste: totalTilgjengelig >= nesteTotaltAS });
     }
     return res;
   })();
 
   const forsteRefiPrivat = raderPrivat.find(r => r.kanRefi);
   const forsteRefiAS = raderAS.find(r => r.kanRefi);
+  const forsteHarRaadPrivat = raderPrivat.find(r => r.harRaadNeste);
+  const forsteHarRaadAS = raderAS.find(r => r.harRaadNeste);
 
   const verdikt = !harPrivat && !harAS
     ? `Du har ikke nok kapital for noen av alternativene. Du trenger minst ${fmtK(totPrivat)} for privat kjøp.`
@@ -511,17 +524,14 @@ export default function EiendomSammenlign() {
     ? `Privat kjøp gir best månedlig kontantstrøm (${fmtMndK(nettoPrivat)} vs ${fmtMndK(nettoAS)}). Velg AS hvis du planlegger portefølje med flere enheter.`
     : `AS gir best månedlig kontantstrøm (${fmtMndK(nettoAS)} vs ${fmtMndK(nettoPrivat)}). AS har også fordeler ved reinvestering og porteføljevekst.`;
 
-  const aiTall = { boligpris, nettoPrivat, nettoAS, ekProsentPrivat, ekProsentAS, ekPrivat, ekAS, totPrivat, totAS, rentePrivat, renteAS, regnskapKost, harPrivat, harAS };
+  const marcelTall = { boligpris, nettoPrivat, nettoAS, ekProsentPrivat, ekProsentAS, ekPrivat, ekAS, totPrivat, totAS, rentePrivat, renteAS, regnskapKost, harPrivat, harAS };
 
   return (
     <div className="es-wrap">
       <style>{styles}</style>
 
       <div className="es-step">
-        <div className="es-step-header">
-          <div className="es-step-num">1</div>
-          <div className="es-step-title">Om boligen (felles for begge)</div>
-        </div>
+        <div className="es-step-header"><div className="es-step-num">1</div><div className="es-step-title">Om boligen (felles for begge)</div></div>
         <div className="es-grid">
           <Field label="Boligpris" value={boligpris} onChange={setBoligpris} step={50000} />
           <Field label="Leieinntekt" value={leie} onChange={setLeie} step={500} suffix="kr/mnd" />
@@ -537,10 +547,7 @@ export default function EiendomSammenlign() {
       </div>
 
       <div className="es-step">
-        <div className="es-step-header">
-          <div className="es-step-num">2</div>
-          <div className="es-step-title">Forutsetninger per alternativ</div>
-        </div>
+        <div className="es-step-header"><div className="es-step-num">2</div><div className="es-step-title">Forutsetninger per alternativ</div></div>
         <div className="es-compare">
           <div className="es-col privat">
             <div className="es-col-label">Privat kjøp</div>
@@ -566,10 +573,7 @@ export default function EiendomSammenlign() {
       </div>
 
       <div className="es-step">
-        <div className="es-step-header">
-          <div className="es-step-num">3</div>
-          <div className="es-step-title">Sammenligning</div>
-        </div>
+        <div className="es-step-header"><div className="es-step-num">3</div><div className="es-step-title">Sammenligning</div></div>
         <div className="es-compare" style={{marginBottom:'20px'}}>
           <div className="es-col privat">
             <div className="es-col-label">Privat</div>
@@ -599,20 +603,10 @@ export default function EiendomSammenlign() {
         <div className="es-verdict">{verdikt}</div>
       </div>
 
-      <Graf
-        boligpris={boligpris}
-        nettoPrivat={nettoPrivat}
-        nettoAS={nettoAS}
-        ekProsentAS={ekProsentAS}
-        restKapitalPrivat={restPrivat}
-        restKapitalAS={restAS}
-      />
+      <Graf boligpris={boligpris} nettoPrivat={nettoPrivat} nettoAS={nettoAS} ekProsentAS={ekProsentAS} restKapitalPrivat={restPrivat} restKapitalAS={restAS} />
 
       <div className="es-step">
-        <div className="es-step-header">
-          <div className="es-step-num">4</div>
-          <div className="es-step-title">10-års prognose side om side</div>
-        </div>
+        <div className="es-step-header"><div className="es-step-num">4</div><div className="es-step-title">10-års prognose side om side</div></div>
         <div className="ep-kapital-box">
           <div style={{fontSize:'12px', fontWeight:'500', color:'var(--dark)', marginBottom:'12px'}}>Forutsetninger for prognosen</div>
           <div className="ep-kapital-grid">
@@ -657,36 +651,86 @@ export default function EiendomSammenlign() {
         </div>
       </div>
 
-      {(forsteRefiPrivat || forsteRefiAS) && (
-        <div className="ep-next">
-          <div className="ep-next-title">Neste leilighet, når har du råd?</div>
-          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'24px'}}>
-            <div>
-              <div style={{fontSize:'10px', color:'var(--gold)', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:'12px'}}>Privat</div>
-              {forsteRefiPrivat ? (
-                <div className="ep-next-grid">
-                  <div className="ep-next-item"><div className="lbl">Tidligst refinansiering</div><div className="val">År {forsteRefiPrivat.aar}</div></div>
-                  <div className="ep-next-item"><div className="lbl">Kapital fra refi</div><div className="val">{fmt(forsteRefiPrivat.refi)}</div></div>
-                  <div className="ep-next-item"><div className="lbl">Maks neste bolig</div><div className="val">{fmt(forsteRefiPrivat.maks)}</div></div>
-                </div>
-              ) : <div style={{fontSize:'13px', color:'#6a7a6e'}}>Ikke mulig innen 10 år</div>}
+      <div className="ep-neste-bolig">
+        <div className="ep-neste-bolig-title">Har du råd til neste bolig?</div>
+        <div className="ep-neste-bolig-sub">Legg inn prisen på neste bolig og EK-krav per kjøpsform, så sammenligner vi når du har råd.</div>
+        <div className="ep-neste-bolig-input-wrap">
+          <div className="ep-neste-bolig-felt">
+            <label>Pris på neste bolig</label>
+            <div style={{position:'relative'}}>
+              <input type="number" value={nesteBoligpris} step={50000} onChange={e => setNesteBoligpris(+e.target.value)} />
+              <span style={{position:'absolute', right:'12px', top:'50%', transform:'translateY(-50%)', fontSize:'13px', color:'#3a6a46', pointerEvents:'none'}}>kr</span>
             </div>
-            <div>
-              <div style={{fontSize:'10px', color:'#9fc9a8', textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:'12px'}}>Via AS</div>
-              {forsteRefiAS ? (
-                <div className="ep-next-grid">
-                  <div className="ep-next-item"><div className="lbl">Tidligst refinansiering</div><div className="val">År {forsteRefiAS.aar}</div></div>
-                  <div className="ep-next-item"><div className="lbl">Kapital fra refi</div><div className="val">{fmt(forsteRefiAS.refi)}</div></div>
-                  <div className="ep-next-item"><div className="lbl">Maks neste bolig</div><div className="val">{fmt(forsteRefiAS.maks)}</div></div>
-                </div>
-              ) : <div style={{fontSize:'13px', color:'#6a7a6e'}}>Ikke mulig innen 10 år</div>}
+          </div>
+          <div className="ep-neste-bolig-felt">
+            <label>EK-krav privat (%)</label>
+            <div style={{position:'relative'}}>
+              <input type="number" value={nesteEkPrivat} step={1} min={5} max={40} onChange={e => setNesteEkPrivat(+e.target.value)} />
+              <span style={{position:'absolute', right:'12px', top:'50%', transform:'translateY(-50%)', fontSize:'13px', color:'#3a6a46', pointerEvents:'none'}}>%</span>
+            </div>
+          </div>
+          <div className="ep-neste-bolig-felt">
+            <label>EK-krav AS (%)</label>
+            <div style={{position:'relative'}}>
+              <input type="number" value={nesteEkAS} step={1} min={15} max={40} onChange={e => setNesteEkAS(+e.target.value)} />
+              <span style={{position:'absolute', right:'12px', top:'50%', transform:'translateY(-50%)', fontSize:'13px', color:'#3a6a46', pointerEvents:'none'}}>%</span>
             </div>
           </div>
         </div>
-      )}
 
-      <AIAssistent tall={aiTall} />
+        <div className="ep-neste-sammenlign">
+          <div className="ep-neste-col">
+            <div className="ep-neste-col-tittel privat">Privat</div>
+            <div className="ep-neste-linje"><span className="k">Trenger totalt</span><span className="v">{fmt(nesteTotaltPrivat)}</span></div>
+            <div className="ep-neste-linje"><span className="k">Egenkapital ({nesteEkPrivat}%)</span><span className="v">{fmt(nesteBoligpris * nesteEkPrivat / 100)}</span></div>
+            <div className="ep-neste-linje"><span className="k">Tidligst mulig</span><span className="v" style={{color: forsteHarRaadPrivat ? '#9fc9a8' : '#c84040'}}>{forsteHarRaadPrivat ? 'År ' + forsteHarRaadPrivat.aar : 'Over 10 år'}</span></div>
+            <div className={`ep-neste-status ${forsteHarRaadPrivat ? 'ok' : 'ikke-ok'}`}>
+              {forsteHarRaadPrivat ? `✓ Har råd i år ${forsteHarRaadPrivat.aar}` : '✗ Ikke mulig innen 10 år'}
+            </div>
+          </div>
+          <div className="ep-neste-col">
+            <div className="ep-neste-col-tittel as">Via AS</div>
+            <div className="ep-neste-linje"><span className="k">Trenger totalt</span><span className="v">{fmt(nesteTotaltAS)}</span></div>
+            <div className="ep-neste-linje"><span className="k">Egenkapital ({nesteEkAS}%)</span><span className="v">{fmt(nesteBoligpris * nesteEkAS / 100)}</span></div>
+            <div className="ep-neste-linje"><span className="k">Tidligst mulig</span><span className="v" style={{color: forsteHarRaadAS ? '#9fc9a8' : '#c84040'}}>{forsteHarRaadAS ? 'År ' + forsteHarRaadAS.aar : 'Over 10 år'}</span></div>
+            <div className={`ep-neste-status ${forsteHarRaadAS ? 'ok' : 'ikke-ok'}`}>
+              {forsteHarRaadAS ? `✓ Har råd i år ${forsteHarRaadAS.aar}` : '✗ Ikke mulig innen 10 år'}
+            </div>
+          </div>
+        </div>
 
+        <table className="ep-aar-tabell">
+          <thead>
+            <tr>
+              <th>År</th>
+              <th style={{color:'#c9a84c'}}>Privat tilgjengelig</th>
+              <th style={{color:'#c9a84c'}}>Privat trenger</th>
+              <th style={{color:'#c9a84c'}}>Privat status</th>
+              <th style={{color:'#9fc9a8'}}>AS tilgjengelig</th>
+              <th style={{color:'#9fc9a8'}}>AS trenger</th>
+              <th style={{color:'#9fc9a8'}}>AS status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {raderPrivat.map((rP, i) => {
+              const rA = raderAS[i];
+              return (
+                <tr key={rP.aar} className={rP.harRaadNeste || rA.harRaadNeste ? 'kan' : ''}>
+                  <td>År {rP.aar}</td>
+                  <td style={{color: rP.harRaadNeste ? '#9fc9a8' : '#6a9a6e'}}>{fmt(rP.totalTilgjengelig)}</td>
+                  <td>{fmt(nesteTotaltPrivat)}</td>
+                  <td style={{color: rP.harRaadNeste ? '#9fc9a8' : '#c84040'}}>{rP.harRaadNeste ? '✓ Har råd' : fmt(nesteTotaltPrivat - rP.totalTilgjengelig) + ' mangler'}</td>
+                  <td style={{color: rA.harRaadNeste ? '#9fc9a8' : '#6a9a6e'}}>{fmt(rA.totalTilgjengelig)}</td>
+                  <td>{fmt(nesteTotaltAS)}</td>
+                  <td style={{color: rA.harRaadNeste ? '#9fc9a8' : '#c84040'}}>{rA.harRaadNeste ? '✓ Har råd' : fmt(nesteTotaltAS - rA.totalTilgjengelig) + ' mangler'}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      <Marcel tall={marcelTall} />
       <p className="es-disclaimer">Tallene er estimater og ikke finansiell rådgivning. Konsulter en regnskapsfører.</p>
     </div>
   );
