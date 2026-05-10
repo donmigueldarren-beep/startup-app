@@ -59,6 +59,27 @@ const styles = `
   .ep-next-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
   .ep-next-item .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #6a7a6e; margin-bottom: 6px; }
   .ep-next-item .val { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--cream); }
+  .ep-neste-bolig { background: var(--dark); padding: 28px; margin-bottom: 12px; }
+  .ep-neste-bolig-title { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--cream); margin-bottom: 6px; }
+  .ep-neste-bolig-sub { font-size: 12px; color: #3a6a46; margin-bottom: 20px; }
+  .ep-neste-bolig-input-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .ep-neste-bolig-felt label { display: block; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #6a7a6e; margin-bottom: 6px; }
+  .ep-neste-bolig-felt input { width: 100%; padding: 10px 12px; border: 1px solid #1a3a1e; background: #0a1a0c; color: var(--cream); font-family: 'Inter', sans-serif; font-size: 14px; outline: none; box-sizing: border-box; }
+  .ep-neste-bolig-felt input:focus { border-color: var(--gold); }
+  .ep-neste-bolig-resultat { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #1a2e1e; margin-bottom: 16px; }
+  .ep-neste-bolig-metric { background: #0a1a0c; padding: 16px; }
+  .ep-neste-bolig-metric .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #3a6a46; margin-bottom: 8px; }
+  .ep-neste-bolig-metric .val { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--cream); }
+  .ep-neste-bolig-verdict { padding: 14px 18px; font-size: 13px; line-height: 1.6; border-left: 3px solid; }
+  .ep-neste-bolig-verdict.green { background: #0a1a0c; color: #9fc9a8; border-color: var(--brg); }
+  .ep-neste-bolig-verdict.amber { background: #1a140a; color: #c9a84c; border-color: var(--gold); }
+  .ep-neste-bolig-verdict.red { background: #1a0a0a; color: #c84040; border-color: #c84040; }
+  .ep-aar-tabell { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 16px; }
+  .ep-aar-tabell th { text-align: left; padding: 6px 10px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #3a6a46; border-bottom: 1px solid #1a3a1e; font-weight: 500; }
+  .ep-aar-tabell td { padding: 8px 10px; border-bottom: 1px solid #0f2010; font-size: 12px; color: #6a9a6e; }
+  .ep-aar-tabell tr.kan { background: #0a1a0c; }
+  .ep-aar-tabell tr.kan td { color: #9fc9a8; }
+  .ep-aar-tabell tr.kan td:first-child { font-weight: 500; }
   .marcel-seksjon { background: var(--dark); border: 1px solid #1a2e1e; padding: 28px; margin-bottom: 12px; }
   .marcel-header { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 20px; }
   .marcel-avatar { width: 52px; height: 52px; background: linear-gradient(135deg, #c9a84c, #2a6640); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
@@ -233,6 +254,8 @@ export default function EiendomPrivat() {
   const [prisvekst, setPrisvekst] = useState(3);
   const [oppussing, setOppussing] = useState(0);
   const [maanedligSparing, setMaanedligSparing] = useState(0);
+  const [nesteBoligpris, setNesteBoligpris] = useState(3500000);
+  const [nesteEkProsent, setNesteEkProsent] = useState(10);
 
   const fmtK = (n) => Math.round(n).toLocaleString('no-NO') + ' kr';
   const fmtMndK = (n) => (n >= 0 ? '+' : '') + Math.round(n).toLocaleString('no-NO') + ' kr/mnd';
@@ -248,6 +271,10 @@ export default function EiendomPrivat() {
   const harRaad = kapital >= tot;
   const restKapital = Math.max(0, kapital - tot);
 
+  const nesteEkKrav = nesteBoligpris * (nesteEkProsent / 100);
+  const nesteDokAvgift = nesteBoligpris * (dokumentavgiftPst / 100);
+  const nesteTotalt = nesteEkKrav + nesteDokAvgift + tinglysingKost;
+
   const rader = (() => {
     const res = [];
     let akkumulert = restKapital;
@@ -260,18 +287,22 @@ export default function EiendomPrivat() {
       const egenkapital = boligverdi - gjenvLaan;
       const refinansiering = Math.max(0, boligverdi * 0.75 - gjenvLaan);
       const kanRefinansiere = refinansiering > tot * 0.8;
-      res.push({ aar: y, boligverdi, gjenvLaan, egenkapital, akkumulert, refinansiering, kanRefinansiere, maksNesteBolig: refinansiering / 0.10 });
+      const totalTilgjengelig = refinansiering + akkumulert;
+      const harRaadNeste = totalTilgjengelig >= nesteTotalt;
+      res.push({ aar: y, boligverdi, gjenvLaan, egenkapital, akkumulert, refinansiering, kanRefinansiere, maksNesteBolig: refinansiering / (nesteEkProsent / 100), totalTilgjengelig, harRaadNeste });
     }
     return res;
   })();
 
   const forsteRefi = rader.find(r => r.kanRefinansiere);
+  const forsteHarRaadNeste = rader.find(r => r.harRaadNeste);
   const marcelTall = { boligpris, leie, felles, vedlikehold, rente, ekProsent, netto, restKapital, forsteRefiAar: forsteRefi?.aar };
 
   return (
     <div className="ek-wrap">
       <style>{styles}</style>
       <div className="ek-banner">Privat kjøp: Enklere å komme i gang, lavere egenkapitalkrav og ingen regnskapsfører. Best for én enkelt enhet.</div>
+
       <div className="ek-step">
         <div className="ek-step-header"><div className="ek-step-num">1</div><div className="ek-step-title">Om boligen</div></div>
         <div className="ek-grid">
@@ -286,6 +317,7 @@ export default function EiendomPrivat() {
           <Field label="Tinglysning" value={tinglysingKost} onChange={setTinglysingKost} step={100} />
         </div>
       </div>
+
       <div className="ek-step">
         <div className="ek-step-header"><div className="ek-step-num">2</div><div className="ek-step-title">Din økonomi</div></div>
         <div className="ek-grid">
@@ -320,6 +352,7 @@ export default function EiendomPrivat() {
             : `Negativt resultat på ${fmtMndK(netto)}. Vurder høyere leie eller lavere kjøpspris.`}
         </div>
       </div>
+
       <div className="ek-step">
         <div className="ek-step-header"><div className="ek-step-num">3</div><div className="ek-step-title">10-års prognose</div></div>
         <div className="ep-kapital-box">
@@ -359,18 +392,67 @@ export default function EiendomPrivat() {
           </table>
         </div>
       </div>
-      {forsteRefi && (
-        <div className="ep-next">
-          <div className="ep-next-title">Neste leilighet, når har du råd?</div>
-          <div className="ep-next-grid">
-            <div className="ep-next-item"><div className="lbl">Tidligst refinansiering</div><div className="val">År {forsteRefi.aar}</div></div>
-            <div className="ep-next-item"><div className="lbl">Kapital fra refinansiering</div><div className="val">{fmt(forsteRefi.refinansiering)}</div></div>
-            <div className="ep-next-item"><div className="lbl">EK-krav neste kjøp</div><div className="val">10%</div></div>
-            <div className="ep-next-item"><div className="lbl">Maks boligpris neste</div><div className="val">{fmt(forsteRefi.maksNesteBolig)}</div></div>
-            <div className="ep-next-item"><div className="lbl">Total kapital akkumulert</div><div className="val">{fmt(forsteRefi.akkumulert)}</div></div>
+
+      <div className="ep-neste-bolig">
+        <div className="ep-neste-bolig-title">Har du råd til neste bolig?</div>
+        <div className="ep-neste-bolig-sub">Legg inn prisen på boligen du vurderer å kjøpe neste, så regner vi ut når du har råd.</div>
+        <div className="ep-neste-bolig-input-wrap">
+          <div className="ep-neste-bolig-felt">
+            <label>Pris på neste bolig</label>
+            <div style={{position:'relative'}}>
+              <input type="number" value={nesteBoligpris} step={50000} onChange={e => setNesteBoligpris(+e.target.value)} />
+              <span style={{position:'absolute', right:'12px', top:'50%', transform:'translateY(-50%)', fontSize:'13px', color:'#3a6a46', pointerEvents:'none'}}>kr</span>
+            </div>
+          </div>
+          <div className="ep-neste-bolig-felt">
+            <label>EK-krav neste kjøp (%)</label>
+            <div style={{position:'relative'}}>
+              <input type="number" value={nesteEkProsent} step={1} min={5} max={40} onChange={e => setNesteEkProsent(+e.target.value)} />
+              <span style={{position:'absolute', right:'12px', top:'50%', transform:'translateY(-50%)', fontSize:'13px', color:'#3a6a46', pointerEvents:'none'}}>%</span>
+            </div>
           </div>
         </div>
-      )}
+        <div className="ep-neste-bolig-resultat">
+          <div className="ep-neste-bolig-metric">
+            <div className="lbl">Trenger totalt</div>
+            <div className="val">{fmt(nesteTotalt)}</div>
+          </div>
+          <div className="ep-neste-bolig-metric">
+            <div className="lbl">Egenkapital ({nesteEkProsent}%)</div>
+            <div className="val">{fmt(nesteEkKrav)}</div>
+          </div>
+          <div className="ep-neste-bolig-metric">
+            <div className="lbl">Tidligst mulig</div>
+            <div className="val" style={{color: forsteHarRaadNeste ? '#9fc9a8' : '#c84040'}}>
+              {forsteHarRaadNeste ? 'År ' + forsteHarRaadNeste.aar : 'Over 10 år'}
+            </div>
+          </div>
+        </div>
+        <div className={`ep-neste-bolig-verdict ${forsteHarRaadNeste ? 'green' : 'red'}`}>
+          {forsteHarRaadNeste
+            ? `Du kan kjøpe neste bolig til ${fmtK(nesteBoligpris)} i år ${forsteHarRaadNeste.aar}. Da har du ${fmtK(forsteHarRaadNeste.totalTilgjengelig)} tilgjengelig mot kravet på ${fmtK(nesteTotalt)}.`
+            : `Med disse tallene har du ikke råd til en bolig til ${fmtK(nesteBoligpris)} innen 10 år. Vurder lavere pris på neste bolig, høyere sparing eller økt prisvekst.`}
+        </div>
+        <table className="ep-aar-tabell">
+          <thead>
+            <tr><th>År</th><th>Tilgjengelig kapital</th><th>Trenger</th><th>Mangler</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            {rader.map(r => (
+              <tr key={r.aar} className={r.harRaadNeste ? 'kan' : ''}>
+                <td>År {r.aar}</td>
+                <td style={{color: r.harRaadNeste ? '#9fc9a8' : '#6a9a6e'}}>{fmt(r.totalTilgjengelig)}</td>
+                <td>{fmt(nesteTotalt)}</td>
+                <td style={{color: r.harRaadNeste ? '#9fc9a8' : '#c84040'}}>
+                  {r.harRaadNeste ? '–' : fmt(nesteTotalt - r.totalTilgjengelig)}
+                </td>
+                <td>{r.harRaadNeste ? '✓ Har råd' : 'Ikke ennå'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
       <Marcel tall={marcelTall} />
       <p className="ek-disclaimer">Tallene er estimater og ikke finansiell rådgivning. Konsulter en regnskapsfører.</p>
     </div>
