@@ -394,15 +394,17 @@ function PrisSeksjon({ onKomIgang }) {
     {
       plan: 'Gratis',
       pris: '0',
-      desc: 'Alle kalkulatorer, for alltid gratis.',
+      desc: 'Kom i gang og regn på tallene dine.',
       populær: false,
       funksjoner: [
         'Alle 5 kalkulatorer',
+        'Månedlig kontantstrøm',
+        'Oppstartskostnader',
+      ],
+      ikkeInkludert: [
         '10-års prognose',
         'Neste bolig kalkulator',
         'Banksjekk og stresstest',
-      ],
-      ikkeInkludert: [
         'AI-assistent (Marcel, Colette, René)',
         'Budsjettark med eksport',
       ],
@@ -412,11 +414,13 @@ function PrisSeksjon({ onKomIgang }) {
     {
       plan: 'Basis',
       pris: '49',
-      desc: 'For deg som vil støtte og ikke trenger AI.',
+      desc: 'For deg som vil planlegge langsiktig.',
       populær: false,
       funksjoner: [
         'Alt i gratis',
-        'Støtt videre utvikling',
+        '10-års prognose',
+        'Neste bolig kalkulator',
+        'Banksjekk og stresstest',
         'Tidlig tilgang til nye bransjer',
       ],
       ikkeInkludert: [
@@ -432,7 +436,7 @@ function PrisSeksjon({ onKomIgang }) {
       desc: 'Alt du trenger for å ta gode investeringsbeslutninger.',
       populær: true,
       funksjoner: [
-        'Alt i gratis',
+        'Alt i Basis',
         'AI-assistent Marcel for eiendom',
         'AI-assistent Colette for salong',
         'AI-assistent René for bilutleie',
@@ -455,7 +459,7 @@ function PrisSeksjon({ onKomIgang }) {
         </div>
         <div className="section-title reveal reveal-delay-1" style={{ color: 'var(--cream)', marginBottom: '16px' }}>Velg din plan</div>
         <div className="reveal reveal-delay-2" style={{ fontSize: '14px', color: '#3a6a46', maxWidth: '480px', margin: '0 auto' }}>
-          Kalkulatorene er alltid gratis. Pro gir deg AI-assistenter og budsjettark.
+          Kom i gang gratis. Oppgrader når du vil ha mer.
         </div>
       </div>
       <div className="pris-grid reveal reveal-delay-2">
