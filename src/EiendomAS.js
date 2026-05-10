@@ -1,5 +1,91 @@
 import { useState } from 'react';
 
+const KODER = {
+  basis: 'ADDON49',
+  pro: 'ADDON99',
+};
+
+function sjekkLagretTilgang() {
+  try {
+    const lagret = localStorage.getItem('addon_tilgang');
+    if (lagret === 'pro') return 'pro';
+    if (lagret === 'basis') return 'basis';
+  } catch (e) {}
+  return 'gratis';
+}
+
+function lagreTilgang(nivaa) {
+  try { localStorage.setItem('addon_tilgang', nivaa); } catch (e) {}
+}
+
+function LaasBoks({ krever, onLaasOpp }) {
+  const [kode, setKode] = useState('');
+  const [feil, setFeil] = useState(false);
+
+  const forsok = () => {
+    if (kode.trim().toUpperCase() === KODER.pro) {
+      lagreTilgang('pro');
+      onLaasOpp('pro');
+    } else if (krever === 'basis' && kode.trim().toUpperCase() === KODER.basis) {
+      lagreTilgang('basis');
+      onLaasOpp('basis');
+    } else {
+      setFeil(true);
+      setTimeout(() => setFeil(false), 2000);
+    }
+  };
+
+  return (
+    <div style={{
+      background: '#0f1a12', border: '1px solid #1a3a1e',
+      padding: '32px', marginBottom: '12px', textAlign: 'center'
+    }}>
+      <div style={{ fontSize: '28px', marginBottom: '12px' }}>🔒</div>
+      <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '18px', color: '#f5f0e8', marginBottom: '8px' }}>
+        {krever === 'basis' ? 'Basis eller Pro' : 'Pro'} funksjon
+      </div>
+      <div style={{ fontSize: '13px', color: '#3a6a46', marginBottom: '24px', lineHeight: '1.6' }}>
+        {krever === 'basis'
+          ? 'Denne seksjonen krever Basis (49 kr/mnd) eller Pro (99 kr/mnd).'
+          : 'Denne seksjonen krever Pro (99 kr/mnd).'}
+        <br />
+        <a href="mailto:kontakt@addoninvest.no" style={{ color: '#c9a84c', textDecoration: 'none' }}>
+          Kontakt oss for tilgang
+        </a>
+      </div>
+      <div style={{ display: 'flex', gap: '8px', maxWidth: '320px', margin: '0 auto' }}>
+        <input
+          type="text"
+          placeholder="Skriv inn tilgangskode"
+          value={kode}
+          onChange={e => setKode(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && forsok()}
+          style={{
+            flex: 1, padding: '10px 14px',
+            background: feil ? '#1a0a0a' : '#0a1a0c',
+            border: `1px solid ${feil ? '#c84040' : '#1a3a1e'}`,
+            color: '#f5f0e8', fontFamily: 'Inter, sans-serif',
+            fontSize: '13px', outline: 'none', transition: 'border 0.2s'
+          }}
+        />
+        <button onClick={forsok} style={{
+          background: '#c9a84c', color: '#0f1a12', border: 'none',
+          padding: '10px 20px', fontFamily: 'Inter, sans-serif',
+          fontSize: '11px', letterSpacing: '0.08em',
+          textTransform: 'uppercase', cursor: 'pointer', fontWeight: '500'
+        }}>
+          Lås opp
+        </button>
+      </div>
+      {feil && (
+        <div style={{ fontSize: '12px', color: '#c84040', marginTop: '10px' }}>
+          Feil kode. Kontakt kontakt@addoninvest.no for tilgang.
+        </div>
+      )}
+    </div>
+  );
+}
+
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&display=swap');
   :root {
@@ -62,11 +148,6 @@ const styles = `
   .ep-badge { display: inline-block; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 10px; }
   .ep-badge.green { background: var(--brg-pale); color: var(--brg); }
   .ep-badge.blue { background: #e8f0f8; color: #1a3a5e; }
-  .ep-next { background: var(--dark); padding: 28px; margin-bottom: 12px; }
-  .ep-next-title { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--cream); margin-bottom: 16px; }
-  .ep-next-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-  .ep-next-item .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #6a7a6e; margin-bottom: 6px; }
-  .ep-next-item .val { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--cream); }
   .ep-historikk-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 20px; }
   .ep-historikk-table th { text-align: left; padding: 8px 12px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); border-bottom: 1px solid var(--cream-dark); }
   .ep-historikk-table td { padding: 10px 12px; border-bottom: 1px solid var(--cream-dark); font-size: 13px; }
@@ -259,6 +340,10 @@ Gi en konkret analyse:
 }
 
 export default function EiendomAS() {
+  const [tilgang, setTilgang] = useState(sjekkLagretTilgang);
+  const harBasis = tilgang === 'basis' || tilgang === 'pro';
+  const harPro = tilgang === 'pro';
+
   const [boligpris, setBoligpris] = useState(3000000);
   const [leie, setLeie] = useState(12000);
   const [felles, setFelles] = useState(3000);
@@ -429,108 +514,119 @@ export default function EiendomAS() {
         </div>
       </div>
 
-      <div className="ek-step">
-        <div className="ek-step-header"><div className="ek-step-num">4</div><div className="ek-step-title">10-års prognose</div></div>
-        <div className="ep-kapital-box">
-          <div style={{fontSize:'12px', fontWeight:'500', color:'var(--dark)', marginBottom:'12px'}}>Forutsetninger for prognosen</div>
-          <div className="ep-kapital-grid">
-            <InputFelt label="Oppussing" value={oppussing} onChange={setOppussing} hint="Øker boligverdi fra start" />
-            <InputFelt label="Ekstra månedlig sparing" value={maanedligSparing} onChange={setMaanedligSparing} suffix="kr/mnd" hint="Utover leieinntekt" />
-            <div>
-              <label className="ep-label">Prisvekst: {prisvekst}%</label>
-              <input type="range" min="0" max="8" step="0.5" value={prisvekst} onChange={e => setPrisvekst(+e.target.value)} style={{width:'100%', accentColor:'var(--brg)', marginTop:'8px', display:'block'}} />
+      {harBasis ? (
+        <div className="ek-step">
+          <div className="ek-step-header"><div className="ek-step-num">4</div><div className="ek-step-title">10-års prognose</div></div>
+          <div className="ep-kapital-box">
+            <div style={{fontSize:'12px', fontWeight:'500', color:'var(--dark)', marginBottom:'12px'}}>Forutsetninger for prognosen</div>
+            <div className="ep-kapital-grid">
+              <InputFelt label="Oppussing" value={oppussing} onChange={setOppussing} hint="Øker boligverdi fra start" />
+              <InputFelt label="Ekstra månedlig sparing" value={maanedligSparing} onChange={setMaanedligSparing} suffix="kr/mnd" hint="Utover leieinntekt" />
+              <div>
+                <label className="ep-label">Prisvekst: {prisvekst}%</label>
+                <input type="range" min="0" max="8" step="0.5" value={prisvekst} onChange={e => setPrisvekst(+e.target.value)} style={{width:'100%', accentColor:'var(--brg)', marginTop:'8px', display:'block'}} />
+              </div>
             </div>
           </div>
-        </div>
-        {harRaad && restKapital > 0 && (
-          <div className="ep-restkapital-banner">
-            <span className="ep-restkapital-lbl">Restkapital inkludert som startkapital i prognosen</span>
-            <span className="ep-restkapital-val">{fmtK(restKapital)}</span>
+          {harRaad && restKapital > 0 && (
+            <div className="ep-restkapital-banner">
+              <span className="ep-restkapital-lbl">Restkapital inkludert som startkapital i prognosen</span>
+              <span className="ep-restkapital-val">{fmtK(restKapital)}</span>
+            </div>
+          )}
+          <div style={{overflowX:'auto'}}>
+            <table className="ep-table">
+              <thead>
+                <tr><th>År</th><th>Boligverdi</th><th>Gjenstående lån</th><th>Egenkapital</th><th>Total kapital</th><th>EK-krav neste</th><th>Kan refinansiere</th></tr>
+              </thead>
+              <tbody>
+                {rader.map(r => (
+                  <tr key={r.aar} className={r.kanRefinansiere && r.aar === forsteRefi?.aar ? 'ep-highlight' : ''}>
+                    <td className="ep-bold">År {r.aar}</td>
+                    <td>{fmt(r.boligverdi)}</td>
+                    <td className="ep-red">{fmt(r.gjenvLaan)}</td>
+                    <td className="ep-bold">{fmt(r.egenkapital)}</td>
+                    <td className="ep-bold">{fmt(r.akkumulert)}</td>
+                    <td><span className="ep-badge blue">{Math.round(r.ekKravNeste * 100)}%</span></td>
+                    <td>{r.kanRefinansiere ? <span className="ep-badge green">Ja, {fmt(r.refinansiering)}</span> : <span style={{fontSize:'12px', color:'var(--muted)'}}>Ikke ennå</span>}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        )}
-        <div style={{overflowX:'auto'}}>
-          <table className="ep-table">
+        </div>
+      ) : (
+        <LaasBoks krever="basis" onLaasOpp={setTilgang} />
+      )}
+
+      {harBasis ? (
+        <div className="ep-neste-bolig">
+          <div className="ep-neste-bolig-title">Har du råd til neste bolig?</div>
+          <div className="ep-neste-bolig-sub">Legg inn prisen på boligen du vurderer å kjøpe neste, så regner vi ut når du har råd.</div>
+          <div className="ep-neste-bolig-input-wrap">
+            <div className="ep-neste-bolig-felt">
+              <label>Pris på neste bolig</label>
+              <div style={{position:'relative'}}>
+                <input type="number" value={nesteBoligpris} step={50000} onChange={e => setNesteBoligpris(+e.target.value)} />
+                <span style={{position:'absolute', right:'12px', top:'50%', transform:'translateY(-50%)', fontSize:'13px', color:'#3a6a46', pointerEvents:'none'}}>kr</span>
+              </div>
+            </div>
+            <div className="ep-neste-bolig-felt">
+              <label>EK-krav neste kjøp (%)</label>
+              <div style={{position:'relative'}}>
+                <input type="number" value={nesteEkProsent} step={1} min={15} max={40} onChange={e => setNesteEkProsent(+e.target.value)} />
+                <span style={{position:'absolute', right:'12px', top:'50%', transform:'translateY(-50%)', fontSize:'13px', color:'#3a6a46', pointerEvents:'none'}}>%</span>
+              </div>
+            </div>
+          </div>
+          <div className="ep-neste-bolig-resultat">
+            <div className="ep-neste-bolig-metric">
+              <div className="lbl">Trenger totalt</div>
+              <div className="val">{fmt(nesteTotalt)}</div>
+            </div>
+            <div className="ep-neste-bolig-metric">
+              <div className="lbl">Egenkapital ({nesteEkProsent}%)</div>
+              <div className="val">{fmt(nesteEkKrav)}</div>
+            </div>
+            <div className="ep-neste-bolig-metric">
+              <div className="lbl">Tidligst mulig</div>
+              <div className="val" style={{color: forsteHarRaadNeste ? '#9fc9a8' : '#c84040'}}>
+                {forsteHarRaadNeste ? 'År ' + forsteHarRaadNeste.aar : 'Over 10 år'}
+              </div>
+            </div>
+          </div>
+          <div className={`ep-neste-bolig-verdict ${forsteHarRaadNeste ? 'green' : 'red'}`}>
+            {forsteHarRaadNeste
+              ? `Du kan kjøpe neste bolig til ${fmtK(nesteBoligpris)} i år ${forsteHarRaadNeste.aar}.`
+              : `Med disse tallene har du ikke råd til en bolig til ${fmtK(nesteBoligpris)} innen 10 år.`}
+          </div>
+          <table className="ep-aar-tabell">
             <thead>
-              <tr><th>År</th><th>Boligverdi</th><th>Gjenstående lån</th><th>Egenkapital</th><th>Total kapital</th><th>EK-krav neste</th><th>Kan refinansiere</th></tr>
+              <tr><th>År</th><th>Tilgjengelig</th><th>Trenger</th><th>Mangler</th><th>Status</th></tr>
             </thead>
             <tbody>
               {rader.map(r => (
-                <tr key={r.aar} className={r.kanRefinansiere && r.aar === forsteRefi?.aar ? 'ep-highlight' : ''}>
-                  <td className="ep-bold">År {r.aar}</td>
-                  <td>{fmt(r.boligverdi)}</td>
-                  <td className="ep-red">{fmt(r.gjenvLaan)}</td>
-                  <td className="ep-bold">{fmt(r.egenkapital)}</td>
-                  <td className="ep-bold">{fmt(r.akkumulert)}</td>
-                  <td><span className="ep-badge blue">{Math.round(r.ekKravNeste * 100)}%</span></td>
-                  <td>{r.kanRefinansiere ? <span className="ep-badge green">Ja, {fmt(r.refinansiering)}</span> : <span style={{fontSize:'12px', color:'var(--muted)'}}>Ikke ennå</span>}</td>
+                <tr key={r.aar} className={r.harRaadNeste ? 'kan' : ''}>
+                  <td>År {r.aar}</td>
+                  <td style={{color: r.harRaadNeste ? '#9fc9a8' : '#6a9a6e'}}>{fmt(r.totalTilgjengelig)}</td>
+                  <td>{fmt(nesteTotalt)}</td>
+                  <td style={{color: r.harRaadNeste ? '#9fc9a8' : '#c84040'}}>
+                    {r.harRaadNeste ? '–' : fmt(nesteTotalt - r.totalTilgjengelig)}
+                  </td>
+                  <td>{r.harRaadNeste ? '✓ Har råd' : 'Ikke ennå'}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-      </div>
+      ) : null}
 
-      <div className="ep-neste-bolig">
-        <div className="ep-neste-bolig-title">Har du råd til neste bolig?</div>
-        <div className="ep-neste-bolig-sub">Legg inn prisen på boligen du vurderer å kjøpe neste, så regner vi ut når du har råd.</div>
-        <div className="ep-neste-bolig-input-wrap">
-          <div className="ep-neste-bolig-felt">
-            <label>Pris på neste bolig</label>
-            <div style={{position:'relative'}}>
-              <input type="number" value={nesteBoligpris} step={50000} onChange={e => setNesteBoligpris(+e.target.value)} />
-              <span style={{position:'absolute', right:'12px', top:'50%', transform:'translateY(-50%)', fontSize:'13px', color:'#3a6a46', pointerEvents:'none'}}>kr</span>
-            </div>
-          </div>
-          <div className="ep-neste-bolig-felt">
-            <label>EK-krav neste kjøp (%)</label>
-            <div style={{position:'relative'}}>
-              <input type="number" value={nesteEkProsent} step={1} min={15} max={40} onChange={e => setNesteEkProsent(+e.target.value)} />
-              <span style={{position:'absolute', right:'12px', top:'50%', transform:'translateY(-50%)', fontSize:'13px', color:'#3a6a46', pointerEvents:'none'}}>%</span>
-            </div>
-          </div>
-        </div>
-        <div className="ep-neste-bolig-resultat">
-          <div className="ep-neste-bolig-metric">
-            <div className="lbl">Trenger totalt</div>
-            <div className="val">{fmt(nesteTotalt)}</div>
-          </div>
-          <div className="ep-neste-bolig-metric">
-            <div className="lbl">Egenkapital ({nesteEkProsent}%)</div>
-            <div className="val">{fmt(nesteEkKrav)}</div>
-          </div>
-          <div className="ep-neste-bolig-metric">
-            <div className="lbl">Tidligst mulig</div>
-            <div className="val" style={{color: forsteHarRaadNeste ? '#9fc9a8' : '#c84040'}}>
-              {forsteHarRaadNeste ? 'År ' + forsteHarRaadNeste.aar : 'Over 10 år'}
-            </div>
-          </div>
-        </div>
-        <div className={`ep-neste-bolig-verdict ${forsteHarRaadNeste ? 'green' : 'red'}`}>
-          {forsteHarRaadNeste
-            ? `Du kan kjøpe neste bolig til ${fmtK(nesteBoligpris)} i år ${forsteHarRaadNeste.aar}. Da har du ${fmtK(forsteHarRaadNeste.totalTilgjengelig)} tilgjengelig mot kravet på ${fmtK(nesteTotalt)}.`
-            : `Med disse tallene har du ikke råd til en bolig til ${fmtK(nesteBoligpris)} innen 10 år. Vurder lavere pris på neste bolig, høyere sparing eller økt prisvekst.`}
-        </div>
-        <table className="ep-aar-tabell">
-          <thead>
-            <tr><th>År</th><th>Tilgjengelig</th><th>Trenger</th><th>Mangler</th><th>Status</th></tr>
-          </thead>
-          <tbody>
-            {rader.map(r => (
-              <tr key={r.aar} className={r.harRaadNeste ? 'kan' : ''}>
-                <td>År {r.aar}</td>
-                <td style={{color: r.harRaadNeste ? '#9fc9a8' : '#6a9a6e'}}>{fmt(r.totalTilgjengelig)}</td>
-                <td>{fmt(nesteTotalt)}</td>
-                <td style={{color: r.harRaadNeste ? '#9fc9a8' : '#c84040'}}>
-                  {r.harRaadNeste ? '–' : fmt(nesteTotalt - r.totalTilgjengelig)}
-                </td>
-                <td>{r.harRaadNeste ? '✓ Har råd' : 'Ikke ennå'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {harPro ? (
+        <Marcel tall={marcelTall} />
+      ) : (
+        <LaasBoks krever="pro" onLaasOpp={setTilgang} />
+      )}
 
-      <Marcel tall={marcelTall} />
       <p className="ek-disclaimer">Tallene er estimater og ikke finansiell rådgivning. Konsulter en regnskapsfører.</p>
     </div>
   );
