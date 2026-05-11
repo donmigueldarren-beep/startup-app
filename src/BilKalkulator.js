@@ -1,5 +1,89 @@
 import { useState } from 'react';
 
+const KODER = {
+  basis: 'ADDON49',
+  pro: 'ADDON99',
+};
+
+function sjekkLagretTilgang() {
+  try {
+    const lagret = localStorage.getItem('addon_tilgang');
+    if (lagret === 'pro') return 'pro';
+    if (lagret === 'basis') return 'basis';
+  } catch (e) {}
+  return 'gratis';
+}
+
+function lagreTilgang(nivaa) {
+  try { localStorage.setItem('addon_tilgang', nivaa); } catch (e) {}
+}
+
+function LaasBoks({ krever, onLaasOpp }) {
+  const [kode, setKode] = useState('');
+  const [feil, setFeil] = useState(false);
+
+  const forsok = () => {
+    if (kode.trim().toUpperCase() === KODER.pro) {
+      lagreTilgang('pro');
+      onLaasOpp('pro');
+    } else if (krever === 'basis' && kode.trim().toUpperCase() === KODER.basis) {
+      lagreTilgang('basis');
+      onLaasOpp('basis');
+    } else {
+      setFeil(true);
+      setTimeout(() => setFeil(false), 2000);
+    }
+  };
+
+  return (
+    <div style={{
+      background: '#0f1a12', border: '1px solid #1a3a1e',
+      padding: '32px', marginBottom: '12px', textAlign: 'center'
+    }}>
+      <div style={{ fontSize: '28px', marginBottom: '12px' }}>🔒</div>
+      <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '18px', color: '#f5f0e8', marginBottom: '8px' }}>
+        Pro funksjon
+      </div>
+      <div style={{ fontSize: '13px', color: '#3a6a46', marginBottom: '24px', lineHeight: '1.6' }}>
+        René krever Pro (99 kr/mnd).
+        <br />
+        <a href="mailto:kontakt@addoninvest.no" style={{ color: '#c9a84c', textDecoration: 'none' }}>
+          Kontakt oss for tilgang
+        </a>
+      </div>
+      <div style={{ display: 'flex', gap: '8px', maxWidth: '320px', margin: '0 auto' }}>
+        <input
+          type="text"
+          placeholder="Skriv inn tilgangskode"
+          value={kode}
+          onChange={e => setKode(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && forsok()}
+          style={{
+            flex: 1, padding: '10px 14px',
+            background: feil ? '#1a0a0a' : '#0a1a0c',
+            border: `1px solid ${feil ? '#c84040' : '#1a3a1e'}`,
+            color: '#f5f0e8', fontFamily: 'Inter, sans-serif',
+            fontSize: '13px', outline: 'none', transition: 'border 0.2s'
+          }}
+        />
+        <button onClick={forsok} style={{
+          background: '#c9a84c', color: '#0f1a12', border: 'none',
+          padding: '10px 20px', fontFamily: 'Inter, sans-serif',
+          fontSize: '11px', letterSpacing: '0.08em',
+          textTransform: 'uppercase', cursor: 'pointer', fontWeight: '500'
+        }}>
+          Lås opp
+        </button>
+      </div>
+      {feil && (
+        <div style={{ fontSize: '12px', color: '#c84040', marginTop: '10px' }}>
+          Feil kode. Kontakt kontakt@addoninvest.no for tilgang.
+        </div>
+      )}
+    </div>
+  );
+}
+
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&display=swap');
   :root {
@@ -64,7 +148,7 @@ const styles = `
   .rene-intro { flex: 1; }
   .rene-navn { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--cream); margin-bottom: 4px; }
   .rene-tittel { font-size: 11px; color: var(--gold); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
-  .rene-bio { font-size: 12px; color: #4a6a4e; line-height: 1.6; font-style: italic; }
+  .rene-bio { font-size: 12px; color: #4a6a4e; line-height: 1.6; }
   .rene-analyse-knapp { background: var(--gold); color: var(--dark); border: none; padding: 12px 28px; font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; font-weight: 500; }
   .rene-analyse-knapp:hover { background: #b8943c; }
   .rene-analyse-knapp:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -150,11 +234,11 @@ async function kallRene(meldinger) {
     body: JSON.stringify({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 1000,
-      system: `Du er René, en erfaren bilutleierådgiver hos Invest Tools by ADDON.
-Du har bakgrunn fra bilbransjen og har hjulpet hundrevis av folk med å starte bilutleie i Norge.
-Du er direkte, litt tørrvittig og alltid ærlig – du sier ifra når tallene ikke ser bra ut.
-Du snakker norsk, uformelt men profesjonelt. Aldri klisjeer.
-Presenter deg aldri som en AI. Du er René.
+      system: `Du heter René og er en AI-assistent i Invest Tools by ADDON.
+Du hjelper brukere med å forstå tall og muligheter innen bilutleie i Norge.
+Du er IKKE en menneskelig rådgiver og gir IKKE finansiell eller juridisk rådgivning.
+Svar alltid på norsk, direkte og konkret. Ingen klisjeer.
+Minn alltid brukeren på å konsultere en regnskapsfører ved viktige beslutninger.
 Hold svar under 200 ord med mindre brukeren ber om mer.`,
       messages: meldinger
     })
@@ -187,7 +271,7 @@ Netto per måned: ${tall.netto.toLocaleString('no-NO')} kr
 Break-even utnyttelse: ${tall.breakEven}%
 ROI år 1: ${tall.roi.toFixed(1)}%
 
-Gi en konkret analyse som René:
+Gi en konkret analyse:
 1. Er dette en levedyktig investering?
 2. Hva er de viktigste risikoene?
 3. Er biltype og prising riktig?
@@ -222,12 +306,12 @@ Gi en konkret analyse som René:
         <div className="rene-avatar">🚗</div>
         <div className="rene-intro">
           <div className="rene-navn">René</div>
-          <div className="rene-tittel">Bilutleierådgiver</div>
-          <div className="rene-bio">"Jeg har sett alt i bilbransjen. Fortell meg tallene dine, så sier jeg deg ærlig hva jeg mener."</div>
+          <div className="rene-tittel">AI-assistent for bilutleie</div>
+          <div className="rene-bio">Hjelper deg forstå tallene dine. Erstatter ikke en regnskapsfører.</div>
         </div>
       </div>
       <button className="rene-analyse-knapp" onClick={hentAnalyse} disabled={lasterAnalyse}>
-        {lasterAnalyse ? 'René analyserer...' : 'Få Renés vurdering'}
+        {lasterAnalyse ? 'Analyserer...' : 'Analyser mine tall'}
       </button>
       {analyse && <div className="rene-resultat">{analyse}</div>}
       <div className="rene-chat">
@@ -235,7 +319,7 @@ Gi en konkret analyse som René:
         {chat.length > 0 && (
           <div className="rene-chat-meldinger">
             {chat.map((m, i) => <div key={i} className={`rene-chat-melding ${m.type}`}>{m.tekst}</div>)}
-            {lasterChat && <div className="rene-chat-melding ai laster">René tenker...</div>}
+            {lasterChat && <div className="rene-chat-melding ai laster">Tenker...</div>}
           </div>
         )}
         <div className="rene-chat-input-wrap">
@@ -248,6 +332,9 @@ Gi en konkret analyse som René:
 }
 
 export default function BilKalkulator() {
+  const [tilgang, setTilgang] = useState(sjekkLagretTilgang);
+  const harPro = tilgang === 'pro';
+
   const [bilType, setBilType] = useState('mellomklasse');
   const [antallBiler, setAntallBiler] = useState(1);
   const [egenkapital, setEgenkapital] = useState(200000);
@@ -496,7 +583,11 @@ export default function BilKalkulator() {
         <p className="bil-disclaimer">Tallene er estimater og ikke finansiell rådgivning. Konsulter en regnskapsfører før du tar beslutninger.</p>
       </div>
 
-      <Rene tall={reneTall} />
+      {harPro ? (
+        <Rene tall={reneTall} />
+      ) : (
+        <LaasBoks krever="pro" onLaasOpp={setTilgang} />
+      )}
     </div>
   );
 }

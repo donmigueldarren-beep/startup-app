@@ -1,5 +1,89 @@
 import { useState } from 'react';
 
+const KODER = {
+  basis: 'ADDON49',
+  pro: 'ADDON99',
+};
+
+function sjekkLagretTilgang() {
+  try {
+    const lagret = localStorage.getItem('addon_tilgang');
+    if (lagret === 'pro') return 'pro';
+    if (lagret === 'basis') return 'basis';
+  } catch (e) {}
+  return 'gratis';
+}
+
+function lagreTilgang(nivaa) {
+  try { localStorage.setItem('addon_tilgang', nivaa); } catch (e) {}
+}
+
+function LaasBoks({ onLaasOpp }) {
+  const [kode, setKode] = useState('');
+  const [feil, setFeil] = useState(false);
+
+  const forsok = () => {
+    if (kode.trim().toUpperCase() === KODER.pro) {
+      lagreTilgang('pro');
+      onLaasOpp('pro');
+    } else if (kode.trim().toUpperCase() === KODER.basis) {
+      lagreTilgang('basis');
+      onLaasOpp('basis');
+    } else {
+      setFeil(true);
+      setTimeout(() => setFeil(false), 2000);
+    }
+  };
+
+  return (
+    <div style={{
+      background: '#0f1a12', border: '1px solid #1a3a1e',
+      padding: '32px', marginBottom: '12px', textAlign: 'center'
+    }}>
+      <div style={{ fontSize: '28px', marginBottom: '12px' }}>🔒</div>
+      <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '18px', color: '#f5f0e8', marginBottom: '8px' }}>
+        Pro funksjon
+      </div>
+      <div style={{ fontSize: '13px', color: '#3a6a46', marginBottom: '24px', lineHeight: '1.6' }}>
+        Colette krever Pro (99 kr/mnd).
+        <br />
+        <a href="mailto:kontakt@addoninvest.no" style={{ color: '#c9a84c', textDecoration: 'none' }}>
+          Kontakt oss for tilgang
+        </a>
+      </div>
+      <div style={{ display: 'flex', gap: '8px', maxWidth: '320px', margin: '0 auto' }}>
+        <input
+          type="text"
+          placeholder="Skriv inn tilgangskode"
+          value={kode}
+          onChange={e => setKode(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && forsok()}
+          style={{
+            flex: 1, padding: '10px 14px',
+            background: feil ? '#1a0a0a' : '#0a1a0c',
+            border: `1px solid ${feil ? '#c84040' : '#1a3a1e'}`,
+            color: '#f5f0e8', fontFamily: 'Inter, sans-serif',
+            fontSize: '13px', outline: 'none', transition: 'border 0.2s'
+          }}
+        />
+        <button onClick={forsok} style={{
+          background: '#c9a84c', color: '#0f1a12', border: 'none',
+          padding: '10px 20px', fontFamily: 'Inter, sans-serif',
+          fontSize: '11px', letterSpacing: '0.08em',
+          textTransform: 'uppercase', cursor: 'pointer', fontWeight: '500'
+        }}>
+          Lås opp
+        </button>
+      </div>
+      {feil && (
+        <div style={{ fontSize: '12px', color: '#c84040', marginTop: '10px' }}>
+          Feil kode. Kontakt kontakt@addoninvest.no for tilgang.
+        </div>
+      )}
+    </div>
+  );
+}
+
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&display=swap');
   :root {
@@ -157,10 +241,11 @@ async function kallClaude(meldinger) {
     body: JSON.stringify({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 1000,
-      system: `Du er en norsk rådgiver for salong- og skjønnhetsbransjen hos Invest Tools by ADDON.
-Du gir konkrete, ærlige råd om oppstart og drift av salong i Norge.
-Svar alltid på norsk. Vær direkte og konkret.
-Aldri si at du er en AI. Presenter deg som Invest Tools-rådgiver.
+      system: `Du heter Colette og er en AI-assistent i Invest Tools by ADDON.
+Du hjelper brukere med å forstå tall og muligheter innen salong- og skjønnhetsbransjen i Norge.
+Du er IKKE en menneskelig rådgiver og gir IKKE finansiell eller juridisk rådgivning.
+Svar alltid på norsk, direkte og konkret. Ingen klisjeer.
+Minn alltid brukeren på å konsultere en regnskapsfører ved viktige beslutninger.
 Hold svar under 200 ord med mindre brukeren ber om mer.`,
       messages: meldinger
     })
@@ -225,14 +310,14 @@ Gi en konkret analyse:
 
   return (
     <div className="ai-seksjon">
-      <div className="ai-seksjon-tittel"><span className="ai-spark">✦</span> AI-rådgiver</div>
-      <div className="ai-seksjon-sub">Få en personlig analyse av dine tall, eller still spørsmål om salong-bransjen</div>
+      <div className="ai-seksjon-tittel"><span className="ai-spark">💇</span> Colette</div>
+      <div className="ai-seksjon-sub">AI-assistent for salong og skjønnhetsbransjen. Hjelper deg forstå tallene dine.</div>
       <button className="ai-analyse-knapp" onClick={hentAnalyse} disabled={lasterAnalyse}>
         {lasterAnalyse ? 'Analyserer...' : 'Analyser mine tall'}
       </button>
       {analyse && <div className="ai-analyse-resultat">{analyse}</div>}
       <div className="ai-chat">
-        <div className="ai-chat-tittel">Still et spørsmål</div>
+        <div className="ai-chat-tittel">Spør Colette</div>
         {chat.length > 0 && (
           <div className="ai-chat-meldinger">
             {chat.map((m, i) => <div key={i} className={`ai-chat-melding ${m.type}`}>{m.tekst}</div>)}
@@ -249,18 +334,18 @@ Gi en konkret analyse:
 }
 
 export default function SalongKalkulator() {
+  const [tilgang, setTilgang] = useState(sjekkLagretTilgang);
+  const harPro = tilgang === 'pro';
+
   const [salongType, setSalongType] = useState('frisor');
   const [selskapsform, setSelskapsform] = useState('enk');
   const [antallStoler, setAntallStoler] = useState(1);
   const [belegg, setBelegg] = useState(75);
   const [egenkapital, setEgenkapital] = useState(200000);
-
-  // Overstyrte verdier - nullstilles når type byttes
   const [overstyr, setOverstyr] = useState({});
 
   const type = SALONG_TYPER[salongType];
 
-  // Hent verdi: bruk overstyrt hvis finnes, ellers default fra type
   const prisPerBehandling = overstyr.pris ?? type.prisPerBehandling;
   const behandlingerPerDag = overstyr.behandlinger ?? type.behandlingerPerDag;
   const husleie = overstyr.husleie ?? type.husleie;
@@ -274,10 +359,7 @@ export default function SalongKalkulator() {
   const [markedsforing, setMarkedsforing] = useState(2000);
   const [regnskapKost, setRegnskapKost] = useState(0);
 
-  const byttType = (nyType) => {
-    setSalongType(nyType);
-    setOverstyr({}); // nullstill alle overstyrte verdier
-  };
+  const byttType = (nyType) => { setSalongType(nyType); setOverstyr({}); };
 
   const fmt = (n) => Math.round(n).toLocaleString('no-NO') + ' kr';
   const fmtMnd = (n) => (n >= 0 ? '+' : '') + Math.round(n).toLocaleString('no-NO') + ' kr/mnd';
@@ -342,12 +424,10 @@ export default function SalongKalkulator() {
             </div>
           ))}
         </div>
-
         <div className="sal-info">{type.fagkrav}</div>
         <div style={{ fontSize: '12px', color: 'var(--muted)', marginBottom: '16px', fontStyle: 'italic' }}>
           Typiske priser: {type.typiskPriser}
         </div>
-
         <div className="sal-section-label">Selskapsform</div>
         <div className="sal-enk-as">
           <div className={`sal-enk-card ${selskapsform === 'enk' ? 'active' : ''}`} onClick={() => { setSelskapsform('enk'); setRegnskapKost(0); }}>
@@ -374,7 +454,6 @@ export default function SalongKalkulator() {
           <Field label="Pris per behandling" value={prisPerBehandling} onChange={v => setOverstyr(o => ({...o, pris: v}))} step={50} hint={`Snitt for ${type.navn.toLowerCase()}`} />
           <Field label="Behandlinger per plass per dag" value={behandlingerPerDag} onChange={v => setOverstyr(o => ({...o, behandlinger: v}))} step={1} suffix="stk" />
         </div>
-
         <div className="sal-belegg-wrap">
           <div className="sal-belegg-row">
             <span className="sal-slider-label">Beleggsprosent</span>
@@ -385,7 +464,6 @@ export default function SalongKalkulator() {
             <span>30% – oppstart</span><span>75% – realistisk</span><span>100% – fullt</span>
           </div>
         </div>
-
         <div className="sal-metrics">
           <div className="sal-metric">
             <div className="lbl">Behandlinger/mnd</div>
@@ -416,7 +494,6 @@ export default function SalongKalkulator() {
           <Field label="Markedsføring / mnd" value={markedsforing} onChange={setMarkedsforing} step={500} hint="Instagram, Google, flyers" />
           <Field label="Regnskapsfører / år" value={regnskapKost} onChange={setRegnskapKost} step={1000} hint={selskapsform === 'enk' ? 'Ikke nødvendig for ENK' : 'Påkrevd for AS'} />
         </div>
-
         <div className="sal-section-label">Bemanning</div>
         <div className="sal-grid">
           <Field label="Antall ansatte (ekskl. deg selv)" value={antallAnsatte} onChange={setAntallAnsatte} step={1} suffix="stk" hint="0 = solodrift" />
@@ -427,7 +504,6 @@ export default function SalongKalkulator() {
             Total lønnskostnad inkl. arbeidsgiveravgift (14,1%), feriepenger (10,2%) og pensjon (2%): <strong>{fmt(lonnTotal + aga + feriepenger + pensjon)}/mnd</strong>
           </div>
         )}
-
         <div className="sal-section-label">Oppstartskostnader</div>
         <div className="sal-grid">
           <Field label="Utstyr og maskiner" value={oppstartUtstyr} onChange={v => setOverstyr(o => ({...o, oppstartUtstyr: v}))} step={10000} hint="Stoler, utstyr, kassasystem" />
@@ -442,7 +518,6 @@ export default function SalongKalkulator() {
           <div className="sal-step-num">4</div>
           <div className="sal-step-title">Resultat</div>
         </div>
-
         <div className="sal-two-col">
           <div className="sal-col">
             <div className="sal-col-header">Månedlige kostnader</div>
@@ -462,9 +537,7 @@ export default function SalongKalkulator() {
             <div className="sal-result" style={{ color: netto >= 0 ? 'var(--brg)' : '#8b2020' }}>{fmtMnd(netto)}</div>
           </div>
         </div>
-
         <div className={`sal-verdict ${verdiktKlasse}`}>{verdiktTekst}</div>
-
         <div className="sal-metrics">
           <div className="sal-metric">
             <div className="lbl">Oppstartskostnad</div>
@@ -482,7 +555,6 @@ export default function SalongKalkulator() {
             <div className="sub">avkastning på kapital</div>
           </div>
         </div>
-
         <div className="sal-section-label">Beleggscenarioer</div>
         <div style={{ overflowX: 'auto' }}>
           <table className="sal-table">
@@ -508,16 +580,18 @@ export default function SalongKalkulator() {
             </tbody>
           </table>
         </div>
-
         <div className="sal-section-label" style={{ marginTop: '20px' }}>Leiestol-alternativet</div>
         <div className="sal-info">
           Vurder leiestolmodellen: Du leier ut plasser til selvstendig næringsdrivende behandlere for 3 000-8 000 kr/mnd per plass. Du slipper lønnskostnader og risiko, men mister kontroll over kvalitet og kundeopplevelse. Populært i negle- og lash-bransjen.
         </div>
-
         <p className="sal-disclaimer">Tallene er estimater og ikke finansiell rådgivning. Konsulter en regnskapsfører før du tar beslutninger.</p>
       </div>
 
-      <AIAssistent tall={aiTall} />
+      {harPro ? (
+        <AIAssistent tall={aiTall} />
+      ) : (
+        <LaasBoks onLaasOpp={setTilgang} />
+      )}
     </div>
   );
 }
