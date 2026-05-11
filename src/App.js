@@ -148,6 +148,16 @@ const styles = `
   .pris-knapp.gull:hover { background: #d4b558; transform: translateY(-2px); box-shadow: 0 12px 30px rgba(201,168,76,0.25); }
   .pris-budsjett-note { text-align: center; margin-top: 32px; font-size: 12px; color: #2a4a2e; position: relative; z-index: 1; }
   .pris-budsjett-note span { color: var(--gold); }
+  .pris-slik { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; background: rgba(31,78,46,0.15); margin-bottom: 80px; position: relative; z-index: 1; }
+  .pris-slik-steg { background: #060e07; padding: 36px 32px; position: relative; }
+  .pris-slik-num { font-family: 'Playfair Display', serif; font-size: 48px; color: rgba(201,168,76,0.08); position: absolute; top: 20px; right: 24px; line-height: 1; }
+  .pris-slik-ikon { font-size: 28px; margin-bottom: 16px; }
+  .pris-slik-tittel { font-size: 14px; font-weight: 500; color: var(--cream); margin-bottom: 8px; }
+  .pris-slik-desc { font-size: 13px; color: #3a6a46; line-height: 1.65; }
+  .pris-kode-banner { background: rgba(201,168,76,0.06); border: 1px solid rgba(201,168,76,0.15); padding: 20px 28px; margin-bottom: 56px; position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; }
+  .pris-kode-tekst { font-size: 13px; color: #6a9a6e; line-height: 1.6; }
+  .pris-kode-tekst strong { color: var(--gold); }
+  .pris-kode-pill { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 0.12em; color: var(--gold); background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.3); padding: 8px 20px; white-space: nowrap; }
 
   .hvorfor-section { background: var(--dark); padding: 140px 80px; display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: center; position: relative; overflow: hidden; }
   .hvorfor-section::before { content: ''; position: absolute; bottom: -200px; right: -200px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(31,78,46,0.12) 0%, transparent 70%); pointer-events: none; }
@@ -459,9 +469,35 @@ function PrisSeksjon({ onKomIgang }) {
         </div>
         <div className="section-title reveal reveal-delay-1" style={{ color: 'var(--cream)', marginBottom: '16px' }}>Velg din plan</div>
         <div className="reveal reveal-delay-2" style={{ fontSize: '14px', color: '#3a6a46', maxWidth: '480px', margin: '0 auto' }}>
-          Kom i gang gratis. Oppgrader når du vil ha mer.
+          Kalkulatorene er alltid gratis. Oppgrader når du vil ha mer.
         </div>
       </div>
+
+      <div className="pris-slik reveal reveal-delay-1">
+        {[
+          { num: '1', ikon: '🧮', tittel: 'Legg inn tallene dine', desc: 'Velg bransje og fyll inn boligpris, leie, kostnader og din økonomi. Tar under 2 minutter.' },
+          { num: '2', ikon: '📊', tittel: 'Se resultatet med en gang', desc: 'Kalkulatoren regner ut kontantstrøm, break-even og om du faktisk har råd til å starte.' },
+          { num: '3', ikon: '🤖', tittel: 'Lås opp mer med Pro', desc: 'Få 10-års prognose, banksjekk og AI-assistenter som analyserer tallene og svarer på spørsmål.' },
+        ].map((s, i) => (
+          <div className="pris-slik-steg" key={i}>
+            <div className="pris-slik-num">{s.num}</div>
+            <div className="pris-slik-ikon">{s.ikon}</div>
+            <div className="pris-slik-tittel">{s.tittel}</div>
+            <div className="pris-slik-desc">{s.desc}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="pris-kode-banner reveal">
+        <div className="pris-kode-tekst">
+          Har du allerede en tilgangskode? Skriv den inn direkte i kalkulatoren for å låse opp Basis eller Pro. Koden <strong>ADDON49</strong> gir Basis, og <strong>ADDON99</strong> gir Pro.
+        </div>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <div className="pris-kode-pill">ADDON49</div>
+          <div className="pris-kode-pill">ADDON99</div>
+        </div>
+      </div>
+
       <div className="pris-grid reveal reveal-delay-2">
         {planer.map((p, i) => (
           <div key={i} className={`pris-kort ${p.populær ? 'populær' : ''}`}>
@@ -654,7 +690,7 @@ export default function App() {
           <div className="hero-overlay"></div>
           <Partikler />
           <div className="hero-content">
-            <div className="hero-tag">Gratis beslutningsverktøy</div>
+            <div className="hero-tag">Kalkulatorer gratis · Pro fra 99 kr/mnd</div>
             <h1 className="hero-title">Finn ut om ideen din<br /><em>faktisk</em> er lønnsom</h1>
             <p className="hero-sub">Invest Tools gir deg tallene du trenger før du investerer tid og penger i din neste bedrift.</p>
             <div className="hero-btns">
@@ -669,7 +705,7 @@ export default function App() {
           <div className="hero-stats">
             {[
               { slutt: 5, suffix: '', lbl: 'Bransjer' },
-              { slutt: 0, suffix: ' kr', lbl: 'Kostnad' },
+              { slutt: 99, suffix: ' kr', lbl: 'Pro/mnd' },
               { slutt: 100, suffix: '%', lbl: 'Konfidensielt' }
             ].map((s, i) => (
               <div className="hero-stat" key={i}>
