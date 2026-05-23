@@ -405,6 +405,26 @@ export default function EiendomAS() {
   const forsteHarRaadNeste = rader.find(r => r.harRaadNeste);
   const marcelTall = { boligpris, leie, felles, vedlikehold, rente, ekProsent, regnskapKost, netto, restKapital, forsteRefiAar: forsteRefi?.aar };
 
+  const aapneBudsjettark = () => {
+    const data = {
+      inntekt: leie,
+      totalKost: renteMnd + felles + vedlikehold + (regnskapKost / 12),
+      skattSats: 0.22,
+      inntektLinjer: [
+        { navn: 'Leieinntekt', verdi: leie },
+      ],
+      kostnadLinjer: [
+        { navn: `Renter (${rente}%)`, verdi: renteMnd },
+        { navn: 'Felleskostnader', verdi: felles },
+        { navn: 'Vedlikehold', verdi: vedlikehold },
+        { navn: 'Regnskapsfører', verdi: regnskapKost / 12 },
+      ],
+    };
+    try { localStorage.setItem('addon_budsjett_eiendom-as', JSON.stringify(data)); } catch (e) {}
+    window.history.pushState({}, '', '/budsjettark');
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  };
+
   return (
     <div className="ek-wrap">
       <style>{styles}</style>
@@ -625,6 +645,20 @@ export default function EiendomAS() {
         <Marcel tall={marcelTall} />
       ) : (
         <LaasBoks krever="pro" onLaasOpp={setTilgang} />
+      )}
+
+      {harPro && (
+        <button
+          onClick={aapneBudsjettark}
+          style={{
+            width: '100%', padding: '16px', background: 'var(--dark)', color: 'var(--cream)',
+            border: '1px solid #1a3a1e', fontFamily: 'Inter, sans-serif', fontSize: '11px',
+            letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer',
+            marginBottom: '12px', marginTop: '12px', transition: 'background 0.2s'
+          }}
+        >
+          📊 Åpne budsjettark med disse tallene
+        </button>
       )}
 
       <p className="ek-disclaimer">Tallene er estimater og ikke finansiell rådgivning. Konsulter en regnskapsfører.</p>
