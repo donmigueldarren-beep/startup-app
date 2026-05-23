@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 const KODER = {
   basis: 'ADDON49',
@@ -98,7 +98,6 @@ const styles = `
   .bud-tab.aktiv { background: var(--dark); color: var(--cream); }
   .bud-seksjon { background: white; border: 1px solid var(--cream-dark); padding: 28px; margin-bottom: 12px; }
   .bud-seksjon-tittel { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--dark); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-  .bud-seksjon-tittel span { font-size: 20px; }
   .bud-to-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--cream-dark); margin-bottom: 20px; }
   .bud-col { background: var(--cream); padding: 20px; }
   .bud-col-header { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; font-weight: 500; }
@@ -109,7 +108,7 @@ const styles = `
   .bud-linje.sum { border-top: 2px solid var(--cream-dark); margin-top: 4px; padding-top: 12px; }
   .bud-linje.sum .k { font-weight: 600; color: var(--text); }
   .bud-resultat { font-family: 'Playfair Display', serif; font-size: 28px; margin: 12px 0 4px; }
-  .bud-aar-tabell { width: 100%; border-collapse: collapse; font-size: 12px; overflow-x: auto; display: block; }
+  .bud-aar-tabell { width: 100%; border-collapse: collapse; font-size: 12px; display: block; overflow-x: auto; }
   .bud-aar-tabell th { text-align: left; padding: 8px 10px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); border-bottom: 2px solid var(--cream-dark); font-weight: 500; white-space: nowrap; }
   .bud-aar-tabell td { padding: 9px 10px; border-bottom: 1px solid var(--cream-dark); white-space: nowrap; }
   .bud-aar-tabell tr:hover td { background: var(--cream); }
@@ -149,7 +148,7 @@ function hentTallFraStorage(kalkulator) {
   } catch (e) { return null; }
 }
 
-function MaanedligBudsjett({ tall, kalkulator }) {
+function MaanedligBudsjett({ tall }) {
   const [ekstraTall, setEkstraTall] = useState({
     ekstraInntekt: 0,
     ekstraKostnad: 0,
@@ -266,9 +265,7 @@ function MaanedligBudsjett({ tall, kalkulator }) {
       }}>
         <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--muted)', marginBottom: '6px' }}>Netto per måned</div>
         <div className="bud-resultat" style={{ color: netto >= 0 ? 'var(--brg)' : '#8b2020' }}>{fmtMnd(netto)}</div>
-        <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '4px' }}>
-          Årlig: {fmtK(netto * 12)}
-        </div>
+        <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '4px' }}>Årlig: {fmtK(netto * 12)}</div>
       </div>
     </div>
   );
@@ -382,7 +379,6 @@ export default function Budsjettark({ onTilbake }) {
     if (!tall) return;
     const maaneder = ['Jan', 'Feb', 'Mar', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Des'];
     const sesong = tall.sesongFaktor || Array(12).fill(1);
-
     let csv = 'Måned,Inntekt,Kostnader,Brutto,Skatt,Netto,Akkumulert\n';
     let akk = 0;
     maaneder.forEach((mnd, i) => {
@@ -394,7 +390,6 @@ export default function Budsjettark({ onTilbake }) {
       akk += netto;
       csv += `${mnd},${Math.round(inntekt)},${Math.round(kost)},${Math.round(brutto)},${Math.round(skatt)},${Math.round(netto)},${Math.round(akk)}\n`;
     });
-
     const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -404,14 +399,12 @@ export default function Budsjettark({ onTilbake }) {
     URL.revokeObjectURL(url);
   };
 
-  const eksporterPDF = () => {
-    window.print();
-  };
+  const eksporterPDF = () => { window.print(); };
 
   return (
     <div className="bud-wrap">
       <style>{styles}</style>
-      <style>{`@media print { .bud-eksport-wrap, .bud-tabs, .bud-kalkulator-valg, .bud-knapp-wrap { display: none !important; } }`}</style>
+      <style>{`@media print { .bud-eksport-wrap, .bud-tabs, .bud-kalkulator-valg { display: none !important; } }`}</style>
 
       <div className="bud-header">
         <div className="bud-header-inner">
@@ -461,7 +454,7 @@ export default function Budsjettark({ onTilbake }) {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
               <div className="bud-seksjon">
                 <div className="bud-seksjon-tittel"><span>📋</span> Månedlig budsjett</div>
-                <MaanedligBudsjett tall={tall} kalkulator={aktivKalkulator} />
+                <MaanedligBudsjett tall={tall} />
               </div>
               <div className="bud-seksjon">
                 <div className="bud-seksjon-tittel"><span>📅</span> 12-måneders oversikt</div>
@@ -471,7 +464,7 @@ export default function Budsjettark({ onTilbake }) {
           ) : aktivTab === 'maanedlig' ? (
             <div className="bud-seksjon">
               <div className="bud-seksjon-tittel"><span>📋</span> Månedlig budsjett</div>
-              <MaanedligBudsjett tall={tall} kalkulator={aktivKalkulator} />
+              <MaanedligBudsjett tall={tall} />
             </div>
           ) : (
             <div className="bud-seksjon">
