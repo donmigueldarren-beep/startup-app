@@ -5,6 +5,7 @@ import EiendomAS from './EiendomAS';
 import EiendomSammenlign from './EiendomSammenlign';
 import BilKalkulator from './BilKalkulator';
 import SalongKalkulator from './SalongKalkulator';
+import Budsjettark from './Budsjettark';
 import './App.css';
 
 const styles = `
@@ -386,6 +387,7 @@ const bransjer = [
 function getSideFromUrl() {
   const path = window.location.pathname;
   if (path === '/om-oss') return 'om-oss';
+  if (path === '/budsjettark') return 'budsjettark';
   if (path.startsWith('/kalkulator/')) return 'kalkulator';
   return 'hjem';
 }
@@ -406,57 +408,27 @@ function PrisSeksjon({ onKomIgang }) {
       pris: '0',
       desc: 'Kom i gang og regn på tallene dine.',
       populær: false,
-      funksjoner: [
-        'Alle 5 kalkulatorer',
-        'Månedlig kontantstrøm',
-        'Oppstartskostnader',
-      ],
-      ikkeInkludert: [
-        '10-års prognose',
-        'Neste bolig kalkulator',
-        'Banksjekk og stresstest',
-        'AI-assistent (Marcel, Colette, René)',
-        'Budsjettark med eksport',
-      ],
-      knappTekst: 'Start gratis',
-      knappType: 'standard',
+      funksjoner: ['Alle 5 kalkulatorer', 'Månedlig kontantstrøm', 'Oppstartskostnader'],
+      ikkeInkludert: ['10-års prognose', 'Neste bolig kalkulator', 'Banksjekk og stresstest', 'AI-assistent (Marcel, Colette, René)', 'Budsjettark med eksport'],
+      knappTekst: 'Start gratis', knappType: 'standard',
     },
     {
       plan: 'Basis',
       pris: '49',
       desc: 'For deg som vil planlegge langsiktig.',
       populær: false,
-      funksjoner: [
-        'Alt i gratis',
-        '10-års prognose',
-        'Neste bolig kalkulator',
-        'Banksjekk og stresstest',
-        'Tidlig tilgang til nye bransjer',
-      ],
-      ikkeInkludert: [
-        'AI-assistent (Marcel, Colette, René)',
-        'Budsjettark med eksport',
-      ],
-      knappTekst: 'Velg Basis',
-      knappType: 'standard',
+      funksjoner: ['Alt i gratis', '10-års prognose', 'Neste bolig kalkulator', 'Banksjekk og stresstest', 'Tidlig tilgang til nye bransjer'],
+      ikkeInkludert: ['AI-assistent (Marcel, Colette, René)', 'Budsjettark med eksport'],
+      knappTekst: 'Velg Basis', knappType: 'standard',
     },
     {
       plan: 'Pro',
       pris: '99',
       desc: 'Alt du trenger for å ta gode investeringsbeslutninger.',
       populær: true,
-      funksjoner: [
-        'Alt i Basis',
-        'AI-assistent Marcel for eiendom',
-        'AI-assistent Colette for salong',
-        'AI-assistent René for bilutleie',
-        'Budsjettark forhåndsutfylt med dine tall',
-        'Eksport til Excel og PDF',
-        'Tidlig tilgang til nye bransjer',
-      ],
+      funksjoner: ['Alt i Basis', 'AI-assistent Marcel for eiendom', 'AI-assistent Colette for salong', 'AI-assistent René for bilutleie', 'Budsjettark forhåndsutfylt med dine tall', 'Eksport til Excel og PDF', 'Tidlig tilgang til nye bransjer'],
       ikkeInkludert: [],
-      knappTekst: 'Velg Pro',
-      knappType: 'gull',
+      knappTekst: 'Velg Pro', knappType: 'gull',
     },
   ];
 
@@ -510,10 +482,7 @@ function PrisSeksjon({ onKomIgang }) {
               {p.funksjoner.map((f, j) => <li key={j}>{f}</li>)}
               {p.ikkeInkludert.map((f, j) => <li key={j} className="nei">{f}</li>)}
             </ul>
-            <button
-              className={`pris-knapp ${p.knappType === 'gull' ? 'gull' : ''}`}
-              onClick={onKomIgang}
-            >
+            <button className={`pris-knapp ${p.knappType === 'gull' ? 'gull' : ''}`} onClick={onKomIgang}>
               {p.knappTekst}
             </button>
           </div>
@@ -570,6 +539,38 @@ export default function App() {
     window.history.pushState({}, '', '/om-oss');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  const gaaBudsjettark = () => {
+    setSide('budsjettark');
+    setAnimKey(k => k + 1);
+    window.history.pushState({}, '', '/budsjettark');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  if (side === 'budsjettark') {
+    return (
+      <div className="app">
+        <style>{styles}</style>
+        <nav className="nav">
+          <NavLogo onClick={gaaHjem} />
+          <div className="nav-links">
+            <span className="nav-link" onClick={gaaHjem}>Hjem</span>
+            <span className="nav-link" onClick={gaaOmOss}>Om oss</span>
+            <span className="nav-link" style={{ color: 'var(--gold)' }}>Budsjettark</span>
+          </div>
+          <button className="nav-cta" onClick={gaaHjem}><span>Alle bransjer</span></button>
+        </nav>
+        <div className="side-innhold" key={animKey} style={{ padding: '100px 80px 80px', maxWidth: '1200px', margin: '0 auto' }}>
+          <button className="kalkulator-back" onClick={gaaHjem}>← Tilbake</button>
+          <Budsjettark onTilbake={gaaHjem} />
+        </div>
+        <footer>
+          <FooterLogo />
+          <div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning.</div>
+        </footer>
+      </div>
+    );
+  }
 
   if (side === 'om-oss') {
     return (
@@ -642,6 +643,7 @@ export default function App() {
           <div className="nav-links">
             <span className="nav-link" onClick={gaaHjem}>Hjem</span>
             <span className="nav-link" onClick={gaaOmOss}>Om oss</span>
+            <span className="nav-link" onClick={gaaBudsjettark}>Budsjettark</span>
           </div>
           <button className="nav-cta" onClick={gaaHjem}><span>Alle bransjer</span></button>
         </nav>
@@ -679,6 +681,7 @@ export default function App() {
         <div className="nav-links">
           <span className="nav-link" onClick={() => document.getElementById('bransjer')?.scrollIntoView({ behavior: 'smooth' })}>Bransjer</span>
           <span className="nav-link" onClick={gaaOmOss}>Om oss</span>
+          <span className="nav-link" onClick={gaaBudsjettark}>Budsjettark</span>
         </div>
         <button className="nav-cta" onClick={() => aapneBransje(bransjer[0])}><span>Kom i gang</span></button>
       </nav>
