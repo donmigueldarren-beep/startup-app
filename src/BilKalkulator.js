@@ -396,6 +396,26 @@ export default function BilKalkulator() {
     breakEven: breakEvenPst, roi: roiAar
   };
 
+  const aapneBudsjettark = () => {
+    const data = {
+      inntekt: inntektMnd,
+      totalKost: totalKostMnd,
+      skattSats: 0.22,
+      inntektLinjer: [
+        { navn: `Bilutleie (${antallBiler} bil${antallBiler > 1 ? 'er' : ''}, ${utnyttelse}% utnyttelse)`, verdi: inntektMnd },
+      ],
+      kostnadLinjer: [
+        { navn: 'Renter på lån', verdi: renteMnd },
+        { navn: 'Forsikring', verdi: forsikringMnd },
+        { navn: 'Service og vedlikehold', verdi: serviceMnd },
+        { navn: 'Drivstoff / klargjøring', verdi: drivstoffMnd },
+        { navn: 'Regnskapsfører', verdi: regnskapMnd },
+      ],
+    };
+    try { localStorage.setItem('addon_budsjett_bil', JSON.stringify(data)); } catch (e) {}
+    window.location.href = '/budsjettark';
+  };
+
   return (
     <div className="bil-wrap">
       <style>{styles}</style>
@@ -587,6 +607,20 @@ export default function BilKalkulator() {
         <Rene tall={reneTall} />
       ) : (
         <LaasBoks krever="pro" onLaasOpp={setTilgang} />
+      )}
+
+      {harPro && (
+        <button
+          onClick={aapneBudsjettark}
+          style={{
+            width: '100%', padding: '16px', background: 'var(--dark)', color: 'var(--cream)',
+            border: '1px solid #1a3a1e', fontFamily: 'Inter, sans-serif', fontSize: '11px',
+            letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer',
+            marginBottom: '12px', marginTop: '12px', transition: 'background 0.2s'
+          }}
+        >
+          📊 Åpne budsjettark med disse tallene
+        </button>
       )}
     </div>
   );
