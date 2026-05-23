@@ -421,8 +421,7 @@ export default function EiendomAS() {
       ],
     };
     try { localStorage.setItem('addon_budsjett_eiendom-as', JSON.stringify(data)); } catch (e) {}
-    window.history.pushState({}, '', '/budsjettark');
-    window.dispatchEvent(new PopStateEvent('popstate'));
+    window.location.href = '/budsjettark';
   };
 
   return (
