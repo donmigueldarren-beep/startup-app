@@ -425,6 +425,24 @@ export default function EiendomPrivat() {
   const forsteHarRaadNeste = rader.find(r => r.harRaadNeste);
   const marcelTall = { boligpris, leie, felles, vedlikehold, rente, ekProsent, aarsinntekt, maksLaan, laan, klarerBelaning, klarerStress, netto, restKapital, forsteRefiAar: forsteRefi?.aar };
 
+  const aapneBudsjettark = () => {
+    const data = {
+      inntekt: leie,
+      totalKost: renteMnd + felles + vedlikehold,
+      skattSats: skattProsent / 100,
+      inntektLinjer: [
+        { navn: 'Leieinntekt', verdi: leie },
+      ],
+      kostnadLinjer: [
+        { navn: `Renter (${rente}%)`, verdi: renteMnd },
+        { navn: 'Felleskostnader', verdi: felles },
+        { navn: 'Vedlikehold', verdi: vedlikehold },
+      ],
+    };
+    try { localStorage.setItem('addon_budsjett_eiendom-privat', JSON.stringify(data)); } catch (e) {}
+    window.location.href = '/budsjettark';
+  };
+
   return (
     <div className="ek-wrap">
       <style>{styles}</style>
@@ -621,6 +639,20 @@ export default function EiendomPrivat() {
         <Marcel tall={marcelTall} />
       ) : (
         <LaasBoks krever="pro" onLaasOpp={setTilgang} />
+      )}
+
+      {harPro && (
+        <button
+          onClick={aapneBudsjettark}
+          style={{
+            width: '100%', padding: '16px', background: 'var(--dark)', color: 'var(--cream)',
+            border: '1px solid #1a3a1e', fontFamily: 'Inter, sans-serif', fontSize: '11px',
+            letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer',
+            marginBottom: '12px', marginTop: '12px', transition: 'background 0.2s'
+          }}
+        >
+          📊 Åpne budsjettark med disse tallene
+        </button>
       )}
 
       <p className="ek-disclaimer">Tallene er estimater og ikke finansiell rådgivning. Konsulter en regnskapsfører.</p>
