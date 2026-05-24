@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Analytics } from '@vercel/analytics/react';
+import Login from './Login';
+import { supabase } from './supabaseClient';
 import EiendomPrivat from './EiendomPrivat';
 import EiendomAS from './EiendomAS';
 import EiendomSammenlign from './EiendomSammenlign';
@@ -508,9 +510,22 @@ function PrisSeksjon({ onKomIgang }) {
 }
 
 export default function App() {
+  const [bruker, setBruker] = useState(null);
+  const [lasterAuth, setLasterAuth] = useState(true);
   const [side, setSide] = useState(getSideFromUrl);
   const [aktivBransje, setAktivBransje] = useState(getBransjeFromUrl);
   const [animKey, setAnimKey] = useState(0);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setBruker(session?.user ?? null);
+      setLasterAuth(false);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setBruker(session?.user ?? null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   useScrollReveal();
   useParallax();
@@ -527,6 +542,9 @@ export default function App() {
     window.addEventListener('popstate', handlePop);
     return () => window.removeEventListener('popstate', handlePop);
   }, []);
+
+  if (lasterAuth) return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#f5f0e8', fontFamily: 'Inter, sans-serif', color: '#5a6e5e' }}>Laster...</div>;
+  if (!bruker) return <Login onLogin={setBruker} />;
 
   const aapneBransje = (bransje) => {
     if (bransje.coming) return;
