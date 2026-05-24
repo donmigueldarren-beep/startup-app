@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { Analytics } from '@vercel/analytics/react';
-import Login from './Login';
 import { supabase } from './supabaseClient';
 import EiendomPrivat from './EiendomPrivat';
 import EiendomAS from './EiendomAS';
@@ -62,6 +61,27 @@ const styles = `
   .nav-cta:hover::before { transform: scaleX(1); }
   .nav-cta:hover { color: var(--dark); border-color: var(--gold); }
   .nav-cta span { position: relative; z-index: 1; }
+
+  .login-side { position: fixed; inset: 0; z-index: 200; background: rgba(8,14,9,0.97); display: flex; align-items: center; justify-content: center; animation: fadeInn 0.3s ease; }
+  @keyframes fadeInn { from { opacity: 0; } to { opacity: 1; } }
+  .login-boks { background: #0a1a0c; border: 1px solid rgba(31,78,46,0.4); padding: 56px 48px; width: 100%; max-width: 440px; position: relative; }
+  .login-boks::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--gold); }
+  .login-lukk { position: absolute; top: 20px; right: 20px; background: none; border: none; color: #3a6a46; font-size: 20px; cursor: pointer; transition: color 0.3s; line-height: 1; }
+  .login-lukk:hover { color: var(--cream); }
+  .login-tag { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+  .login-tag::before { content: ''; display: inline-block; width: 20px; height: 1px; background: var(--gold); }
+  .login-tittel { font-family: 'Playfair Display', serif; font-size: 32px; color: var(--cream); margin-bottom: 36px; line-height: 1.1; }
+  .login-input { width: 100%; background: rgba(31,78,46,0.1); border: 1px solid rgba(31,78,46,0.4); color: var(--cream); padding: 14px 16px; font-family: 'Inter', sans-serif; font-size: 13px; margin-bottom: 12px; outline: none; transition: border-color 0.3s; }
+  .login-input:focus { border-color: var(--gold); }
+  .login-input::placeholder { color: #3a6a46; }
+  .login-knapp { width: 100%; padding: 15px; background: var(--gold); color: var(--dark); border: none; font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: all 0.3s; font-weight: 500; margin-top: 8px; }
+  .login-knapp:hover { background: #d4b558; transform: translateY(-2px); }
+  .login-knapp:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .login-melding { font-size: 13px; color: var(--gold); margin-top: 12px; min-height: 20px; }
+  .login-melding.feil { color: #e07070; }
+  .login-bytt { margin-top: 24px; font-size: 12px; color: #3a6a46; cursor: pointer; transition: color 0.3s; text-align: center; letter-spacing: 0.04em; }
+  .login-bytt:hover { color: var(--cream); }
+  .login-bruker { font-size: 11px; color: #3a6a46; letter-spacing: 0.06em; }
 
   .hero { position: relative; height: 100vh; min-height: 600px; overflow: hidden; display: flex; align-items: center; }
   .hero-bg { position: absolute; inset: -20%; background: url('https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1600&q=80') center/cover no-repeat; will-change: transform; }
@@ -262,6 +282,50 @@ const FooterLogo = () => (
   </div>
 );
 
+function LoginModal({ onLogin, onLukk }) {
+  const [epost, setEpost] = useState('');
+  const [passord, setPassord] = useState('');
+  const [melding, setMelding] = useState('');
+  const [feil, setFeil] = useState(false);
+  const [laster, setLaster] = useState(false);
+  const [erNyBruker, setErNyBruker] = useState(false);
+
+  async function handleSubmit() {
+    setLaster(true);
+    setMelding('');
+    setFeil(false);
+    if (erNyBruker) {
+      const { error } = await supabase.auth.signUp({ email: epost, password: passord });
+      if (error) { setMelding(error.message); setFeil(true); }
+      else { setMelding('Sjekk e-posten din for å bekrefte kontoen!'); }
+    } else {
+      const { data, error } = await supabase.auth.signInWithPassword({ email: epost, password: passord });
+      if (error) { setMelding('Feil e-post eller passord'); setFeil(true); }
+      else { onLogin(data.user); onLukk(); }
+    }
+    setLaster(false);
+  }
+
+  return (
+    <div className="login-side" onClick={(e) => { if (e.target === e.currentTarget) onLukk(); }}>
+      <div className="login-boks">
+        <button className="login-lukk" onClick={onLukk}>×</button>
+        <div className="login-tag">{erNyBruker ? 'Ny bruker' : 'Konto'}</div>
+        <div className="login-tittel">{erNyBruker ? 'Opprett konto' : 'Logg inn'}</div>
+        <input className="login-input" type="email" placeholder="E-post" value={epost} onChange={e => setEpost(e.target.value)} />
+        <input className="login-input" type="password" placeholder="Passord" value={passord} onChange={e => setPassord(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSubmit()} />
+        {melding && <div className={`login-melding ${feil ? 'feil' : ''}`}>{melding}</div>}
+        <button className="login-knapp" onClick={handleSubmit} disabled={laster}>
+          {laster ? 'Venter...' : erNyBruker ? 'Registrer' : 'Logg inn'}
+        </button>
+        <div className="login-bytt" onClick={() => { setErNyBruker(!erNyBruker); setMelding(''); }}>
+          {erNyBruker ? 'Har du konto? Logg inn' : 'Ny bruker? Opprett konto'}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Partikler() {
   const canvasRef = useRef(null);
   useEffect(() => {
@@ -461,7 +525,6 @@ function PrisSeksjon({ onKomIgang }) {
           Kalkulatorene er alltid gratis. Oppgrader når du vil ha mer.
         </div>
       </div>
-
       <div className="pris-slik reveal reveal-delay-1">
         {[
           { num: '1', ikon: '🧮', tittel: 'Legg inn tallene dine', desc: 'Velg bransje og fyll inn boligpris, leie, kostnader og din økonomi. Tar under 2 minutter.' },
@@ -476,7 +539,6 @@ function PrisSeksjon({ onKomIgang }) {
           </div>
         ))}
       </div>
-
       <div className="pris-grid reveal reveal-delay-2">
         {planer.map((p, i) => (
           <div key={i} className={`pris-kort ${p.populær ? 'populær' : ''}`}>
@@ -512,6 +574,7 @@ function PrisSeksjon({ onKomIgang }) {
 export default function App() {
   const [bruker, setBruker] = useState(null);
   const [lasterAuth, setLasterAuth] = useState(true);
+  const [visLogin, setVisLogin] = useState(false);
   const [side, setSide] = useState(getSideFromUrl);
   const [aktivBransje, setAktivBransje] = useState(getBransjeFromUrl);
   const [animKey, setAnimKey] = useState(0);
@@ -544,7 +607,19 @@ export default function App() {
   }, []);
 
   if (lasterAuth) return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#f5f0e8', fontFamily: 'Inter, sans-serif', color: '#5a6e5e' }}>Laster...</div>;
-  if (!bruker) return <Login onLogin={setBruker} />;
+
+  const NavKnapper = () => (
+    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+      {bruker ? (
+        <>
+          <span className="login-bruker">{bruker.email}</span>
+          <button className="nav-cta" onClick={() => supabase.auth.signOut()}><span>Logg ut</span></button>
+        </>
+      ) : (
+        <button className="nav-cta" onClick={() => setVisLogin(true)}><span>Logg inn</span></button>
+      )}
+    </div>
+  );
 
   const aapneBransje = (bransje) => {
     if (bransje.coming) return;
@@ -581,6 +656,7 @@ export default function App() {
     return (
       <div className="app">
         <style>{styles}</style>
+        {visLogin && <LoginModal onLogin={setBruker} onLukk={() => setVisLogin(false)} />}
         <nav className="nav">
           <NavLogo onClick={gaaHjem} />
           <div className="nav-links">
@@ -588,7 +664,7 @@ export default function App() {
             <span className="nav-link" onClick={gaaOmOss}>Om oss</span>
             <span className="nav-link" style={{ color: 'var(--gold)' }}>Budsjettark</span>
           </div>
-          <button className="nav-cta" onClick={gaaHjem}><span>Alle bransjer</span></button>
+          <NavKnapper />
         </nav>
         <div className="side-innhold" key={animKey} style={{ padding: '100px 80px 80px', maxWidth: '1200px', margin: '0 auto' }}>
           <button className="kalkulator-back" onClick={gaaHjem}>← Tilbake</button>
@@ -606,6 +682,7 @@ export default function App() {
     return (
       <div className="app">
         <style>{styles}</style>
+        {visLogin && <LoginModal onLogin={setBruker} onLukk={() => setVisLogin(false)} />}
         <nav className="nav">
           <NavLogo onClick={gaaHjem} />
           <div className="nav-links">
@@ -613,7 +690,7 @@ export default function App() {
             <span className="nav-link" onClick={() => { gaaHjem(); setTimeout(() => document.getElementById('bransjer')?.scrollIntoView({ behavior: 'smooth' }), 300); }}>Bransjer</span>
             <span className="nav-link" style={{ color: 'var(--gold)' }}>Om oss</span>
           </div>
-          <button className="nav-cta" onClick={() => aapneBransje(bransjer[0])}><span>Kom i gang</span></button>
+          <NavKnapper />
         </nav>
         <div className="side-innhold" key={animKey}>
           <div className="om-oss-hero">
@@ -668,6 +745,7 @@ export default function App() {
     return (
       <div className="app">
         <style>{styles}</style>
+        {visLogin && <LoginModal onLogin={setBruker} onLukk={() => setVisLogin(false)} />}
         <nav className="nav">
           <NavLogo onClick={gaaHjem} />
           <div className="nav-links">
@@ -675,7 +753,7 @@ export default function App() {
             <span className="nav-link" onClick={gaaOmOss}>Om oss</span>
             <span className="nav-link" onClick={gaaBudsjettark}>Budsjettark</span>
           </div>
-          <button className="nav-cta" onClick={gaaHjem}><span>Alle bransjer</span></button>
+          <NavKnapper />
         </nav>
         <div className="side-innhold" key={animKey}>
           <div className="kalkulator-view">
@@ -706,6 +784,7 @@ export default function App() {
   return (
     <div className="app">
       <style>{styles}</style>
+      {visLogin && <LoginModal onLogin={setBruker} onLukk={() => setVisLogin(false)} />}
       <nav className="nav">
         <NavLogo onClick={gaaHjem} />
         <div className="nav-links">
@@ -713,7 +792,7 @@ export default function App() {
           <span className="nav-link" onClick={gaaOmOss}>Om oss</span>
           <span className="nav-link" onClick={gaaBudsjettark}>Budsjettark</span>
         </div>
-        <button className="nav-cta" onClick={() => aapneBransje(bransjer[0])}><span>Kom i gang</span></button>
+        <NavKnapper />
       </nav>
 
       <div className="side-innhold" key={animKey}>
