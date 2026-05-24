@@ -406,6 +406,27 @@ export default function SalongKalkulator() {
 
   const aiTall = { salongType: type.navn, selskapsform: selskapsform.toUpperCase(), antallStoler, prisPerBehandling, behandlingerPerDag, belegg, omsetning, kostnader: totalKost, netto, antallAnsatte, oppstart: totalOppstart, breakEvenPerStol };
 
+  const aapneBudsjettark = () => {
+    const data = {
+      inntekt: omsetning,
+      totalKost: totalKost,
+      skattSats: skattSats,
+      inntektLinjer: [
+        { navn: `${type.navn} (${behandlingerMnd} behandlinger)`, verdi: omsetning },
+      ],
+      kostnadLinjer: [
+        { navn: 'Husleie', verdi: husleie },
+        { navn: `Produkter (${type.produktProsent}%)`, verdi: produktKost },
+        { navn: 'Forsikring', verdi: forsikring },
+        { navn: 'Markedsføring', verdi: markedsforing },
+        ...(antallAnsatte > 0 ? [{ navn: 'Lønn inkl. avgifter', verdi: lonnTotal + aga + feriepenger + pensjon }] : []),
+        ...(regnskapMnd > 0 ? [{ navn: 'Regnskapsfører', verdi: regnskapMnd }] : []),
+      ],
+    };
+    try { localStorage.setItem('addon_budsjett_salong', JSON.stringify(data)); } catch (e) {}
+    window.location.href = '/budsjettark';
+  };
+
   return (
     <div className="sal-wrap">
       <style>{styles}</style>
@@ -591,6 +612,20 @@ export default function SalongKalkulator() {
         <AIAssistent tall={aiTall} />
       ) : (
         <LaasBoks onLaasOpp={setTilgang} />
+      )}
+
+      {harPro && (
+        <button
+          onClick={aapneBudsjettark}
+          style={{
+            width: '100%', padding: '16px', background: 'var(--dark)', color: 'var(--cream)',
+            border: '1px solid #1a3a1e', fontFamily: 'Inter, sans-serif', fontSize: '11px',
+            letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer',
+            marginBottom: '12px', marginTop: '12px', transition: 'background 0.2s'
+          }}
+        >
+          📊 Åpne budsjettark med disse tallene
+        </button>
       )}
     </div>
   );
