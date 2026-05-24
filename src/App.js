@@ -147,6 +147,7 @@ const styles = `
   .pris-knapp:hover { border-color: var(--brg-light); color: var(--cream); background: rgba(31,78,46,0.2); }
   .pris-knapp.gull { background: var(--gold); color: var(--dark); border-color: var(--gold); }
   .pris-knapp.gull:hover { background: #d4b558; transform: translateY(-2px); box-shadow: 0 12px 30px rgba(201,168,76,0.25); }
+  .pris-knapp:disabled { opacity: 0.6; cursor: not-allowed; }
   .pris-budsjett-note { text-align: center; margin-top: 32px; font-size: 12px; color: #2a4a2e; position: relative; z-index: 1; }
   .pris-budsjett-note span { color: var(--gold); }
   .pris-slik { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; background: rgba(31,78,46,0.15); margin-bottom: 80px; position: relative; z-index: 1; }
@@ -155,10 +156,6 @@ const styles = `
   .pris-slik-ikon { font-size: 28px; margin-bottom: 16px; }
   .pris-slik-tittel { font-size: 14px; font-weight: 500; color: var(--cream); margin-bottom: 8px; }
   .pris-slik-desc { font-size: 13px; color: #3a6a46; line-height: 1.65; }
-  .pris-kode-banner { background: rgba(201,168,76,0.06); border: 1px solid rgba(201,168,76,0.15); padding: 20px 28px; margin-bottom: 56px; position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; }
-  .pris-kode-tekst { font-size: 13px; color: #6a9a6e; line-height: 1.6; }
-  .pris-kode-tekst strong { color: var(--gold); }
-  .pris-kode-pill { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 0.12em; color: var(--gold); background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.3); padding: 8px 20px; white-space: nowrap; }
 
   .hvorfor-section { background: var(--dark); padding: 140px 80px; display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: center; position: relative; overflow: hidden; }
   .hvorfor-section::before { content: ''; position: absolute; bottom: -200px; right: -200px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(31,78,46,0.12) 0%, transparent 70%); pointer-events: none; }
@@ -402,6 +399,24 @@ function getBransjeFromUrl() {
 }
 
 function PrisSeksjon({ onKomIgang }) {
+  const [lasterBetaling, setLasterBetaling] = useState(null);
+
+  const startBetaling = async (plan) => {
+    setLasterBetaling(plan);
+    try {
+      const res = await fetch('/api/create-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan })
+      });
+      const data = await res.json();
+      if (data.url) window.location.href = data.url;
+    } catch (e) {
+      alert('Noe gikk galt. Prøv igjen.');
+    }
+    setLasterBetaling(null);
+  };
+
   const planer = [
     {
       plan: 'Gratis',
@@ -410,7 +425,7 @@ function PrisSeksjon({ onKomIgang }) {
       populær: false,
       funksjoner: ['Alle 5 kalkulatorer', 'Månedlig kontantstrøm', 'Oppstartskostnader'],
       ikkeInkludert: ['10-års prognose', 'Neste bolig kalkulator', 'Banksjekk og stresstest', 'AI-assistent (Marcel, Colette, René)', 'Budsjettark med eksport'],
-      knappTekst: 'Start gratis', knappType: 'standard',
+      knappTekst: 'Start gratis', knappType: 'standard', knappPlan: null,
     },
     {
       plan: 'Basis',
@@ -419,7 +434,7 @@ function PrisSeksjon({ onKomIgang }) {
       populær: false,
       funksjoner: ['Alt i gratis', '10-års prognose', 'Neste bolig kalkulator', 'Banksjekk og stresstest', 'Tidlig tilgang til nye bransjer'],
       ikkeInkludert: ['AI-assistent (Marcel, Colette, René)', 'Budsjettark med eksport'],
-      knappTekst: 'Velg Basis', knappType: 'standard',
+      knappTekst: 'Velg Basis', knappType: 'standard', knappPlan: 'basis',
     },
     {
       plan: 'Pro',
@@ -428,7 +443,7 @@ function PrisSeksjon({ onKomIgang }) {
       populær: true,
       funksjoner: ['Alt i Basis', 'AI-assistent Marcel for eiendom', 'AI-assistent Colette for salong', 'AI-assistent René for bilutleie', 'Budsjettark forhåndsutfylt med dine tall', 'Eksport til Excel og PDF', 'Tidlig tilgang til nye bransjer'],
       ikkeInkludert: [],
-      knappTekst: 'Velg Pro', knappType: 'gull',
+      knappTekst: 'Velg Pro', knappType: 'gull', knappPlan: 'pro',
     },
   ];
 
@@ -460,16 +475,6 @@ function PrisSeksjon({ onKomIgang }) {
         ))}
       </div>
 
-      <div className="pris-kode-banner reveal">
-        <div className="pris-kode-tekst">
-          Har du allerede en tilgangskode? Skriv den inn direkte i kalkulatoren for å låse opp Basis eller Pro. Koden <strong>ADDON49</strong> gir Basis, og <strong>ADDON99</strong> gir Pro.
-        </div>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          <div className="pris-kode-pill">ADDON49</div>
-          <div className="pris-kode-pill">ADDON99</div>
-        </div>
-      </div>
-
       <div className="pris-grid reveal reveal-delay-2">
         {planer.map((p, i) => (
           <div key={i} className={`pris-kort ${p.populær ? 'populær' : ''}`}>
@@ -482,8 +487,15 @@ function PrisSeksjon({ onKomIgang }) {
               {p.funksjoner.map((f, j) => <li key={j}>{f}</li>)}
               {p.ikkeInkludert.map((f, j) => <li key={j} className="nei">{f}</li>)}
             </ul>
-            <button className={`pris-knapp ${p.knappType === 'gull' ? 'gull' : ''}`} onClick={onKomIgang}>
-              {p.knappTekst}
+            <button
+              className={`pris-knapp ${p.knappType === 'gull' ? 'gull' : ''}`}
+              disabled={lasterBetaling !== null}
+              onClick={() => {
+                if (!p.knappPlan) { onKomIgang(); return; }
+                startBetaling(p.knappPlan);
+              }}
+            >
+              {lasterBetaling === p.knappPlan ? 'Laster...' : p.knappTekst}
             </button>
           </div>
         ))}
@@ -693,7 +705,7 @@ export default function App() {
           <div className="hero-overlay"></div>
           <Partikler />
           <div className="hero-content">
-            <div className="hero-tag">Kalkulatorer gratis · Pro fra 99 kr/mnd</div>
+            <div className="hero-tag">Kalkulatorer gratis · Fra 49 kr/mnd</div>
             <h1 className="hero-title">Finn ut om ideen din<br /><em>faktisk</em> er lønnsom</h1>
             <p className="hero-sub">Invest Tools gir deg tallene du trenger før du investerer tid og penger i din neste bedrift.</p>
             <div className="hero-btns">
@@ -708,7 +720,7 @@ export default function App() {
           <div className="hero-stats">
             {[
               { slutt: 5, suffix: '', lbl: 'Bransjer' },
-              { slutt: 99, suffix: ' kr', lbl: 'Pro/mnd' },
+              { slutt: 49, suffix: ' kr', lbl: 'Fra/mnd' },
               { slutt: 100, suffix: '%', lbl: 'Konfidensielt' }
             ].map((s, i) => (
               <div className="hero-stat" key={i}>
