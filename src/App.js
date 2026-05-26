@@ -82,6 +82,7 @@ const styles = `
   .login-bytt { margin-top: 24px; font-size: 12px; color: #3a6a46; cursor: pointer; transition: color 0.3s; text-align: center; letter-spacing: 0.04em; }
   .login-bytt:hover { color: var(--cream); }
   .login-bruker { font-size: 11px; color: #3a6a46; letter-spacing: 0.06em; }
+  .tilgang-badge { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; background: rgba(201,168,76,0.15); color: var(--gold); padding: 3px 8px; border: 1px solid rgba(201,168,76,0.3); }
 
   .hero { position: relative; height: 100vh; min-height: 600px; overflow: hidden; display: flex; align-items: center; }
   .hero-bg { position: absolute; inset: -20%; background: url('https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1600&q=80') center/cover no-repeat; will-change: transform; }
@@ -464,16 +465,17 @@ function getBransjeFromUrl() {
   return null;
 }
 
-function PrisSeksjon({ onKomIgang }) {
+function PrisSeksjon({ onKomIgang, bruker, tilgang, onVisLogin }) {
   const [lasterBetaling, setLasterBetaling] = useState(null);
 
   const startBetaling = async (plan) => {
+    if (!bruker) { onVisLogin(); return; }
     setLasterBetaling(plan);
     try {
       const res = await fetch('/api/create-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan })
+        body: JSON.stringify({ plan, epost: bruker.email })
       });
       const data = await res.json();
       if (data.url) window.location.href = data.url;
@@ -500,7 +502,9 @@ function PrisSeksjon({ onKomIgang }) {
       populær: false,
       funksjoner: ['Alt i gratis', '10-års prognose', 'Neste bolig kalkulator', 'Banksjekk og stresstest', 'Tidlig tilgang til nye bransjer'],
       ikkeInkludert: ['AI-assistent (Marcel, Colette, René)', 'Budsjettark med eksport'],
-      knappTekst: 'Velg Basis', knappType: 'standard', knappPlan: 'basis',
+      knappTekst: tilgang === 'basis' ? 'Din nåværende plan' : 'Velg Basis',
+      knappType: 'standard',
+      knappPlan: 'basis',
     },
     {
       plan: 'Pro',
@@ -509,7 +513,9 @@ function PrisSeksjon({ onKomIgang }) {
       populær: true,
       funksjoner: ['Alt i Basis', 'AI-assistent Marcel for eiendom', 'AI-assistent Colette for salong', 'AI-assistent René for bilutleie', 'Budsjettark forhåndsutfylt med dine tall', 'Eksport til Excel og PDF', 'Tidlig tilgang til nye bransjer'],
       ikkeInkludert: [],
-      knappTekst: 'Velg Pro', knappType: 'gull', knappPlan: 'pro',
+      knappTekst: tilgang === 'pro' ? 'Din nåværende plan' : 'Velg Pro',
+      knappType: 'gull',
+      knappPlan: 'pro',
     },
   ];
 
@@ -553,7 +559,7 @@ function PrisSeksjon({ onKomIgang }) {
             </ul>
             <button
               className={`pris-knapp ${p.knappType === 'gull' ? 'gull' : ''}`}
-              disabled={lasterBetaling !== null}
+              disabled={lasterBetaling !== null || (p.knappPlan && tilgang === p.knappPlan)}
               onClick={() => {
                 if (!p.knappPlan) { onKomIgang(); return; }
                 startBetaling(p.knappPlan);
@@ -573,6 +579,7 @@ function PrisSeksjon({ onKomIgang }) {
 
 export default function App() {
   const [bruker, setBruker] = useState(null);
+  const [tilgang, setTilgang] = useState('gratis');
   const [lasterAuth, setLasterAuth] = useState(true);
   const [visLogin, setVisLogin] = useState(false);
   const [side, setSide] = useState(getSideFromUrl);
@@ -582,13 +589,26 @@ export default function App() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setBruker(session?.user ?? null);
+      if (session?.user) hentTilgang(session.user.email);
       setLasterAuth(false);
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setBruker(session?.user ?? null);
+      if (session?.user) hentTilgang(session.user.email);
+      else setTilgang('gratis');
     });
     return () => subscription.unsubscribe();
   }, []);
+
+  async function hentTilgang(epost) {
+    const { data } = await supabase
+      .from('brukere')
+      .select('tilgang')
+      .eq('epost', epost)
+      .single();
+    if (data) setTilgang(data.tilgang);
+    else setTilgang('gratis');
+  }
 
   useScrollReveal();
   useParallax();
@@ -612,6 +632,7 @@ export default function App() {
     <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
       {bruker ? (
         <>
+          {tilgang !== 'gratis' && <span className="tilgang-badge">{tilgang}</span>}
           <span className="login-bruker">{bruker.email}</span>
           <button className="nav-cta" onClick={() => supabase.auth.signOut()}><span>Logg ut</span></button>
         </>
@@ -766,11 +787,11 @@ export default function App() {
                 <div className="kalkulator-hero-title">{aktivBransje.navn}</div>
               </div>
             </div>
-            {aktivBransje.id === 'eiendom-privat' && <EiendomPrivat />}
-            {aktivBransje.id === 'eiendom-as' && <EiendomAS />}
-            {aktivBransje.id === 'eiendom-sammenlign' && <EiendomSammenlign />}
-            {aktivBransje.id === 'bil' && <BilKalkulator />}
-            {aktivBransje.id === 'salong' && <SalongKalkulator />}
+            {aktivBransje.id === 'eiendom-privat' && <EiendomPrivat tilgang={tilgang} onVisLogin={() => setVisLogin(true)} />}
+            {aktivBransje.id === 'eiendom-as' && <EiendomAS tilgang={tilgang} onVisLogin={() => setVisLogin(true)} />}
+            {aktivBransje.id === 'eiendom-sammenlign' && <EiendomSammenlign tilgang={tilgang} onVisLogin={() => setVisLogin(true)} />}
+            {aktivBransje.id === 'bil' && <BilKalkulator tilgang={tilgang} onVisLogin={() => setVisLogin(true)} />}
+            {aktivBransje.id === 'salong' && <SalongKalkulator tilgang={tilgang} onVisLogin={() => setVisLogin(true)} />}
           </div>
           <footer>
             <FooterLogo />
@@ -855,7 +876,12 @@ export default function App() {
           </div>
         </section>
 
-        <PrisSeksjon onKomIgang={() => aapneBransje(bransjer[0])} />
+        <PrisSeksjon
+          onKomIgang={() => aapneBransje(bransjer[0])}
+          bruker={bruker}
+          tilgang={tilgang}
+          onVisLogin={() => setVisLogin(true)}
+        />
 
         <section className="hvorfor-section">
           <div className="hvorfor-img-wrap reveal-left">
