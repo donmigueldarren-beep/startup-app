@@ -1,40 +1,6 @@
 import { useState } from 'react';
 
-const KODER = {
-  basis: 'ADDON49',
-  pro: 'ADDON99',
-};
-
-function sjekkLagretTilgang() {
-  try {
-    const lagret = localStorage.getItem('addon_tilgang');
-    if (lagret === 'pro') return 'pro';
-    if (lagret === 'basis') return 'basis';
-  } catch (e) {}
-  return 'gratis';
-}
-
-function lagreTilgang(nivaa) {
-  try { localStorage.setItem('addon_tilgang', nivaa); } catch (e) {}
-}
-
-function LaasBoks({ krever, onLaasOpp }) {
-  const [kode, setKode] = useState('');
-  const [feil, setFeil] = useState(false);
-
-  const forsok = () => {
-    if (kode.trim().toUpperCase() === KODER.pro) {
-      lagreTilgang('pro');
-      onLaasOpp('pro');
-    } else if (krever === 'basis' && kode.trim().toUpperCase() === KODER.basis) {
-      lagreTilgang('basis');
-      onLaasOpp('basis');
-    } else {
-      setFeil(true);
-      setTimeout(() => setFeil(false), 2000);
-    }
-  };
-
+function LaasBoks({ krever, onVisLogin }) {
   return (
     <div style={{
       background: '#0f1a12',
@@ -56,53 +22,24 @@ function LaasBoks({ krever, onLaasOpp }) {
         {krever === 'basis'
           ? 'Denne seksjonen krever Basis (49 kr/mnd) eller Pro (99 kr/mnd).'
           : 'Denne seksjonen krever Pro (99 kr/mnd).'}
-        <br />
-        <a href="mailto:kontakt@addoninvest.no" style={{ color: '#c9a84c', textDecoration: 'none' }}>
-          Kontakt oss for tilgang
-        </a>
       </div>
-      <div style={{ display: 'flex', gap: '8px', maxWidth: '320px', margin: '0 auto' }}>
-        <input
-          type="text"
-          placeholder="Skriv inn tilgangskode"
-          value={kode}
-          onChange={e => setKode(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && forsok()}
-          style={{
-            flex: 1,
-            padding: '10px 14px',
-            background: feil ? '#1a0a0a' : '#0a1a0c',
-            border: `1px solid ${feil ? '#c84040' : '#1a3a1e'}`,
-            color: '#f5f0e8',
-            fontFamily: 'Inter, sans-serif',
-            fontSize: '13px',
-            outline: 'none',
-            transition: 'border 0.2s'
-          }}
-        />
-        <button
-          onClick={forsok}
-          style={{
-            background: '#c9a84c',
-            color: '#0f1a12',
-            border: 'none',
-            padding: '10px 20px',
-            fontFamily: 'Inter, sans-serif',
-            fontSize: '11px',
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            cursor: 'pointer',
-            fontWeight: '500'
-          }}
-        >
-          Lås opp
-        </button>
-      </div>
-      {feil && (
-        <div style={{ fontSize: '12px', color: '#c84040', marginTop: '10px' }}>
-          Feil kode. Kontakt kontakt@addoninvest.no for tilgang.
-        </div>
-      )}
+      <button
+        onClick={onVisLogin}
+        style={{
+          background: '#c9a84c',
+          color: '#0f1a12',
+          border: 'none',
+          padding: '12px 28px',
+          fontFamily: 'Inter, sans-serif',
+          fontSize: '11px',
+          letterSpacing: '0.1em',
+          textTransform: 'uppercase',
+          cursor: 'pointer',
+          fontWeight: '500'
+        }}
+      >
+        Logg inn / Oppgrader
+      </button>
     </div>
   );
 }
@@ -354,9 +291,7 @@ Gi en konkret analyse:
   );
 }
 
-export default function EiendomPrivat() {
-  const [tilgang, setTilgang] = useState(sjekkLagretTilgang);
-
+export default function EiendomPrivat({ tilgang = 'gratis', onVisLogin = () => {} }) {
   const harBasis = tilgang === 'basis' || tilgang === 'pro';
   const harPro = tilgang === 'pro';
 
@@ -430,9 +365,7 @@ export default function EiendomPrivat() {
       inntekt: leie,
       totalKost: renteMnd + felles + vedlikehold,
       skattSats: skattProsent / 100,
-      inntektLinjer: [
-        { navn: 'Leieinntekt', verdi: leie },
-      ],
+      inntektLinjer: [{ navn: 'Leieinntekt', verdi: leie }],
       kostnadLinjer: [
         { navn: `Renter (${rente}%)`, verdi: renteMnd },
         { navn: 'Felleskostnader', verdi: felles },
@@ -499,7 +432,7 @@ export default function EiendomPrivat() {
             </div>
           </>
         ) : (
-          <LaasBoks krever="basis" onLaasOpp={setTilgang} />
+          <LaasBoks krever="basis" onVisLogin={onVisLogin} />
         )}
 
         <hr className="ek-divider" />
@@ -570,7 +503,7 @@ export default function EiendomPrivat() {
           </div>
         </div>
       ) : (
-        <LaasBoks krever="basis" onLaasOpp={setTilgang} />
+        <LaasBoks krever="basis" onVisLogin={onVisLogin} />
       )}
 
       {harBasis ? (
@@ -594,14 +527,8 @@ export default function EiendomPrivat() {
             </div>
           </div>
           <div className="ep-neste-bolig-resultat">
-            <div className="ep-neste-bolig-metric">
-              <div className="lbl">Trenger totalt</div>
-              <div className="val">{fmt(nesteTotalt)}</div>
-            </div>
-            <div className="ep-neste-bolig-metric">
-              <div className="lbl">Egenkapital ({nesteEkProsent}%)</div>
-              <div className="val">{fmt(nesteEkKrav)}</div>
-            </div>
+            <div className="ep-neste-bolig-metric"><div className="lbl">Trenger totalt</div><div className="val">{fmt(nesteTotalt)}</div></div>
+            <div className="ep-neste-bolig-metric"><div className="lbl">Egenkapital ({nesteEkProsent}%)</div><div className="val">{fmt(nesteEkKrav)}</div></div>
             <div className="ep-neste-bolig-metric">
               <div className="lbl">Tidligst mulig</div>
               <div className="val" style={{color: forsteHarRaadNeste ? '#9fc9a8' : '#c84040'}}>
@@ -638,7 +565,7 @@ export default function EiendomPrivat() {
       {harPro ? (
         <Marcel tall={marcelTall} />
       ) : (
-        <LaasBoks krever="pro" onLaasOpp={setTilgang} />
+        <LaasBoks krever="pro" onVisLogin={onVisLogin} />
       )}
 
       {harPro && (

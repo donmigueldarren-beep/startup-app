@@ -1,40 +1,6 @@
 import { useState } from 'react';
 
-const KODER = {
-  basis: 'ADDON49',
-  pro: 'ADDON99',
-};
-
-function sjekkLagretTilgang() {
-  try {
-    const lagret = localStorage.getItem('addon_tilgang');
-    if (lagret === 'pro') return 'pro';
-    if (lagret === 'basis') return 'basis';
-  } catch (e) {}
-  return 'gratis';
-}
-
-function lagreTilgang(nivaa) {
-  try { localStorage.setItem('addon_tilgang', nivaa); } catch (e) {}
-}
-
-function LaasBoks({ onLaasOpp }) {
-  const [kode, setKode] = useState('');
-  const [feil, setFeil] = useState(false);
-
-  const forsok = () => {
-    if (kode.trim().toUpperCase() === KODER.pro) {
-      lagreTilgang('pro');
-      onLaasOpp('pro');
-    } else if (kode.trim().toUpperCase() === KODER.basis) {
-      lagreTilgang('basis');
-      onLaasOpp('basis');
-    } else {
-      setFeil(true);
-      setTimeout(() => setFeil(false), 2000);
-    }
-  };
-
+function LaasBoks({ onVisLogin }) {
   return (
     <div style={{
       background: '#0f1a12', border: '1px solid #1a3a1e',
@@ -46,40 +12,18 @@ function LaasBoks({ onLaasOpp }) {
       </div>
       <div style={{ fontSize: '13px', color: '#3a6a46', marginBottom: '24px', lineHeight: '1.6' }}>
         Colette krever Pro (99 kr/mnd).
-        <br />
-        <a href="mailto:kontakt@addoninvest.no" style={{ color: '#c9a84c', textDecoration: 'none' }}>
-          Kontakt oss for tilgang
-        </a>
       </div>
-      <div style={{ display: 'flex', gap: '8px', maxWidth: '320px', margin: '0 auto' }}>
-        <input
-          type="text"
-          placeholder="Skriv inn tilgangskode"
-          value={kode}
-          onChange={e => setKode(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && forsok()}
-          style={{
-            flex: 1, padding: '10px 14px',
-            background: feil ? '#1a0a0a' : '#0a1a0c',
-            border: `1px solid ${feil ? '#c84040' : '#1a3a1e'}`,
-            color: '#f5f0e8', fontFamily: 'Inter, sans-serif',
-            fontSize: '13px', outline: 'none', transition: 'border 0.2s'
-          }}
-        />
-        <button onClick={forsok} style={{
+      <button
+        onClick={onVisLogin}
+        style={{
           background: '#c9a84c', color: '#0f1a12', border: 'none',
-          padding: '10px 20px', fontFamily: 'Inter, sans-serif',
-          fontSize: '11px', letterSpacing: '0.08em',
+          padding: '12px 28px', fontFamily: 'Inter, sans-serif',
+          fontSize: '11px', letterSpacing: '0.1em',
           textTransform: 'uppercase', cursor: 'pointer', fontWeight: '500'
-        }}>
-          Lås opp
-        </button>
-      </div>
-      {feil && (
-        <div style={{ fontSize: '12px', color: '#c84040', marginTop: '10px' }}>
-          Feil kode. Kontakt kontakt@addoninvest.no for tilgang.
-        </div>
-      )}
+        }}
+      >
+        Logg inn / Oppgrader
+      </button>
     </div>
   );
 }
@@ -333,8 +277,7 @@ Gi en konkret analyse:
   );
 }
 
-export default function SalongKalkulator() {
-  const [tilgang, setTilgang] = useState(sjekkLagretTilgang);
+export default function SalongKalkulator({ tilgang = 'gratis', onVisLogin = () => {} }) {
   const harPro = tilgang === 'pro';
 
   const [salongType, setSalongType] = useState('frisor');
@@ -581,11 +524,7 @@ export default function SalongKalkulator() {
           <table className="sal-table">
             <thead>
               <tr>
-                <th>Belegg</th>
-                <th>Behandlinger/mnd</th>
-                <th>Omsetning</th>
-                <th>Netto/mnd</th>
-                <th>Vurdering</th>
+                <th>Belegg</th><th>Behandlinger/mnd</th><th>Omsetning</th><th>Netto/mnd</th><th>Vurdering</th>
               </tr>
             </thead>
             <tbody>
@@ -611,7 +550,7 @@ export default function SalongKalkulator() {
       {harPro ? (
         <AIAssistent tall={aiTall} />
       ) : (
-        <LaasBoks onLaasOpp={setTilgang} />
+        <LaasBoks onVisLogin={onVisLogin} />
       )}
 
       {harPro && (
