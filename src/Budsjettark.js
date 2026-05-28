@@ -1,37 +1,6 @@
 import { useState } from 'react';
 
-const KODER = {
-  basis: 'ADDON49',
-  pro: 'ADDON99',
-};
-
-function sjekkLagretTilgang() {
-  try {
-    const lagret = localStorage.getItem('addon_tilgang');
-    if (lagret === 'pro') return 'pro';
-    if (lagret === 'basis') return 'basis';
-  } catch (e) {}
-  return 'gratis';
-}
-
-function lagreTilgang(nivaa) {
-  try { localStorage.setItem('addon_tilgang', nivaa); } catch (e) {}
-}
-
-function LaasBoks({ onLaasOpp }) {
-  const [kode, setKode] = useState('');
-  const [feil, setFeil] = useState(false);
-
-  const forsok = () => {
-    if (kode.trim().toUpperCase() === KODER.pro) {
-      lagreTilgang('pro');
-      onLaasOpp('pro');
-    } else {
-      setFeil(true);
-      setTimeout(() => setFeil(false), 2000);
-    }
-  };
-
+function LaasBoks({ onVisLogin }) {
   return (
     <div style={{
       background: '#0f1a12', border: '1px solid #1a3a1e',
@@ -42,34 +11,19 @@ function LaasBoks({ onLaasOpp }) {
         Budsjettark krever Pro
       </div>
       <div style={{ fontSize: '13px', color: '#3a6a46', marginBottom: '28px', lineHeight: '1.7' }}>
-        Budsjettarket er en Pro-funksjon (99 kr/mnd).<br />
-        <a href="mailto:kontakt@addoninvest.no" style={{ color: '#c9a84c', textDecoration: 'none' }}>
-          Kontakt oss for tilgang
-        </a>
+        Budsjettarket er en Pro-funksjon (99 kr/mnd).
       </div>
-      <div style={{ display: 'flex', gap: '8px', maxWidth: '320px', margin: '0 auto' }}>
-        <input
-          type="text"
-          placeholder="Skriv inn Pro-kode"
-          value={kode}
-          onChange={e => setKode(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && forsok()}
-          style={{
-            flex: 1, padding: '10px 14px',
-            background: feil ? '#1a0a0a' : '#0a1a0c',
-            border: `1px solid ${feil ? '#c84040' : '#1a3a1e'}`,
-            color: '#f5f0e8', fontFamily: 'Inter, sans-serif',
-            fontSize: '13px', outline: 'none'
-          }}
-        />
-        <button onClick={forsok} style={{
+      <button
+        onClick={onVisLogin}
+        style={{
           background: '#c9a84c', color: '#0f1a12', border: 'none',
-          padding: '10px 20px', fontFamily: 'Inter, sans-serif',
-          fontSize: '11px', letterSpacing: '0.08em',
+          padding: '12px 28px', fontFamily: 'Inter, sans-serif',
+          fontSize: '11px', letterSpacing: '0.1em',
           textTransform: 'uppercase', cursor: 'pointer', fontWeight: '500'
-        }}>Lås opp</button>
-      </div>
-      {feil && <div style={{ fontSize: '12px', color: '#c84040', marginTop: '10px' }}>Feil kode.</div>}
+        }}
+      >
+        Logg inn / Oppgrader
+      </button>
     </div>
   );
 }
@@ -91,6 +45,7 @@ const styles = `
   .bud-eksport-knapp { padding: 10px 20px; font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; font-weight: 500; border: none; transition: all 0.2s; }
   .bud-eksport-knapp.excel { background: #1a6640; color: var(--cream); }
   .bud-eksport-knapp.excel:hover { background: #2a8050; }
+  .bud-eksport-knapp.excel:disabled { opacity: 0.5; cursor: not-allowed; }
   .bud-eksport-knapp.pdf { background: var(--gold); color: var(--dark); }
   .bud-eksport-knapp.pdf:hover { background: #d4b558; }
   .bud-tabs { display: flex; gap: 2px; background: var(--cream-dark); margin-bottom: 24px; }
@@ -131,6 +86,7 @@ const styles = `
   .bud-kalkulator-knapp { padding: 8px 18px; font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; background: var(--cream); border: 1px solid var(--cream-dark); color: var(--muted); transition: all 0.2s; }
   .bud-kalkulator-knapp.aktiv { background: var(--dark); color: var(--cream); border-color: var(--dark); }
   .bud-disclaimer { font-size: 11px; color: var(--muted); font-style: italic; margin-top: 12px; }
+  .bud-laster { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); padding: 12px 0; }
 `;
 
 function fmtK(n) {
@@ -359,12 +315,11 @@ function AarligOversikt({ tall }) {
   );
 }
 
-export default function Budsjettark({ onTilbake }) {
-  const [tilgang, setTilgang] = useState(sjekkLagretTilgang);
+export default function Budsjettark({ tilgang = 'gratis', onVisLogin = () => {} }) {
+  const harPro = tilgang === 'pro';
   const [aktivTab, setAktivTab] = useState('maanedlig');
   const [aktivKalkulator, setAktivKalkulator] = useState('eiendom-privat');
-
-  const harPro = tilgang === 'pro';
+  const [lasterExcel, setLasterExcel] = useState(false);
 
   const kalkulatorer = [
     { id: 'eiendom-privat', navn: 'Eiendom privat' },
@@ -375,28 +330,28 @@ export default function Budsjettark({ onTilbake }) {
 
   const tall = hentTallFraStorage(aktivKalkulator);
 
-  const eksporterExcel = () => {
-    if (!tall) return;
-    const maaneder = ['Jan', 'Feb', 'Mar', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Des'];
-    const sesong = tall.sesongFaktor || Array(12).fill(1);
-    let csv = 'Måned,Inntekt,Kostnader,Brutto,Skatt,Netto,Akkumulert\n';
-    let akk = 0;
-    maaneder.forEach((mnd, i) => {
-      const inntekt = tall.inntekt * sesong[i];
-      const kost = tall.totalKost;
-      const brutto = inntekt - kost;
-      const skatt = Math.max(0, brutto * (tall.skattSats || 0.22));
-      const netto = brutto - skatt;
-      akk += netto;
-      csv += `${mnd},${Math.round(inntekt)},${Math.round(kost)},${Math.round(brutto)},${Math.round(skatt)},${Math.round(netto)},${Math.round(akk)}\n`;
-    });
-    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `budsjett_${aktivKalkulator}_${new Date().getFullYear()}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+  const eksporterExcel = async () => {
+    if (!tall || lasterExcel) return;
+    setLasterExcel(true);
+    try {
+      const svar = await fetch('/api/budsjett', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ kalkulator: aktivKalkulator, tall }),
+      });
+      const data = await svar.json();
+      const bytes = Uint8Array.from(atob(data.xlsx), c => c.charCodeAt(0));
+      const blob = new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `budsjett_${aktivKalkulator}_${new Date().getFullYear()}.xlsx`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      alert('Kunne ikke generere Excel. Prøv igjen.');
+    }
+    setLasterExcel(false);
   };
 
   const eksporterPDF = () => { window.print(); };
@@ -415,7 +370,13 @@ export default function Budsjettark({ onTilbake }) {
           </div>
           {harPro && (
             <div className="bud-eksport-wrap">
-              <button className="bud-eksport-knapp excel" onClick={eksporterExcel}>↓ Excel / CSV</button>
+              <button
+                className="bud-eksport-knapp excel"
+                onClick={eksporterExcel}
+                disabled={!tall || lasterExcel}
+              >
+                {lasterExcel ? 'Genererer...' : '↓ Last ned Excel'}
+              </button>
               <button className="bud-eksport-knapp pdf" onClick={eksporterPDF}>↓ PDF / Print</button>
             </div>
           )}
@@ -423,7 +384,7 @@ export default function Budsjettark({ onTilbake }) {
       </div>
 
       {!harPro ? (
-        <LaasBoks onLaasOpp={setTilgang} />
+        <LaasBoks onVisLogin={onVisLogin} />
       ) : (
         <>
           <div className="bud-kalkulator-valg">

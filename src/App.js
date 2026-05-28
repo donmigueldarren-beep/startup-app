@@ -689,7 +689,7 @@ export default function App() {
         </nav>
         <div className="side-innhold" key={animKey} style={{ padding: '100px 80px 80px', maxWidth: '1200px', margin: '0 auto' }}>
           <button className="kalkulator-back" onClick={gaaHjem}>← Tilbake</button>
-          <Budsjettark onTilbake={gaaHjem} />
+          <Budsjettark tilgang={tilgang} onVisLogin={() => setVisLogin(true)} onTilbake={gaaHjem} />
         </div>
         <footer>
           <FooterLogo />
