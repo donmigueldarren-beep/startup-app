@@ -601,11 +601,13 @@ export default function App() {
   }, []);
 
   async function hentTilgang(epost) {
-    const { data } = await supabase
+    console.log('Henter tilgang for:', epost);
+    const { data, error } = await supabase
       .from('brukere')
       .select('tilgang')
       .eq('epost', epost)
       .single();
+    console.log('Tilgang data:', data, 'Feil:', error);
     if (data) setTilgang(data.tilgang);
     else setTilgang('gratis');
   }
