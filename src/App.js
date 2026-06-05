@@ -20,10 +20,8 @@ const styles = `
     --text: #1a2e1e; --muted: #5a6e5e;
   }
   .app { font-family: 'Inter', sans-serif; background: var(--cream); min-height: 100vh; color: var(--text); }
-
   .side-innhold { animation: slideOpp 0.5s cubic-bezier(0.4,0,0.2,1); }
   @keyframes slideOpp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
-
   .reveal { opacity: 0; transform: translateY(50px); transition: opacity 0.8s cubic-bezier(0.4,0,0.2,1), transform 0.8s cubic-bezier(0.4,0,0.2,1); }
   .reveal.synlig { opacity: 1; transform: translateY(0); }
   .reveal-left { opacity: 0; transform: translateX(-60px); transition: opacity 0.9s cubic-bezier(0.4,0,0.2,1), transform 0.9s cubic-bezier(0.4,0,0.2,1); }
@@ -38,7 +36,6 @@ const styles = `
   .reveal-delay-4 { transition-delay: 0.32s; }
   .reveal-delay-5 { transition-delay: 0.40s; }
   .reveal-delay-6 { transition-delay: 0.48s; }
-
   .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(15,26,18,0.85); backdrop-filter: blur(20px); padding: 18px 48px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(31,78,46,0.25); transition: all 0.4s cubic-bezier(0.4,0,0.2,1); }
   .nav.scrolled { padding: 12px 48px; background: rgba(8,14,9,0.97); border-bottom-color: rgba(201,168,76,0.15); }
   .nav-logo { display: flex; align-items: center; gap: 14px; cursor: pointer; }
@@ -61,7 +58,6 @@ const styles = `
   .nav-cta:hover::before { transform: scaleX(1); }
   .nav-cta:hover { color: var(--dark); border-color: var(--gold); }
   .nav-cta span { position: relative; z-index: 1; }
-
   .login-side { position: fixed; inset: 0; z-index: 200; background: rgba(8,14,9,0.97); display: flex; align-items: center; justify-content: center; animation: fadeInn 0.3s ease; }
   @keyframes fadeInn { from { opacity: 0; } to { opacity: 1; } }
   .login-boks { background: #0a1a0c; border: 1px solid rgba(31,78,46,0.4); padding: 56px 48px; width: 100%; max-width: 440px; position: relative; }
@@ -83,7 +79,6 @@ const styles = `
   .login-bytt:hover { color: var(--cream); }
   .login-bruker { font-size: 11px; color: #3a6a46; letter-spacing: 0.06em; }
   .tilgang-badge { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; background: rgba(201,168,76,0.15); color: var(--gold); padding: 3px 8px; border: 1px solid rgba(201,168,76,0.3); }
-
   .hero { position: relative; height: 100vh; min-height: 600px; overflow: hidden; display: flex; align-items: center; }
   .hero-bg { position: absolute; inset: -20%; background: url('https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1600&q=80') center/cover no-repeat; will-change: transform; }
   .hero-grain { position: absolute; inset: 0; opacity: 0.04; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); background-size: 256px; pointer-events: none; animation: grain 0.8s steps(1) infinite; z-index: 3; }
@@ -115,7 +110,6 @@ const styles = `
   .hero-scroll-line { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--gold), transparent); animation: scrollLine 2s ease-in-out infinite; }
   @keyframes scrollLine { 0%,100% { transform: scaleY(1); opacity: 1; } 50% { transform: scaleY(0.5); opacity: 0.4; } }
   .hero-scroll-text { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: #3a5a3e; writing-mode: vertical-rl; }
-
   .bransjer-section { padding: 140px 80px; background: var(--cream); position: relative; }
   .bransjer-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(to right, transparent, var(--gold), transparent); opacity: 0.3; }
   .section-tag { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--brg); margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
@@ -145,7 +139,6 @@ const styles = `
   .bransje-card:not(.coming):hover .bransje-tag { background: #c8deca; }
   .bransje-more { background: white; padding: 22px 28px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--cream-dark); }
   .bransje-more-text { font-family: 'Playfair Display', serif; font-size: 14px; color: var(--muted); font-style: italic; }
-
   .pris-section { padding: 120px 80px; background: var(--dark); position: relative; overflow: hidden; }
   .pris-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(to right, transparent, rgba(201,168,76,0.4), transparent); }
   .pris-section::after { content: ''; position: absolute; bottom: -300px; left: 50%; transform: translateX(-50%); width: 800px; height: 600px; background: radial-gradient(circle, rgba(31,78,46,0.08) 0%, transparent 70%); pointer-events: none; }
@@ -179,7 +172,6 @@ const styles = `
   .pris-slik-ikon { font-size: 28px; margin-bottom: 16px; }
   .pris-slik-tittel { font-size: 14px; font-weight: 500; color: var(--cream); margin-bottom: 8px; }
   .pris-slik-desc { font-size: 13px; color: #3a6a46; line-height: 1.65; }
-
   .hvorfor-section { background: var(--dark); padding: 140px 80px; display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: center; position: relative; overflow: hidden; }
   .hvorfor-section::before { content: ''; position: absolute; bottom: -200px; right: -200px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(31,78,46,0.12) 0%, transparent 70%); pointer-events: none; }
   .hvorfor-img-wrap { position: relative; height: 520px; }
@@ -204,7 +196,6 @@ const styles = `
   .hvorfor-item-title { font-size: 14px; font-weight: 500; color: var(--cream); margin-bottom: 4px; transition: color 0.3s; }
   .hvorfor-item:hover .hvorfor-item-title { color: var(--gold); }
   .hvorfor-item-desc { font-size: 13px; color: rgba(90,110,94,0.9); line-height: 1.65; }
-
   .om-oss-hero { background: var(--dark); padding: 140px 80px 100px; position: relative; overflow: hidden; }
   .om-oss-hero::before { content: ''; position: absolute; top: -100px; right: -100px; width: 700px; height: 700px; background: radial-gradient(circle, rgba(201,168,76,0.04) 0%, transparent 65%); pointer-events: none; }
   .om-oss-hero-accent { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent 0%, var(--gold) 30%, var(--brg-light) 70%, transparent 100%); background-size: 200% 100%; animation: shimmer 4s linear infinite; }
@@ -230,7 +221,6 @@ const styles = `
   .om-oss-kontakt-desc { font-size: 14px; color: rgba(159,201,168,0.8); line-height: 1.7; }
   .om-oss-kontakt-epost { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--gold); text-decoration: none; display: block; margin-top: 10px; transition: letter-spacing 0.3s; }
   .om-oss-kontakt-epost:hover { letter-spacing: 0.04em; }
-
   .kalkulator-view { padding: 100px 80px 80px; max-width: 980px; margin: 0 auto; }
   .kalkulator-back { display: flex; align-items: center; gap: 10px; font-size: 11px; color: var(--muted); cursor: pointer; margin-bottom: 36px; background: none; border: none; font-family: 'Inter', sans-serif; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.3s; }
   .kalkulator-back:hover { color: var(--text); gap: 16px; }
@@ -242,7 +232,6 @@ const styles = `
   .kalkulator-hero-tag { font-size: 10px; text-transform: uppercase; letter-spacing: 0.25em; color: var(--gold); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
   .kalkulator-hero-tag::before { content: ''; display: inline-block; width: 20px; height: 1px; background: var(--gold); }
   .kalkulator-hero-title { font-family: 'Playfair Display', serif; font-size: 48px; color: var(--cream); }
-
   footer { border-top: 1px solid rgba(26,46,30,0.8); padding: 32px 80px; display: flex; justify-content: space-between; align-items: center; background: var(--dark2); }
   .footer-logo { display: flex; align-items: center; gap: 12px; cursor: pointer; }
   .footer-logo-icon { position: relative; width: 28px; height: 28px; }
@@ -601,13 +590,11 @@ export default function App() {
   }, []);
 
   async function hentTilgang(epost) {
-    console.log('Henter tilgang for:', epost);
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('brukere')
       .select('tilgang')
       .eq('epost', epost)
       .single();
-    console.log('Tilgang data:', data, 'Feil:', error);
     if (data) setTilgang(data.tilgang);
     else setTilgang('gratis');
   }
@@ -817,7 +804,6 @@ export default function App() {
         </div>
         <NavKnapper />
       </nav>
-
       <div className="side-innhold" key={animKey}>
         <section className="hero">
           <div className="hero-bg" id="hero-bg"></div>
@@ -850,7 +836,6 @@ export default function App() {
             ))}
           </div>
         </section>
-
         <section className="bransjer-section" id="bransjer">
           <div className="section-tag reveal">Velg bransje</div>
           <div className="section-title reveal reveal-delay-1">Hva vil du starte?</div>
@@ -877,14 +862,12 @@ export default function App() {
             <span style={{ color: 'var(--cream-dark)', fontSize: '20px' }}>→</span>
           </div>
         </section>
-
         <PrisSeksjon
           onKomIgang={() => aapneBransje(bransjer[0])}
           bruker={bruker}
           tilgang={tilgang}
           onVisLogin={() => setVisLogin(true)}
         />
-
         <section className="hvorfor-section">
           <div className="hvorfor-img-wrap reveal-left">
             <img className="hvorfor-img" src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80" alt="Investor" />
@@ -913,7 +896,6 @@ export default function App() {
             </div>
           </div>
         </section>
-
         <footer>
           <FooterLogo />
           <div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning. Konsulter en regnskapsfører.</div>
