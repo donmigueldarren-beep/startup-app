@@ -118,7 +118,7 @@ const styles = `
   .ep-aar-tabell td { padding: 8px 10px; border-bottom: 1px solid #0f2010; font-size: 12px; color: #6a9a6e; }
   .ep-aar-tabell tr.kan td { color: #9fc9a8; background: #0a1a0c; }
   .ep-aar-tabell tr.kan td:first-child { font-weight: 500; }
-  .bank-sjekk { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--cream-dark); margin-bottom: 16px; }
+  .bank-sjekk { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: var(--cream-dark); margin-bottom: 16px; }
   .bank-sjekk-col { background: var(--cream); padding: 18px; }
   .bank-sjekk-tittel { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 12px; font-weight: 500; }
   .bank-sjekk-linje { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--cream-dark); font-size: 13px; }
@@ -128,6 +128,12 @@ const styles = `
   .bank-status { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 13px; font-weight: 500; }
   .bank-status.ok { color: var(--brg); }
   .bank-status.ikke-ok { color: #8b2020; }
+  .gjeld-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .gjeld-sum-banner { background: var(--cream); border: 1px solid var(--cream-dark); padding: 14px 16px; margin-top: 12px; display: flex; justify-content: space-between; align-items: center; }
+  .gjeld-sum-lbl { font-size: 12px; color: var(--muted); }
+  .gjeld-sum-val { font-family: 'Playfair Display', serif; font-size: 18px; color: #8b2020; }
+  .gjeld-sum-val.ingen { color: var(--brg); font-size: 15px; }
+  .gjeld-info { background: #fdf6e8; border-left: 3px solid var(--gold); padding: 10px 14px; font-size: 12px; color: #7a5a1e; line-height: 1.6; margin-top: 12px; }
   .marcel-seksjon { background: var(--dark); border: 1px solid #1a2e1e; padding: 28px; margin-bottom: 12px; }
   .marcel-header { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 20px; }
   .marcel-avatar { width: 52px; height: 52px; background: linear-gradient(135deg, #c9a84c, #2a6640); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
@@ -225,15 +231,18 @@ Vedlikehold: ${tall.vedlikehold.toLocaleString('no-NO')} kr/mnd
 Rente: ${tall.rente}%
 Egenkapital: ${tall.ekProsent}%
 Brutto årsinntekt: ${tall.aarsinntekt.toLocaleString('no-NO')} kr
-Maks lån (5x inntekt): ${tall.maksLaan.toLocaleString('no-NO')} kr
+Eksisterende gjeld: ${tall.eksisterendeGjeld.toLocaleString('no-NO')} kr
+Maks total gjeld (5x inntekt): ${tall.maksLaan.toLocaleString('no-NO')} kr
+Gjenværende lånekapasitet: ${tall.gjenvaerendeLaanekapasitet.toLocaleString('no-NO')} kr
 Lån som trengs: ${tall.laan.toLocaleString('no-NO')} kr
-Klarer belåningskrav: ${tall.klarerBelaning ? 'Ja' : 'Nei'}
+Klarer gjeldsgraden: ${tall.klarerGjeldsgrad ? 'Ja' : 'Nei'}
 Klarer stresstest: ${tall.klarerStress ? 'Ja' : 'Nei'}
+Klarer belåningsgrad: ${tall.klarerBelaning ? 'Ja' : 'Nei'}
 Månedlig nettoresultat: ${tall.netto.toLocaleString('no-NO')} kr
 
 Gi en konkret analyse:
 1. Er dette en god investering basert på tallene?
-2. Hva bør brukeren passe på?
+2. Hva bør brukeren passe på, inkludert eksisterende gjeld?
 3. De to viktigste risikoene
 4. Ett konkret råd for å forbedre tallene` }]);
       setAnalyse(tekst);
@@ -250,7 +259,7 @@ Gi en konkret analyse:
     setMelding('');
     setLasterChat(true);
     try {
-      const kontekst = `Brukeren analyserer en eiendomsinvestering i privat regi. Boligpris: ${tall.boligpris.toLocaleString('no-NO')} kr, Leie: ${tall.leie.toLocaleString('no-NO')} kr/mnd, Netto: ${tall.netto.toLocaleString('no-NO')} kr/mnd, Rente: ${tall.rente}%, EK: ${tall.ekProsent}%, Årsinntekt: ${tall.aarsinntekt.toLocaleString('no-NO')} kr.`;
+      const kontekst = `Brukeren analyserer en eiendomsinvestering i privat regi. Boligpris: ${tall.boligpris.toLocaleString('no-NO')} kr, Leie: ${tall.leie.toLocaleString('no-NO')} kr/mnd, Netto: ${tall.netto.toLocaleString('no-NO')} kr/mnd, Rente: ${tall.rente}%, EK: ${tall.ekProsent}%, Årsinntekt: ${tall.aarsinntekt.toLocaleString('no-NO')} kr, Eksisterende gjeld: ${tall.eksisterendeGjeld.toLocaleString('no-NO')} kr.`;
       const historikk = chat.filter(m => m.type === 'bruker' || m.type === 'ai').map(m => ({ role: m.type === 'bruker' ? 'user' : 'assistant', content: m.tekst }));
       const tekst = await kallMarcel([{ role: 'user', content: kontekst + '\n\nSpørsmål: ' + melding }, ...historikk.slice(-6), nyMelding]);
       setChat(prev => [...prev, { type: 'ai', tekst }]);
@@ -306,6 +315,14 @@ export default function EiendomPrivat({ tilgang = 'gratis', onVisLogin = () => {
   const [ekProsent, setEkProsent] = useState(10);
   const [skattProsent, setSkattProsent] = useState(22);
   const [aarsinntekt, setAarsinntekt] = useState(700000);
+
+  // Eksisterende gjeld
+  const [studielaan, setStudielaan] = useState(0);
+  const [boliglaan, setBoliglaan] = useState(0);
+  const [billaan, setBillaan] = useState(0);
+  const [forbrukslaan, setForbrukslaan] = useState(0);
+  const [annetLaan, setAnnetLaan] = useState(0);
+
   const [prisvekst, setPrisvekst] = useState(3);
   const [oppussing, setOppussing] = useState(0);
   const [maanedligSparing, setMaanedligSparing] = useState(0);
@@ -326,12 +343,29 @@ export default function EiendomPrivat({ tilgang = 'gratis', onVisLogin = () => {
   const harRaad = kapital >= tot;
   const restKapital = Math.max(0, kapital - tot);
 
+  // Gjeldsberegninger
+  const eksisterendeGjeld = studielaan + boliglaan + billaan + forbrukslaan + annetLaan;
   const maksLaan = aarsinntekt * 5;
-  const klarerBelaning = laan <= maksLaan;
+  const gjenvaerendeLaanekapasitet = Math.max(0, maksLaan - eksisterendeGjeld);
+  const klarerGjeldsgrad = (laan + eksisterendeGjeld) <= maksLaan;
+  const manglendeLaanekapasitet = Math.max(0, (laan + eksisterendeGjeld) - maksLaan);
+
+  // Stresstest: rente + 3%, pluss avdrag på eksisterende gjeld (estimert som 1% av saldo per måned)
   const stressRente = rente + 3;
-  const stressMndKostnad = laan * (stressRente / 100) / 12;
+  const stressMndKostnadNyttLaan = laan * (stressRente / 100) / 12;
+  // Eksisterende gjeld antar vi betjenes med gjeldende rente + 3% stresstest
+  // Estimert som ca. 0.6% av saldo per måned (renter + avdrag på 20-30 år)
+  const eksisterendeGjeldMndKostnad = eksisterendeGjeld * 0.006;
+  const stressMndTotalkostnad = stressMndKostnadNyttLaan + eksisterendeGjeldMndKostnad;
   const stressMndInntekt = aarsinntekt / 12;
-  const klarerStress = stressMndKostnad <= stressMndInntekt * 0.5;
+  // SIFO livsopphold enslig 2025: ca. 12 000 kr/mnd
+  const sifoMnd = 12000;
+  const disponibeltEtterSifo = stressMndInntekt - sifoMnd;
+  const klarerStress = stressMndTotalkostnad <= disponibeltEtterSifo;
+
+  // Belåningsgrad
+  const belaaningsgrad = (laan / boligpris) * 100;
+  const klarerBelaning = belaaningsgrad <= 90;
 
   const nesteEkKrav = nesteBoligpris * (nesteEkProsent / 100);
   const nesteDokAvgift = nesteBoligpris * (dokumentavgiftPst / 100);
@@ -358,18 +392,34 @@ export default function EiendomPrivat({ tilgang = 'gratis', onVisLogin = () => {
 
   const forsteRefi = rader.find(r => r.kanRefinansiere);
   const forsteHarRaadNeste = rader.find(r => r.harRaadNeste);
-  const marcelTall = { boligpris, leie, felles, vedlikehold, rente, ekProsent, aarsinntekt, maksLaan, laan, klarerBelaning, klarerStress, netto, restKapital, forsteRefiAar: forsteRefi?.aar };
+  const marcelTall = {
+    boligpris, leie, felles, vedlikehold, rente, ekProsent,
+    aarsinntekt, eksisterendeGjeld, maksLaan, gjenvaerendeLaanekapasitet,
+    laan, klarerGjeldsgrad, klarerStress, klarerBelaning, netto,
+    restKapital, forsteRefiAar: forsteRefi?.aar
+  };
+
+  const bankSjekkOk = klarerGjeldsgrad && klarerStress && klarerBelaning;
 
   const aapneBudsjettark = () => {
+    const gjeldAvdragMnd = eksisterendeGjeld > 0
+      ? Math.round(eksisterendeGjeld * 0.006)
+      : 0;
+
     const data = {
       inntekt: leie,
-      totalKost: renteMnd + felles + vedlikehold,
+      totalKost: renteMnd + felles + vedlikehold + gjeldAvdragMnd,
       skattSats: skattProsent / 100,
       inntektLinjer: [{ navn: 'Leieinntekt', verdi: leie }],
       kostnadLinjer: [
-        { navn: `Renter (${rente}%)`, verdi: renteMnd },
+        { navn: `Renter (${rente}%)`, verdi: Math.round(renteMnd) },
         { navn: 'Felleskostnader', verdi: felles },
         { navn: 'Vedlikehold', verdi: vedlikehold },
+        ...(studielaan > 0 ? [{ navn: 'Studielån (avdrag/renter)', verdi: Math.round(studielaan * 0.006) }] : []),
+        ...(boliglaan > 0 ? [{ navn: 'Eksisterende boliglån', verdi: Math.round(boliglaan * 0.006) }] : []),
+        ...(billaan > 0 ? [{ navn: 'Billån (avdrag/renter)', verdi: Math.round(billaan * 0.006) }] : []),
+        ...(forbrukslaan > 0 ? [{ navn: 'Forbrukslån (avdrag/renter)', verdi: Math.round(forbrukslaan * 0.006) }] : []),
+        ...(annetLaan > 0 ? [{ navn: 'Annet lån (avdrag/renter)', verdi: Math.round(annetLaan * 0.006) }] : []),
       ],
     };
     try { localStorage.setItem('addon_budsjett_eiendom-privat', JSON.stringify(data)); } catch (e) {}
@@ -381,6 +431,7 @@ export default function EiendomPrivat({ tilgang = 'gratis', onVisLogin = () => {
       <style>{styles}</style>
       <div className="ek-banner">Privat kjøp: Enklere å komme i gang, lavere egenkapitalkrav og ingen regnskapsfører. Best for én enkelt enhet.</div>
 
+      {/* STEG 1: Om boligen */}
       <div className="ek-step">
         <div className="ek-step-header"><div className="ek-step-num">1</div><div className="ek-step-title">Om boligen</div></div>
         <div className="ek-grid">
@@ -396,6 +447,7 @@ export default function EiendomPrivat({ tilgang = 'gratis', onVisLogin = () => {
         </div>
       </div>
 
+      {/* STEG 2: Din økonomi */}
       <div className="ek-step">
         <div className="ek-step-header"><div className="ek-step-num">2</div><div className="ek-step-title">Din økonomi</div></div>
         <div className="ek-grid">
@@ -406,29 +458,88 @@ export default function EiendomPrivat({ tilgang = 'gratis', onVisLogin = () => {
           <Field label="Skatteprosent" value={skattProsent} onChange={setSkattProsent} step={1} suffix="%" />
         </div>
 
+        {/* Eksisterende gjeld */}
+        <div className="ek-section-label">Eksisterende gjeld</div>
+        <div className="gjeld-grid">
+          <Field label="Studielån" value={studielaan} onChange={setStudielaan} step={10000} />
+          <Field label="Eksisterende boliglån" value={boliglaan} onChange={setBoliglaan} step={50000} />
+          <Field label="Billån" value={billaan} onChange={setBillaan} step={10000} />
+          <Field label="Forbrukslån / kredittkort" value={forbrukslaan} onChange={setForbrukslaan} step={5000} />
+          <Field label="Annet lån" value={annetLaan} onChange={setAnnetLaan} step={10000} />
+        </div>
+        <div className="gjeld-sum-banner">
+          <span className="gjeld-sum-lbl">Total eksisterende gjeld</span>
+          <span className={`gjeld-sum-val ${eksisterendeGjeld === 0 ? 'ingen' : ''}`}>
+            {eksisterendeGjeld === 0 ? 'Ingen gjeld registrert' : fmtK(eksisterendeGjeld)}
+          </span>
+        </div>
+        {eksisterendeGjeld > 0 && (
+          <div className="gjeld-info">
+            Eksisterende gjeld på {fmtK(eksisterendeGjeld)} reduserer lånekapasiteten din med samme beløp.
+            Du kan maksimalt låne {fmtK(gjenvaerendeLaanekapasitet)} til ny bolig (5x inntekt minus eksisterende gjeld).
+          </div>
+        )}
+
+        {/* Banksjekk (Basis/Pro) */}
         {harBasis ? (
           <>
-            <div className="ek-section-label">Banksjekk</div>
+            <div className="ek-section-label">Banksjekk (utlånsforskriften 2025)</div>
             <div className="bank-sjekk">
+              {/* 1: Gjeldsgrad */}
               <div className="bank-sjekk-col">
-                <div className="bank-sjekk-tittel">Belåningsgrad (maks 5x inntekt)</div>
+                <div className="bank-sjekk-tittel">1. Gjeldsgrad (maks 5x inntekt)</div>
                 <div className="bank-sjekk-linje"><span className="k">Brutto årsinntekt</span><span className="v">{fmtK(aarsinntekt)}</span></div>
-                <div className="bank-sjekk-linje"><span className="k">Maks lån (5x)</span><span className="v">{fmtK(maksLaan)}</span></div>
-                <div className="bank-sjekk-linje"><span className="k">Lån du trenger</span><span className="v" style={{color: klarerBelaning ? 'var(--brg)' : '#8b2020'}}>{fmtK(laan)}</span></div>
-                <div className={`bank-status ${klarerBelaning ? 'ok' : 'ikke-ok'}`}>
-                  {klarerBelaning ? '✓ Innenfor grensen' : '✗ Over maks belåning'}
+                <div className="bank-sjekk-linje"><span className="k">Maks total gjeld</span><span className="v">{fmtK(maksLaan)}</span></div>
+                <div className="bank-sjekk-linje"><span className="k">Eksisterende gjeld</span><span className="v" style={{color: eksisterendeGjeld > 0 ? '#8b2020' : 'var(--muted)'}}>{eksisterendeGjeld > 0 ? '- ' + fmtK(eksisterendeGjeld) : 'Ingen'}</span></div>
+                <div className="bank-sjekk-linje"><span className="k">Lån du kan søke om</span><span className="v" style={{color:'var(--brg)'}}>{fmtK(gjenvaerendeLaanekapasitet)}</span></div>
+                <div className="bank-sjekk-linje"><span className="k">Lån du trenger</span><span className="v" style={{color: klarerGjeldsgrad ? 'var(--brg)' : '#8b2020'}}>{fmtK(laan)}</span></div>
+                {!klarerGjeldsgrad && (
+                  <div className="bank-sjekk-linje"><span className="k">Mangler kapasitet</span><span className="v" style={{color:'#8b2020'}}>{fmtK(manglendeLaanekapasitet)}</span></div>
+                )}
+                <div className={`bank-status ${klarerGjeldsgrad ? 'ok' : 'ikke-ok'}`}>
+                  {klarerGjeldsgrad ? '✓ Innenfor gjeldsgraden' : '✗ Over maks gjeldsgrad'}
                 </div>
               </div>
+
+              {/* 2: Stresstest */}
               <div className="bank-sjekk-col">
-                <div className="bank-sjekk-tittel">Stresstest (rente + 3%)</div>
-                <div className="bank-sjekk-linje"><span className="k">Nåværende rente</span><span className="v">{rente}%</span></div>
-                <div className="bank-sjekk-linje"><span className="k">Stressrente</span><span className="v">{stressRente.toFixed(1)}%</span></div>
-                <div className="bank-sjekk-linje"><span className="k">Månedskostnad v/stress</span><span className="v" style={{color: klarerStress ? 'var(--brg)' : '#8b2020'}}>{fmtK(stressMndKostnad)}</span></div>
-                <div className="bank-sjekk-linje"><span className="k">50% av månedsinntekt</span><span className="v">{fmtK(stressMndInntekt * 0.5)}</span></div>
+                <div className="bank-sjekk-tittel">2. Stresstest (rente + 3%)</div>
+                <div className="bank-sjekk-linje"><span className="k">Månedsinntekt (brutto)</span><span className="v">{fmtK(stressMndInntekt)}</span></div>
+                <div className="bank-sjekk-linje"><span className="k">SIFO livsopphold</span><span className="v" style={{color:'#8b2020'}}>- {fmtK(sifoMnd)}</span></div>
+                <div className="bank-sjekk-linje"><span className="k">Disponibelt til lån</span><span className="v">{fmtK(disponibeltEtterSifo)}</span></div>
+                <div className="bank-sjekk-linje"><span className="k">Nytt lån v/{stressRente.toFixed(1)}%</span><span className="v" style={{color:'#8b2020'}}>- {fmtK(stressMndKostnadNyttLaan)}</span></div>
+                {eksisterendeGjeld > 0 && (
+                  <div className="bank-sjekk-linje"><span className="k">Eksist. gjeld (est.)</span><span className="v" style={{color:'#8b2020'}}>- {fmtK(eksisterendeGjeldMndKostnad)}</span></div>
+                )}
+                <div className="bank-sjekk-linje"><span className="k">Total månedskostnad</span><span className="v" style={{color: klarerStress ? 'var(--brg)' : '#8b2020'}}>{fmtK(stressMndTotalkostnad)}</span></div>
                 <div className={`bank-status ${klarerStress ? 'ok' : 'ikke-ok'}`}>
                   {klarerStress ? '✓ Klarer stresstesten' : '✗ Klarer ikke stresstesten'}
                 </div>
               </div>
+
+              {/* 3: Belåningsgrad */}
+              <div className="bank-sjekk-col">
+                <div className="bank-sjekk-tittel">3. Belåningsgrad (maks 90%)</div>
+                <div className="bank-sjekk-linje"><span className="k">Boligpris</span><span className="v">{fmtK(boligpris)}</span></div>
+                <div className="bank-sjekk-linje"><span className="k">Lån</span><span className="v">{fmtK(laan)}</span></div>
+                <div className="bank-sjekk-linje"><span className="k">Belåningsgrad</span><span className="v" style={{color: klarerBelaning ? 'var(--brg)' : '#8b2020'}}>{belaaningsgrad.toFixed(1)}%</span></div>
+                <div className="bank-sjekk-linje"><span className="k">Egenkapital ({ekProsent}%)</span><span className="v">{fmtK(ek)}</span></div>
+                <div className={`bank-status ${klarerBelaning ? 'ok' : 'ikke-ok'}`}>
+                  {klarerBelaning ? '✓ Tilstrekkelig EK' : '✗ For lav egenkapital'}
+                </div>
+              </div>
+            </div>
+
+            {/* Samlet banksjekk-verdict */}
+            <div className={`ek-verdict ${bankSjekkOk ? 'green' : 'red'}`}>
+              {bankSjekkOk
+                ? `Alle tre banksjekk-kravene er oppfylt. Du bør kvalifisere for boliglånet.`
+                : `Du oppfyller ikke alle kravene: ${[
+                    !klarerGjeldsgrad && `gjeldsgrad (mangler ${fmtK(manglendeLaanekapasitet)} i kapasitet)`,
+                    !klarerStress && `stresstest (månedskostnad ${fmtK(stressMndTotalkostnad)} overstiger disponibelt ${fmtK(disponibeltEtterSifo)})`,
+                    !klarerBelaning && `belåningsgrad (${belaaningsgrad.toFixed(1)}% er over 90%)`
+                  ].filter(Boolean).join(', ')}.`
+              }
             </div>
           </>
         ) : (
@@ -462,6 +573,7 @@ export default function EiendomPrivat({ tilgang = 'gratis', onVisLogin = () => {
         </div>
       </div>
 
+      {/* STEG 3: 10-års prognose */}
       {harBasis ? (
         <div className="ek-step">
           <div className="ek-step-header"><div className="ek-step-num">3</div><div className="ek-step-title">10-års prognose</div></div>
@@ -506,6 +618,7 @@ export default function EiendomPrivat({ tilgang = 'gratis', onVisLogin = () => {
         <LaasBoks krever="basis" onVisLogin={onVisLogin} />
       )}
 
+      {/* Neste bolig */}
       {harBasis ? (
         <div className="ep-neste-bolig">
           <div className="ep-neste-bolig-title">Har du råd til neste bolig?</div>
@@ -562,6 +675,7 @@ export default function EiendomPrivat({ tilgang = 'gratis', onVisLogin = () => {
         </div>
       ) : null}
 
+      {/* Marcel */}
       {harPro ? (
         <Marcel tall={marcelTall} />
       ) : (
@@ -582,7 +696,7 @@ export default function EiendomPrivat({ tilgang = 'gratis', onVisLogin = () => {
         </button>
       )}
 
-      <p className="ek-disclaimer">Tallene er estimater og ikke finansiell rådgivning. Konsulter en regnskapsfører.</p>
+      <p className="ek-disclaimer">Tallene er estimater og ikke finansiell rådgivning. Konsulter en regnskapsfører eller finansiell rådgiver.</p>
     </div>
   );
 }
