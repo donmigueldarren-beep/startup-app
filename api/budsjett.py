@@ -4,6 +4,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 from openpyxl.chart import BarChart, PieChart, LineChart, Reference
+from openpyxl.chart.label import DataLabelList
 
 MRK    = "FF1F4E2E"
 MRK2   = "FF163D23"
@@ -306,13 +307,32 @@ def lag_excel(kalkulator, tall):
 
     pie = PieChart()
     pie.title = "Kostnadsfordeling"
-    pie.style = 26
-    pie.width = 14
-    pie.height = 12
+    pie.style = 2
+    pie.width = 16
+    pie.height = 13
+    pie.legend.position = "r"
+
     data_ref = Reference(ws, min_col=2, max_col=2, min_row=diag_start+1, max_row=diag_start+len(kostnader))
     cats = Reference(ws, min_col=1, max_col=1, min_row=diag_start+1, max_row=diag_start+len(kostnader))
     pie.add_data(data_ref)
     pie.set_categories(cats)
+
+    addon_farger = ["1F4E2E", "C9A84C", "2A6640", "8B5E1A", "3A7A50", "A07830", "4A8A60"]
+    for i, dp_color in enumerate(addon_farger[:len(kostnader)]):
+        from openpyxl.chart.series import DataPoint
+        dp = DataPoint(idx=i)
+        dp.graphicalProperties.solidFill = dp_color
+        dp.graphicalProperties.line.solidFill = "FFFFFF"
+        dp.graphicalProperties.line.width = 12700
+        pie.series[0].dPt.append(dp)
+
+    pie.series[0].dLbls = DataLabelList()
+    pie.series[0].dLbls.showPercent = True
+    pie.series[0].dLbls.showVal = False
+    pie.series[0].dLbls.showCatName = False
+    pie.series[0].dLbls.showSerName = False
+    pie.series[0].dLbls.showLegendKey = False
+
     ws.add_chart(pie, "D%d" % diag_start)
 
     # ARK 2: 12-MÅNEDER
@@ -385,33 +405,59 @@ def lag_excel(kalkulator, tall):
     bar = BarChart()
     bar.type = "col"
     bar.grouping = "clustered"
-    bar.title = "Netto per maned"
+    bar.title = "Netto per maned - Budsjett vs Faktisk"
     bar.y_axis.title = "NOK"
-    bar.style = 10
+    bar.x_axis.title = ""
+    bar.style = 2
     bar.width = 32
-    bar.height = 14
+    bar.height = 16
+    bar.gapWidth = 80
+    bar.overlap = -10
+    bar.y_axis.numFmt = '#,##0" kr"'
+    bar.y_axis.majorGridlines = None
+    bar.plot_area.graphicalProperties = None
+
     bud_ref = Reference(ws2, min_col=6, max_col=6, min_row=4, max_row=16)
     fak_ref = Reference(ws2, min_col=8, max_col=8, min_row=4, max_row=16)
     cats2 = Reference(ws2, min_col=1, min_row=5, max_row=16)
     bar.add_data(bud_ref, titles_from_data=True)
     bar.add_data(fak_ref, titles_from_data=True)
     bar.set_categories(cats2)
+
     bar.series[0].graphicalProperties.solidFill = "1F4E2E"
+    bar.series[0].graphicalProperties.line.solidFill = "163D23"
+    bar.series[0].graphicalProperties.line.width = 6350
     bar.series[1].graphicalProperties.solidFill = "4A9EDB"
+    bar.series[1].graphicalProperties.line.solidFill = "1A3A8B"
+    bar.series[1].graphicalProperties.line.width = 6350
+
     ws2.add_chart(bar, "A20")
 
     # Linjediagram akkumulert
     line = LineChart()
-    line.title = "Akkumulert netto"
-    line.style = 10
+    line.title = "Akkumulert netto gjennom aret"
+    line.style = 2
     line.y_axis.title = "NOK"
+    line.x_axis.title = "Maned"
     line.width = 32
-    line.height = 14
+    line.height = 16
+    line.y_axis.numFmt = '#,##0" kr"'
+    line.y_axis.majorGridlines = None
+    line.smooth = True
+
     akk_ref = Reference(ws2, min_col=7, max_col=7, min_row=4, max_row=16)
     line.add_data(akk_ref, titles_from_data=True)
     line.set_categories(cats2)
+
     line.series[0].graphicalProperties.line.solidFill = "C9A84C"
-    line.series[0].graphicalProperties.line.width = 28000
+    line.series[0].graphicalProperties.line.width = 32000
+    line.series[0].smooth = True
+    line.series[0].marker.symbol = "circle"
+    line.series[0].marker.size = 6
+    line.series[0].marker.graphicalProperties.solidFill = "C9A84C"
+    line.series[0].marker.graphicalProperties.line.solidFill = "7A5A1E"
+    line.series[0].marker.graphicalProperties.line.width = 12700
+
     ws2.add_chart(line, "A36")
 
     # ARK 3: NOKKELTALL
