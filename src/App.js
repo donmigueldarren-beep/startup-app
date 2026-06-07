@@ -441,6 +441,8 @@ const bransjer = [
 function getSideFromUrl() {
   const path = window.location.pathname;
   if (path === '/om-oss') return 'om-oss';
+  if (path === '/om-verktøyet' || path === '/om-verktoyet') return 'info';
+  if (path === '/priser') return 'priser';
   if (path === '/budsjettark') return 'budsjettark';
   if (path.startsWith('/kalkulator/')) return 'kalkulator';
   return 'hjem';
@@ -455,7 +457,7 @@ function getBransjeFromUrl() {
   return null;
 }
 
-function PrisSeksjon({ onKomIgang, bruker, tilgang, onVisLogin }) {
+function PrisSeksjon({ onKomIgang, bruker, tilgang, onVisLogin, erEgenSide = false }) {
   const [lasterBetaling, setLasterBetaling] = useState(null);
 
   const startBetaling = async (plan) => {
@@ -510,7 +512,7 @@ function PrisSeksjon({ onKomIgang, bruker, tilgang, onVisLogin }) {
   ];
 
   return (
-    <section className="pris-section">
+    <section className="pris-section" style={erEgenSide ? { paddingTop: '140px' } : {}}>
       <div style={{ textAlign: 'center', marginBottom: '64px', position: 'relative', zIndex: 1 }}>
         <div className="section-tag reveal" style={{ justifyContent: 'center', color: 'var(--gold)' }}>
           <span style={{ display: 'inline-block', width: '24px', height: '1px', background: 'var(--gold)', marginRight: '12px', verticalAlign: 'middle' }}></span>
@@ -663,6 +665,198 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const gaaPriser = () => {
+    setSide('priser');
+    setAnimKey(k => k + 1);
+    window.history.pushState({}, '', '/priser');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const gaaInfo = () => {
+    setSide('info');
+    setAnimKey(k => k + 1);
+    window.history.pushState({}, '', '/om-verktoyet');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const NavLinks = ({ aktivSide }) => (
+    <div className="nav-links">
+      <span className="nav-link" onClick={() => { gaaHjem(); setTimeout(() => document.getElementById('bransjer')?.scrollIntoView({ behavior: 'smooth' }), 300); }} style={aktivSide === 'bransjer' ? { color: 'var(--gold)' } : {}}>Bransjer</span>
+      <span className="nav-link" onClick={gaaInfo} style={aktivSide === 'info' ? { color: 'var(--gold)' } : {}}>Om verktøyet</span>
+      <span className="nav-link" onClick={gaaPriser} style={aktivSide === 'priser' ? { color: 'var(--gold)' } : {}}>Priser</span>
+      <span className="nav-link" onClick={gaaOmOss} style={aktivSide === 'om-oss' ? { color: 'var(--gold)' } : {}}>Om oss</span>
+    </div>
+  );
+
+  // PRISSIDE
+  if (side === 'priser') {
+    return (
+      <div className="app">
+        <style>{styles}</style>
+        {visLogin && <LoginModal onLogin={setBruker} onLukk={() => setVisLogin(false)} />}
+        <nav className="nav">
+          <NavLogo onClick={gaaHjem} />
+          <NavLinks aktivSide="priser" />
+          <NavKnapper />
+        </nav>
+        <div className="side-innhold" key={animKey}>
+          <PrisSeksjon
+            onKomIgang={() => { gaaHjem(); setTimeout(() => aapneBransje(bransjer[0]), 300); }}
+            bruker={bruker}
+            tilgang={tilgang}
+            onVisLogin={() => setVisLogin(true)}
+            erEgenSide={true}
+          />
+          <footer>
+            <FooterLogo />
+            <div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning.</div>
+          </footer>
+        </div>
+      </div>
+    );
+  }
+
+  // INFOSIDE
+  if (side === 'info') {
+    return (
+      <div className="app">
+        <style>{styles}</style>
+        {visLogin && <LoginModal onLogin={setBruker} onLukk={() => setVisLogin(false)} />}
+        <nav className="nav">
+          <NavLogo onClick={gaaHjem} />
+          <NavLinks aktivSide="info" />
+          <NavKnapper />
+        </nav>
+        <div className="side-innhold" key={animKey}>
+          {/* Hero */}
+          <div className="om-oss-hero">
+            <div className="om-oss-hero-accent"></div>
+            <div className="om-oss-inner">
+              <div className="om-oss-tag reveal">Om verktøyet</div>
+              <h1 className="om-oss-title reveal reveal-delay-1">Tallene du trenger,<br />før du bestemmer deg</h1>
+            </div>
+          </div>
+
+          {/* Hva er Invest Tools */}
+          <div className="om-oss-body">
+            <p className="om-oss-tekst reveal">Invest Tools er et norsk verktøy for deg som vurderer å starte en bedrift eller investere i eiendom. Du fyller inn tallene dine, og kalkulatoren viser deg hva du faktisk sitter igjen med, om du klarer bankens krav, og om ideen din er lønnsom.</p>
+            <p className="om-oss-tekst reveal">Vi dekker i dag eiendomsinvestering (privat og via AS), bilutleie og salong. Nye bransjer kommer løpende.</p>
+            <div className="om-oss-sitat reveal">Dette er en tidlig versjon. Vi er langt fra ferdige, og det er poenget.</div>
+
+            {/* Hva kalkulatorene gjør */}
+            <div style={{ margin: '48px 0' }}>
+              <div style={{ fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--brg)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{ display: 'inline-block', width: '24px', height: '1px', background: 'var(--brg)' }}></span>
+                Hva kalkulatorene gjør
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1px', background: 'var(--cream-dark)' }}>
+                {[
+                  { ikon: '🏠', tittel: 'Eiendom privat', desc: 'Kontantstrøm, gjeldsgrad, stresstest og 10-års prognose for utleie i eget navn.' },
+                  { ikon: '🏢', tittel: 'Eiendom via AS', desc: 'Næringslån, EK-krav, refinansiering og veien til porteføljeinvestor.' },
+                  { ikon: '⚖️', tittel: 'Privat vs AS', desc: 'Sammenlign begge strukturene side om side med dine egne tall.' },
+                  { ikon: '🚗', tittel: 'Bilutleie', desc: 'Break-even, ROI og kontantstrøm for én bil eller en hel flåte.' },
+                  { ikon: '✂️', tittel: 'Salong', desc: 'Lønnsomhet for frisør, negler og hudpleie før du signerer leiekontrakten.' },
+                  { ikon: '🕐', tittel: 'Kommer snart', desc: 'Korttidsutleie, personlig trener og flere bransjer er under utvikling.' },
+                ].map((k, i) => (
+                  <div key={i} style={{ background: 'white', padding: '28px', display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                    <span style={{ fontSize: '24px', flexShrink: 0 }}>{k.ikon}</span>
+                    <div>
+                      <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '16px', color: 'var(--dark)', marginBottom: '6px' }}>{k.tittel}</div>
+                      <div style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: '1.65' }}>{k.desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Tidlig versjon / beta */}
+            <div style={{ background: 'var(--dark)', padding: '48px', margin: '48px 0', position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: 'var(--gold)' }}></div>
+              <div style={{ fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '16px' }}>Tidlig versjon</div>
+              <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '28px', color: 'var(--cream)', marginBottom: '20px', lineHeight: '1.2' }}>Dette er starten,<br />ikke slutten</div>
+              <p style={{ fontSize: '14px', color: '#4a6a4e', lineHeight: '1.8', marginBottom: '20px', maxWidth: '600px' }}>Invest Tools er lansert tidlig med vilje. Vi tror på å bygge i det åpne, med tilbakemelding fra de som faktisk bruker verktøyet. Kalkulatorene fungerer og er basert på gjeldende norske regler, men det er mye vi ønsker å legge til.</p>
+              <p style={{ fontSize: '14px', color: '#4a6a4e', lineHeight: '1.8', maxWidth: '600px' }}>Vi jobber kontinuerlig med nye bransjer, bedre beregninger og mer funksjonalitet. Det du ser i dag er bare et utgangspunkt.</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2px', background: 'rgba(31,78,46,0.3)', marginTop: '32px' }}>
+                {[
+                  { num: '5', lbl: 'Kalkulatorer i dag' },
+                  { num: '2+', lbl: 'Nye bransjer på vei' },
+                  { num: '∞', lbl: 'Forbedringer planlagt' },
+                ].map((s, i) => (
+                  <div key={i} style={{ background: '#0a1a0c', padding: '24px', textAlign: 'center' }}>
+                    <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '36px', color: 'var(--gold)' }}>{s.num}</div>
+                    <div style={{ fontSize: '10px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#3a6a46', marginTop: '6px' }}>{s.lbl}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Send inn ønsker */}
+            <div style={{ margin: '48px 0' }}>
+              <div style={{ fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--brg)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{ display: 'inline-block', width: '24px', height: '1px', background: 'var(--brg)' }}></span>
+                Hjelp oss bli bedre
+              </div>
+              <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '28px', color: 'var(--dark)', marginBottom: '16px', lineHeight: '1.2' }}>Din bransje mangler?<br />Si ifra.</div>
+              <p className="om-oss-tekst">Vi ønsker innspill på nye bransjer, mangler i eksisterende kalkulatorer og alt som kan gjøre verktøyet mer nyttig for deg. Ingen tilbakemelding er for liten, og alle henvendelser leses.</p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1px', background: 'var(--cream-dark)', marginTop: '32px', marginBottom: '32px' }}>
+                {[
+                  { ikon: '🏗️', tekst: 'Ønsker du en ny bransje? Send oss navnet og hva du vil vite.' },
+                  { ikon: '🔧', tekst: 'Noe som ikke stemmer eller mangler i en kalkulator? Fortell oss.' },
+                  { ikon: '💡', tekst: 'Har du en idé til en funksjon? Vi vil høre om den.' },
+                ].map((t, i) => (
+                  <div key={i} style={{ background: 'white', padding: '28px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '28px', marginBottom: '12px' }}>{t.ikon}</div>
+                    <div style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: '1.65' }}>{t.tekst}</div>
+                  </div>
+                ))}
+              </div>
+              <button className="btn-primary" onClick={() => window.location.href = 'mailto:kontakt@addoninvest.no'}>
+                Send oss en e-post
+              </button>
+              <span style={{ fontSize: '13px', color: 'var(--muted)', marginLeft: '16px' }}>kontakt@addoninvest.no</span>
+            </div>
+
+            <div className="om-oss-verdier">
+              {[
+                { num: '01', tittel: 'Gratis å starte', desc: 'Alle kalkulatorer er gratis. Betalte funksjoner er tillegg, ikke krav.' },
+                { num: '02', tittel: 'Norske regler', desc: 'Oppdatert med gjeldende skatteregler, utlånsforskrift og satser for 2025.' },
+                { num: '03', tittel: 'Ingen lagring', desc: 'Tallene du legger inn forblir i nettleseren din. Vi lagrer ingenting.' },
+              ].map((v, i) => (
+                <div className={`om-oss-verdi reveal-scale reveal-delay-${i + 1}`} key={i}>
+                  <div className="om-oss-verdi-num">{v.num}</div>
+                  <div className="om-oss-verdi-title">{v.tittel}</div>
+                  <div className="om-oss-verdi-desc">{v.desc}</div>
+                </div>
+              ))}
+            </div>
+
+            <button className="btn-primary reveal" onClick={() => aapneBransje(bransjer[0])}>
+              Start en beregning
+            </button>
+          </div>
+
+          <div className="om-oss-kontakt">
+            <div className="om-oss-kontakt-inner">
+              <div>
+                <div className="om-oss-kontakt-title">Ta kontakt</div>
+                <div className="om-oss-kontakt-desc">Spørsmål, ønsker eller tilbakemeldinger er alltid velkomne.</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(159,201,168,0.7)', marginBottom: '10px' }}>Send oss en e-post</div>
+                <a href="mailto:kontakt@addoninvest.no" className="om-oss-kontakt-epost">kontakt@addoninvest.no</a>
+              </div>
+            </div>
+          </div>
+
+          <footer>
+            <FooterLogo />
+            <div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning.</div>
+          </footer>
+        </div>
+      </div>
+    );
+  }
+
   if (side === 'budsjettark') {
     return (
       <div className="app">
@@ -670,11 +864,7 @@ export default function App() {
         {visLogin && <LoginModal onLogin={setBruker} onLukk={() => setVisLogin(false)} />}
         <nav className="nav">
           <NavLogo onClick={gaaHjem} />
-          <div className="nav-links">
-            <span className="nav-link" onClick={gaaHjem}>Hjem</span>
-            <span className="nav-link" onClick={gaaOmOss}>Om oss</span>
-            <span className="nav-link" style={{ color: 'var(--gold)' }}>Budsjettark</span>
-          </div>
+          <NavLinks aktivSide="" />
           <NavKnapper />
         </nav>
         <div className="side-innhold" key={animKey} style={{ padding: '100px 80px 80px', maxWidth: '1200px', margin: '0 auto' }}>
@@ -696,11 +886,7 @@ export default function App() {
         {visLogin && <LoginModal onLogin={setBruker} onLukk={() => setVisLogin(false)} />}
         <nav className="nav">
           <NavLogo onClick={gaaHjem} />
-          <div className="nav-links">
-            <span className="nav-link" onClick={gaaHjem}>Hjem</span>
-            <span className="nav-link" onClick={() => { gaaHjem(); setTimeout(() => document.getElementById('bransjer')?.scrollIntoView({ behavior: 'smooth' }), 300); }}>Bransjer</span>
-            <span className="nav-link" style={{ color: 'var(--gold)' }}>Om oss</span>
-          </div>
+          <NavLinks aktivSide="om-oss" />
           <NavKnapper />
         </nav>
         <div className="side-innhold" key={animKey}>
@@ -759,11 +945,7 @@ export default function App() {
         {visLogin && <LoginModal onLogin={setBruker} onLukk={() => setVisLogin(false)} />}
         <nav className="nav">
           <NavLogo onClick={gaaHjem} />
-          <div className="nav-links">
-            <span className="nav-link" onClick={gaaHjem}>Hjem</span>
-            <span className="nav-link" onClick={gaaOmOss}>Om oss</span>
-            <span className="nav-link" onClick={gaaBudsjettark}>Budsjettark</span>
-          </div>
+          <NavLinks aktivSide="" />
           <NavKnapper />
         </nav>
         <div className="side-innhold" key={animKey}>
@@ -798,11 +980,7 @@ export default function App() {
       {visLogin && <LoginModal onLogin={setBruker} onLukk={() => setVisLogin(false)} />}
       <nav className="nav">
         <NavLogo onClick={gaaHjem} />
-        <div className="nav-links">
-          <span className="nav-link" onClick={() => document.getElementById('bransjer')?.scrollIntoView({ behavior: 'smooth' })}>Bransjer</span>
-          <span className="nav-link" onClick={gaaOmOss}>Om oss</span>
-          <span className="nav-link" onClick={gaaBudsjettark}>Budsjettark</span>
-        </div>
+        <NavLinks aktivSide="bransjer" />
         <NavKnapper />
       </nav>
       <div className="side-innhold" key={animKey}>
