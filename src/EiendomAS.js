@@ -147,6 +147,33 @@ const styles = `
   .marcel-chat-send { background: var(--brg); color: var(--cream); border: none; padding: 10px 20px; font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; }
   .marcel-chat-send:hover { background: #2a6640; }
   .marcel-chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* ===================== MOBILE ===================== */
+  @media (max-width: 768px) {
+    .ek-step { padding: 20px 16px; }
+    .ek-grid { grid-template-columns: 1fr; }
+    .ek-two-col { grid-template-columns: 1fr; }
+    .ep-kapital-grid { grid-template-columns: 1fr; }
+    .ep-neste-bolig-input-wrap { grid-template-columns: 1fr; }
+    .ep-neste-bolig-resultat { grid-template-columns: 1fr; }
+    .ep-neste-bolig { padding: 20px 16px; }
+    .ep-restkapital-banner { flex-direction: column; align-items: flex-start; gap: 4px; }
+    .marcel-seksjon { padding: 20px 16px; }
+    .ep-table th, .ep-table td { padding: 8px 6px; font-size: 11px; }
+    .ep-aar-tabell th, .ep-aar-tabell td { padding: 6px 4px; font-size: 11px; }
+    .ep-historikk-table th, .ep-historikk-table td { padding: 8px 6px; font-size: 11px; }
+    .ek-line { font-size: 12px; }
+    .ek-line .k { font-size: 11px; max-width: 60%; }
+    .ek-slider-hints { font-size: 10px; }
+  }
+
+  @media (max-width: 480px) {
+    .ek-step { padding: 16px 12px; }
+    .ep-neste-bolig { padding: 16px 12px; }
+    .marcel-seksjon { padding: 16px 12px; }
+    .ek-result { font-size: 20px; }
+    .ep-neste-bolig-metric .val { font-size: 18px; }
+  }
 `;
 
 function fmt(n) {
@@ -439,10 +466,10 @@ export default function EiendomAS({ tilgang = 'gratis', onVisLogin = () => {} })
             </thead>
             <tbody>
               {[
-                { aar: 'År 1 til 2', fase: 'Nystartet AS', ekKrav: '30%', rente: `${rente.toFixed(1)}%`, beskrivelse: 'Ingen historikk. Høyt EK-krav og markedsrente.' },
-                { aar: 'År 3 til 4', fase: 'Etablert', ekKrav: '25%', rente: `${(rente - 0.3).toFixed(1)}%`, beskrivelse: '2 godkjente skattemeldinger med overskudd. Bedre betingelser.' },
-                { aar: 'År 5 til 7', fase: 'Solid track record', ekKrav: '20%', rente: `${(rente - 0.5).toFixed(1)}%`, beskrivelse: 'Stabil leieinntekt over flere år. Lavere EK-krav.' },
-                { aar: 'År 8 og oppover', fase: 'Porteføljeinvestor', ekKrav: '15%', rente: `${(rente - 0.7).toFixed(1)}%`, beskrivelse: 'Beste betingelser som profesjonell investor.' }
+                { aar: 'År 1–2', fase: 'Nystartet AS', ekKrav: '30%', rente: `${rente.toFixed(1)}%`, beskrivelse: 'Ingen historikk. Høyt EK-krav og markedsrente.' },
+                { aar: 'År 3–4', fase: 'Etablert', ekKrav: '25%', rente: `${(rente - 0.3).toFixed(1)}%`, beskrivelse: '2 godkjente skattemeldinger med overskudd.' },
+                { aar: 'År 5–7', fase: 'Solid track record', ekKrav: '20%', rente: `${(rente - 0.5).toFixed(1)}%`, beskrivelse: 'Stabil leieinntekt over flere år.' },
+                { aar: 'År 8+', fase: 'Porteføljeinvestor', ekKrav: '15%', rente: `${(rente - 0.7).toFixed(1)}%`, beskrivelse: 'Beste betingelser som profesjonell investor.' }
               ].map((f, i) => (
                 <tr key={i}>
                   <td style={{fontWeight:'500'}}>{f.aar}</td>
@@ -461,8 +488,8 @@ export default function EiendomAS({ tilgang = 'gratis', onVisLogin = () => {} })
             {[
               { tittel: 'Driftsselskap bygger historikk', desc: 'Eier eiendommene, tar opp lån og viser overskudd år for år.', future: false },
               { tittel: 'År 3: Første refinansiering', desc: 'Banken senker EK-krav og rente. Kapital hentes ut til neste kjøp.', future: true },
-              { tittel: 'År 5 til 7: Solid track record', desc: 'Stabil leieinntekt og 20% EK-krav. Enklere å vokse porteføljen.', future: true },
-              { tittel: 'År 8 og oppover: Porteføljeinvestor', desc: 'Med 2 til 3 enheter og solid historikk er AS en attraktiv låntaker.', future: true }
+              { tittel: 'År 5–7: Solid track record', desc: 'Stabil leieinntekt og 20% EK-krav. Enklere å vokse porteføljen.', future: true },
+              { tittel: 'År 8+: Porteføljeinvestor', desc: 'Med 2–3 enheter og solid historikk er AS en attraktiv låntaker.', future: true }
             ].map((item, i) => (
               <div className="ep-timeline-item" key={i}>
                 <div className={`ep-timeline-dot ${item.future ? 'future' : ''}`}></div>
@@ -554,24 +581,26 @@ export default function EiendomAS({ tilgang = 'gratis', onVisLogin = () => {} })
               ? `Du kan kjøpe neste bolig til ${fmtK(nesteBoligpris)} i år ${forsteHarRaadNeste.aar}.`
               : `Med disse tallene har du ikke råd til en bolig til ${fmtK(nesteBoligpris)} innen 10 år.`}
           </div>
-          <table className="ep-aar-tabell">
-            <thead>
-              <tr><th>År</th><th>Tilgjengelig</th><th>Trenger</th><th>Mangler</th><th>Status</th></tr>
-            </thead>
-            <tbody>
-              {rader.map(r => (
-                <tr key={r.aar} className={r.harRaadNeste ? 'kan' : ''}>
-                  <td>År {r.aar}</td>
-                  <td style={{color: r.harRaadNeste ? '#9fc9a8' : '#6a9a6e'}}>{fmt(r.totalTilgjengelig)}</td>
-                  <td>{fmt(nesteTotalt)}</td>
-                  <td style={{color: r.harRaadNeste ? '#9fc9a8' : '#c84040'}}>
-                    {r.harRaadNeste ? '–' : fmt(nesteTotalt - r.totalTilgjengelig)}
-                  </td>
-                  <td>{r.harRaadNeste ? '✓ Har råd' : 'Ikke ennå'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div style={{overflowX:'auto'}}>
+            <table className="ep-aar-tabell">
+              <thead>
+                <tr><th>År</th><th>Tilgjengelig</th><th>Trenger</th><th>Mangler</th><th>Status</th></tr>
+              </thead>
+              <tbody>
+                {rader.map(r => (
+                  <tr key={r.aar} className={r.harRaadNeste ? 'kan' : ''}>
+                    <td>År {r.aar}</td>
+                    <td style={{color: r.harRaadNeste ? '#9fc9a8' : '#6a9a6e'}}>{fmt(r.totalTilgjengelig)}</td>
+                    <td>{fmt(nesteTotalt)}</td>
+                    <td style={{color: r.harRaadNeste ? '#9fc9a8' : '#c84040'}}>
+                      {r.harRaadNeste ? '–' : fmt(nesteTotalt - r.totalTilgjengelig)}
+                    </td>
+                    <td>{r.harRaadNeste ? '✓ Har råd' : 'Ikke ennå'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       ) : null}
 
