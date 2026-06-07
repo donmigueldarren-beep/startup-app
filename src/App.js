@@ -156,7 +156,8 @@ const styles = `
   .pris-skillelinje { border: none; border-top: 1px solid rgba(31,78,46,0.4); margin-bottom: 28px; }
   .pris-liste { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 36px; }
   .pris-liste li { font-size: 13px; color: #6a9a6e; display: flex; align-items: flex-start; gap: 10px; line-height: 1.5; }
-  .pris-liste li::before { content: '✓'; color: var(--brg-light); font-size: 12px; flex-shrink: 0; margin-top: 1px; }
+  .pris-liste li::before { content: 'checkmark'; color: var(--brg-light); font-size: 12px; flex-shrink: 0; margin-top: 1px; }
+  .pris-liste li::before { content: '✓'; }
   .pris-liste li.nei { color: #2a3a2e; }
   .pris-liste li.nei::before { content: '–'; color: #2a3a2e; }
   .pris-knapp { width: 100%; padding: 14px; font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.3s; font-weight: 500; border: 1px solid rgba(31,78,46,0.5); background: transparent; color: #6a9a6e; }
@@ -244,6 +245,22 @@ const styles = `
   .footer-disclaimer { font-size: 11px; color: #2a3a2e; max-width: 400px; text-align: right; }
   .teller { display: inline-block; }
 `;
+
+// Hjelpefunksjoner for å lese/skrive kalkulator-state til sessionStorage
+function lesKalkulatorState(id) {
+  try {
+    const lagret = sessionStorage.getItem('addon_kalk_' + id);
+    return lagret ? JSON.parse(lagret) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function skrivKalkulatorState(id, state) {
+  try {
+    sessionStorage.setItem('addon_kalk_' + id, JSON.stringify(state));
+  } catch (e) {}
+}
 
 const NavLogo = ({ onClick }) => (
   <div className="nav-logo" onClick={onClick}>
@@ -700,8 +717,8 @@ export default function App() {
             </div>
           </div>
           <div className="om-oss-body">
-            <p className="om-oss-tekst reveal">Invest Tools er et norsk verktøy for deg som vurderer å starte en bedrift eller investere i eiendom. Du fyller inn tallene dine, og kalkulatoren viser deg hva du faktisk sitter igjen med, om du klarer bankens krav, og om ideen din er lønnsom.</p>
-            <p className="om-oss-tekst reveal">Vi dekker i dag eiendomsinvestering (privat og via AS), bilutleie og salong. Nye bransjer kommer løpende.</p>
+            <p className="om-oss-tekst reveal">Invest Tools er et norsk verktøy for deg som vurderer å starte noe nytt eller investere. Du fyller inn tallene dine, og kalkulatoren viser deg hva du faktisk sitter igjen med, om du klarer bankens krav, og om ideen din er lønnsom.</p>
+            <p className="om-oss-tekst reveal">Vi dekker i dag eiendomsinvestering (privat og via AS), bilutleie og salong, med flere bransjer på vei. I tillegg får Pro-brukere tilgang til budsjettark som automatisk fylles ut med tallene fra kalkulatoren og kan eksporteres til Excel.</p>
             <div className="om-oss-sitat reveal">Dette er en tidlig versjon. Vi er langt fra ferdige, og det er poenget.</div>
             <div style={{ margin: '48px 0' }}>
               <div style={{ fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--brg)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -715,7 +732,7 @@ export default function App() {
                   { ikon: '⚖️', tittel: 'Privat vs AS', desc: 'Sammenlign begge strukturene side om side med dine egne tall.' },
                   { ikon: '🚗', tittel: 'Bilutleie', desc: 'Break-even, ROI og kontantstrøm for én bil eller en hel flåte.' },
                   { ikon: '✂️', tittel: 'Salong', desc: 'Lønnsomhet for frisør, negler og hudpleie før du signerer leiekontrakten.' },
-                  { ikon: '🕐', tittel: 'Kommer snart', desc: 'Korttidsutleie, personlig trener og flere bransjer er under utvikling.' },
+                  { ikon: '📊', tittel: 'Budsjettark', desc: 'Pro-brukere får budsjettark forhåndsutfylt med kalkulatortallene. Eksporter til Excel.' },
                 ].map((k, i) => (
                   <div key={i} style={{ background: 'white', padding: '28px', display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
                     <span style={{ fontSize: '24px', flexShrink: 0 }}>{k.ikon}</span>
@@ -868,6 +885,7 @@ export default function App() {
 
   // KALKULATOR
   if (side === 'kalkulator' && aktivBransje) {
+    const lagretState = lesKalkulatorState(aktivBransje.id);
     return (
       <div className="app">
         <style>{styles}</style>
@@ -884,11 +902,11 @@ export default function App() {
                 <div className="kalkulator-hero-title">{aktivBransje.navn}</div>
               </div>
             </div>
-            {aktivBransje.id === 'eiendom-privat' && <EiendomPrivat tilgang={tilgang} onVisLogin={() => setVisLogin(true)} />}
-            {aktivBransje.id === 'eiendom-as' && <EiendomAS tilgang={tilgang} onVisLogin={() => setVisLogin(true)} />}
-            {aktivBransje.id === 'eiendom-sammenlign' && <EiendomSammenlign tilgang={tilgang} onVisLogin={() => setVisLogin(true)} />}
-            {aktivBransje.id === 'bil' && <BilKalkulator tilgang={tilgang} onVisLogin={() => setVisLogin(true)} />}
-            {aktivBransje.id === 'salong' && <SalongKalkulator tilgang={tilgang} onVisLogin={() => setVisLogin(true)} />}
+            {aktivBransje.id === 'eiendom-privat' && <EiendomPrivat tilgang={tilgang} onVisLogin={() => setVisLogin(true)} lagretState={lagretState} onStateChange={(s) => skrivKalkulatorState('eiendom-privat', s)} />}
+            {aktivBransje.id === 'eiendom-as' && <EiendomAS tilgang={tilgang} onVisLogin={() => setVisLogin(true)} lagretState={lagretState} onStateChange={(s) => skrivKalkulatorState('eiendom-as', s)} />}
+            {aktivBransje.id === 'eiendom-sammenlign' && <EiendomSammenlign tilgang={tilgang} onVisLogin={() => setVisLogin(true)} lagretState={lagretState} onStateChange={(s) => skrivKalkulatorState('eiendom-sammenlign', s)} />}
+            {aktivBransje.id === 'bil' && <BilKalkulator tilgang={tilgang} onVisLogin={() => setVisLogin(true)} lagretState={lagretState} onStateChange={(s) => skrivKalkulatorState('bil', s)} />}
+            {aktivBransje.id === 'salong' && <SalongKalkulator tilgang={tilgang} onVisLogin={() => setVisLogin(true)} lagretState={lagretState} onStateChange={(s) => skrivKalkulatorState('salong', s)} />}
           </div>
           <footer><FooterLogo /><div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning.</div></footer>
         </div>
@@ -901,11 +919,7 @@ export default function App() {
     <div className="app">
       <style>{styles}</style>
       {visLogin && <LoginModal onLogin={setBruker} onLukk={() => setVisLogin(false)} />}
-      <nav className="nav">
-        <NavLogo onClick={gaaHjem} />
-        <NavLinks aktivSide="bransjer" />
-        <NavKnapper />
-      </nav>
+      <nav className="nav"><NavLogo onClick={gaaHjem} /><NavLinks aktivSide="bransjer" /><NavKnapper /></nav>
       <div className="side-innhold" key={animKey}>
         <section className="hero">
           <div className="hero-bg" id="hero-bg"></div>
@@ -921,10 +935,7 @@ export default function App() {
               <button className="btn-secondary" onClick={() => document.getElementById('bransjer')?.scrollIntoView({ behavior: 'smooth' })}>Se alle bransjer</button>
             </div>
           </div>
-          <div className="hero-scroll">
-            <div className="hero-scroll-line"></div>
-            <div className="hero-scroll-text">Scroll</div>
-          </div>
+          <div className="hero-scroll"><div className="hero-scroll-line"></div><div className="hero-scroll-text">Scroll</div></div>
           <div className="hero-stats">
             {[{ slutt: 5, suffix: '', lbl: 'Bransjer' }, { slutt: 49, suffix: ' kr', lbl: 'Fra/mnd' }, { slutt: 100, suffix: '%', lbl: 'Konfidensielt' }].map((s, i) => (
               <div className="hero-stat" key={i}>
