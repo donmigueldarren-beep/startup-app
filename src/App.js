@@ -36,6 +36,8 @@ const styles = `
   .reveal-delay-4 { transition-delay: 0.32s; }
   .reveal-delay-5 { transition-delay: 0.40s; }
   .reveal-delay-6 { transition-delay: 0.48s; }
+
+  /* NAV */
   .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(15,26,18,0.85); backdrop-filter: blur(20px); padding: 18px 48px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(31,78,46,0.25); transition: all 0.4s cubic-bezier(0.4,0,0.2,1); }
   .nav.scrolled { padding: 12px 48px; background: rgba(8,14,9,0.97); border-bottom-color: rgba(201,168,76,0.15); }
   .nav-logo { display: flex; align-items: center; gap: 14px; cursor: pointer; }
@@ -58,6 +60,19 @@ const styles = `
   .nav-cta:hover::before { transform: scaleX(1); }
   .nav-cta:hover { color: var(--dark); border-color: var(--gold); }
   .nav-cta span { position: relative; z-index: 1; }
+
+  /* HAMBURGER MENY */
+  .nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; background: none; border: none; }
+  .nav-hamburger span { display: block; width: 22px; height: 1px; background: var(--cream); transition: all 0.3s; }
+  .nav-hamburger.aapen span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  .nav-hamburger.aapen span:nth-child(2) { opacity: 0; }
+  .nav-hamburger.aapen span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+  .nav-mobil-meny { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 99; background: rgba(8,14,9,0.98); flex-direction: column; align-items: center; justify-content: center; gap: 32px; }
+  .nav-mobil-meny.synlig { display: flex; }
+  .nav-mobil-link { font-size: 22px; color: var(--cream); letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; font-family: 'Playfair Display', serif; transition: color 0.3s; }
+  .nav-mobil-link:hover { color: var(--gold); }
+
+  /* LOGIN */
   .login-side { position: fixed; inset: 0; z-index: 200; background: rgba(8,14,9,0.97); display: flex; align-items: center; justify-content: center; animation: fadeInn 0.3s ease; }
   @keyframes fadeInn { from { opacity: 0; } to { opacity: 1; } }
   .login-boks { background: #0a1a0c; border: 1px solid rgba(31,78,46,0.4); padding: 56px 48px; width: 100%; max-width: 440px; position: relative; }
@@ -79,6 +94,8 @@ const styles = `
   .login-bytt:hover { color: var(--cream); }
   .login-bruker { font-size: 11px; color: #3a6a46; letter-spacing: 0.06em; }
   .tilgang-badge { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; background: rgba(201,168,76,0.15); color: var(--gold); padding: 3px 8px; border: 1px solid rgba(201,168,76,0.3); }
+
+  /* HERO */
   .hero { position: relative; height: 100vh; min-height: 600px; overflow: hidden; display: flex; align-items: center; }
   .hero-bg { position: absolute; inset: -20%; background: url('https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1600&q=80') center/cover no-repeat; will-change: transform; }
   .hero-grain { position: absolute; inset: 0; opacity: 0.04; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); background-size: 256px; pointer-events: none; animation: grain 0.8s steps(1) infinite; z-index: 3; }
@@ -88,11 +105,11 @@ const styles = `
   .hero-content { position: relative; z-index: 4; padding: 0 80px; max-width: 720px; }
   .hero-tag { font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); margin-bottom: 24px; opacity: 0; animation: fadeUp 1s 0.2s cubic-bezier(0.4,0,0.2,1) forwards; display: flex; align-items: center; gap: 12px; }
   .hero-tag::before { content: ''; display: inline-block; width: 32px; height: 1px; background: var(--gold); }
-  .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(42px, 6vw, 72px); line-height: 1.02; color: var(--cream); margin-bottom: 24px; opacity: 0; animation: fadeUp 1s 0.4s cubic-bezier(0.4,0,0.2,1) forwards; }
+  .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(36px, 6vw, 72px); line-height: 1.02; color: var(--cream); margin-bottom: 24px; opacity: 0; animation: fadeUp 1s 0.4s cubic-bezier(0.4,0,0.2,1) forwards; }
   .hero-title em { font-style: italic; color: var(--gold); position: relative; }
   .hero-title em::after { content: ''; position: absolute; bottom: 4px; left: 0; right: 0; height: 1px; background: var(--gold); opacity: 0.4; }
   .hero-sub { font-size: 16px; color: rgba(245,240,232,0.55); line-height: 1.8; max-width: 480px; margin-bottom: 48px; font-weight: 300; opacity: 0; animation: fadeUp 1s 0.6s cubic-bezier(0.4,0,0.2,1) forwards; }
-  .hero-btns { display: flex; gap: 14px; opacity: 0; animation: fadeUp 1s 0.8s cubic-bezier(0.4,0,0.2,1) forwards; }
+  .hero-btns { display: flex; gap: 14px; opacity: 0; animation: fadeUp 1s 0.8s cubic-bezier(0.4,0,0.2,1) forwards; flex-wrap: wrap; }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
   .btn-primary { background: var(--gold); color: var(--dark); border: none; padding: 15px 36px; font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: all 0.4s cubic-bezier(0.4,0,0.2,1); font-weight: 500; }
   .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 20px 40px rgba(201,168,76,0.3); background: #d4b558; }
@@ -110,6 +127,8 @@ const styles = `
   .hero-scroll-line { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--gold), transparent); animation: scrollLine 2s ease-in-out infinite; }
   @keyframes scrollLine { 0%,100% { transform: scaleY(1); opacity: 1; } 50% { transform: scaleY(0.5); opacity: 0.4; } }
   .hero-scroll-text { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: #3a5a3e; writing-mode: vertical-rl; }
+
+  /* BRANSJER */
   .bransjer-section { padding: 140px 80px; background: var(--cream); position: relative; }
   .bransjer-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(to right, transparent, var(--gold), transparent); opacity: 0.3; }
   .section-tag { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--brg); margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
@@ -139,6 +158,8 @@ const styles = `
   .bransje-card:not(.coming):hover .bransje-tag { background: #c8deca; }
   .bransje-more { background: white; padding: 22px 28px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--cream-dark); }
   .bransje-more-text { font-family: 'Playfair Display', serif; font-size: 14px; color: var(--muted); font-style: italic; }
+
+  /* PRISER */
   .pris-section { padding: 120px 80px; background: var(--dark); position: relative; overflow: hidden; }
   .pris-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(to right, transparent, rgba(201,168,76,0.4), transparent); }
   .pris-section::after { content: ''; position: absolute; bottom: -300px; left: 50%; transform: translateX(-50%); width: 800px; height: 600px; background: radial-gradient(circle, rgba(31,78,46,0.08) 0%, transparent 70%); pointer-events: none; }
@@ -156,8 +177,7 @@ const styles = `
   .pris-skillelinje { border: none; border-top: 1px solid rgba(31,78,46,0.4); margin-bottom: 28px; }
   .pris-liste { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 36px; }
   .pris-liste li { font-size: 13px; color: #6a9a6e; display: flex; align-items: flex-start; gap: 10px; line-height: 1.5; }
-  .pris-liste li::before { content: 'checkmark'; color: var(--brg-light); font-size: 12px; flex-shrink: 0; margin-top: 1px; }
-  .pris-liste li::before { content: '✓'; }
+  .pris-liste li::before { content: '✓'; color: var(--brg-light); font-size: 12px; flex-shrink: 0; margin-top: 1px; }
   .pris-liste li.nei { color: #2a3a2e; }
   .pris-liste li.nei::before { content: '–'; color: #2a3a2e; }
   .pris-knapp { width: 100%; padding: 14px; font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.3s; font-weight: 500; border: 1px solid rgba(31,78,46,0.5); background: transparent; color: #6a9a6e; }
@@ -173,6 +193,8 @@ const styles = `
   .pris-slik-ikon { font-size: 28px; margin-bottom: 16px; }
   .pris-slik-tittel { font-size: 14px; font-weight: 500; color: var(--cream); margin-bottom: 8px; }
   .pris-slik-desc { font-size: 13px; color: #3a6a46; line-height: 1.65; }
+
+  /* HVORFOR */
   .hvorfor-section { background: var(--dark); padding: 140px 80px; display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: center; position: relative; overflow: hidden; }
   .hvorfor-section::before { content: ''; position: absolute; bottom: -200px; right: -200px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(31,78,46,0.12) 0%, transparent 70%); pointer-events: none; }
   .hvorfor-img-wrap { position: relative; height: 520px; }
@@ -197,6 +219,8 @@ const styles = `
   .hvorfor-item-title { font-size: 14px; font-weight: 500; color: var(--cream); margin-bottom: 4px; transition: color 0.3s; }
   .hvorfor-item:hover .hvorfor-item-title { color: var(--gold); }
   .hvorfor-item-desc { font-size: 13px; color: rgba(90,110,94,0.9); line-height: 1.65; }
+
+  /* OM OSS */
   .om-oss-hero { background: var(--dark); padding: 140px 80px 100px; position: relative; overflow: hidden; }
   .om-oss-hero::before { content: ''; position: absolute; top: -100px; right: -100px; width: 700px; height: 700px; background: radial-gradient(circle, rgba(201,168,76,0.04) 0%, transparent 65%); pointer-events: none; }
   .om-oss-hero-accent { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent 0%, var(--gold) 30%, var(--brg-light) 70%, transparent 100%); background-size: 200% 100%; animation: shimmer 4s linear infinite; }
@@ -222,6 +246,8 @@ const styles = `
   .om-oss-kontakt-desc { font-size: 14px; color: rgba(159,201,168,0.8); line-height: 1.7; }
   .om-oss-kontakt-epost { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--gold); text-decoration: none; display: block; margin-top: 10px; transition: letter-spacing 0.3s; }
   .om-oss-kontakt-epost:hover { letter-spacing: 0.04em; }
+
+  /* KALKULATOR */
   .kalkulator-view { padding: 100px 80px 80px; max-width: 980px; margin: 0 auto; }
   .kalkulator-back { display: flex; align-items: center; gap: 10px; font-size: 11px; color: var(--muted); cursor: pointer; margin-bottom: 36px; background: none; border: none; font-family: 'Inter', sans-serif; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.3s; }
   .kalkulator-back:hover { color: var(--text); gap: 16px; }
@@ -233,6 +259,8 @@ const styles = `
   .kalkulator-hero-tag { font-size: 10px; text-transform: uppercase; letter-spacing: 0.25em; color: var(--gold); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
   .kalkulator-hero-tag::before { content: ''; display: inline-block; width: 20px; height: 1px; background: var(--gold); }
   .kalkulator-hero-title { font-family: 'Playfair Display', serif; font-size: 48px; color: var(--cream); }
+
+  /* FOOTER */
   footer { border-top: 1px solid rgba(26,46,30,0.8); padding: 32px 80px; display: flex; justify-content: space-between; align-items: center; background: var(--dark2); }
   .footer-logo { display: flex; align-items: center; gap: 12px; cursor: pointer; }
   .footer-logo-icon { position: relative; width: 28px; height: 28px; }
@@ -244,6 +272,80 @@ const styles = `
   .footer-logo-by { font-family: 'Inter', sans-serif; font-size: 6px; color: #2a3a2e; letter-spacing: 0.12em; text-transform: uppercase; }
   .footer-disclaimer { font-size: 11px; color: #2a3a2e; max-width: 400px; text-align: right; }
   .teller { display: inline-block; }
+
+  /* ===================== MOBILE MEDIA QUERIES ===================== */
+
+  @media (max-width: 768px) {
+    /* NAV */
+    .nav { padding: 16px 20px; }
+    .nav.scrolled { padding: 12px 20px; }
+    .nav-links { display: none; }
+    .nav-hamburger { display: flex; }
+    .nav-logo-sub { display: none; }
+    .nav-logo-by { display: none; }
+    .login-bruker { display: none; }
+    .tilgang-badge { display: none; }
+
+    /* HERO */
+    .hero-content { padding: 0 24px; max-width: 100%; }
+    .hero-sub { font-size: 14px; }
+    .hero-btns { flex-direction: column; gap: 10px; }
+    .btn-primary, .btn-secondary { width: 100%; text-align: center; padding: 14px 24px; }
+    .hero-stats { position: static; display: grid; grid-template-columns: repeat(3, 1fr); animation: fadeUp 1s 1s cubic-bezier(0.4,0,0.2,1) forwards; }
+    .hero-stat { padding: 16px 12px; border-left: none; border-top: 1px solid rgba(31,78,46,0.3); }
+    .hero-stat-num { font-size: 24px; }
+    .hero-scroll { display: none; }
+
+    /* BRANSJER */
+    .bransjer-section { padding: 60px 20px; }
+    .section-title { font-size: 32px; margin-bottom: 32px; }
+    .bransje-grid { grid-template-columns: 1fr; gap: 16px; }
+    .bransje-img-wrap { height: 180px; }
+
+    /* PRISER */
+    .pris-section { padding: 60px 20px; }
+    .pris-grid { grid-template-columns: 1fr; }
+    .pris-slik { grid-template-columns: 1fr; }
+    .pris-kort { padding: 32px 24px; }
+
+    /* HVORFOR */
+    .hvorfor-section { padding: 60px 20px; grid-template-columns: 1fr; gap: 40px; }
+    .hvorfor-img-wrap { height: 280px; }
+    .hvorfor-img-frame { display: none; }
+    .hvorfor-img-frame2 { display: none; }
+    .hvorfor-title { font-size: 28px; }
+
+    /* OM OSS */
+    .om-oss-hero { padding: 100px 24px 60px; }
+    .om-oss-body { padding: 40px 24px; }
+    .om-oss-sitat { font-size: 18px; padding: 16px 20px; }
+    .om-oss-verdier { grid-template-columns: 1fr; }
+    .om-oss-kontakt { padding: 40px 24px; }
+    .om-oss-kontakt-inner { flex-direction: column; align-items: flex-start; }
+    .om-oss-kontakt-epost { font-size: 16px; }
+
+    /* KALKULATOR */
+    .kalkulator-view { padding: 80px 16px 40px; }
+    .kalkulator-hero { height: 180px; }
+    .kalkulator-hero-content { padding: 0 24px; }
+    .kalkulator-hero-title { font-size: 28px; }
+
+    /* FOOTER */
+    footer { padding: 24px 20px; flex-direction: column; gap: 16px; text-align: center; }
+    .footer-disclaimer { text-align: center; max-width: 100%; }
+
+    /* LOGIN MODAL */
+    .login-boks { padding: 40px 24px; margin: 16px; }
+    .login-tittel { font-size: 26px; }
+  }
+
+  @media (max-width: 480px) {
+    .hero-content { padding: 0 16px; }
+    .bransjer-section { padding: 48px 16px; }
+    .pris-section { padding: 48px 16px; }
+    .kalkulator-view { padding: 72px 12px 32px; }
+    .section-title { font-size: 28px; }
+  }
 `;
 
 // Hjelpefunksjoner for å lese/skrive kalkulator-state til sessionStorage
@@ -578,6 +680,7 @@ export default function App() {
   const [side, setSide] = useState(getSideFromUrl);
   const [aktivBransje, setAktivBransje] = useState(getBransjeFromUrl);
   const [animKey, setAnimKey] = useState(0);
+  const [mobilMenyAapen, setMobilMenyAapen] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -628,6 +731,15 @@ export default function App() {
       ) : (
         <button className="nav-cta" onClick={() => setVisLogin(true)}><span>Logg inn</span></button>
       )}
+      <button
+        className={`nav-hamburger ${mobilMenyAapen ? 'aapen' : ''}`}
+        onClick={() => setMobilMenyAapen(!mobilMenyAapen)}
+        aria-label="Meny"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
     </div>
   );
 
@@ -636,6 +748,7 @@ export default function App() {
     setAktivBransje(bransje);
     setSide('kalkulator');
     setAnimKey(k => k + 1);
+    setMobilMenyAapen(false);
     window.history.pushState({}, '', `/kalkulator/${bransje.id}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -644,6 +757,7 @@ export default function App() {
     setSide('hjem');
     setAktivBransje(null);
     setAnimKey(k => k + 1);
+    setMobilMenyAapen(false);
     window.history.pushState({}, '', '/');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -651,6 +765,7 @@ export default function App() {
   const gaaOmOss = () => {
     setSide('om-oss');
     setAnimKey(k => k + 1);
+    setMobilMenyAapen(false);
     window.history.pushState({}, '', '/om-oss');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -658,6 +773,7 @@ export default function App() {
   const gaaBudsjettark = () => {
     setSide('budsjettark');
     setAnimKey(k => k + 1);
+    setMobilMenyAapen(false);
     window.history.pushState({}, '', '/budsjettark');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -665,6 +781,7 @@ export default function App() {
   const gaaPriser = () => {
     setSide('priser');
     setAnimKey(k => k + 1);
+    setMobilMenyAapen(false);
     window.history.pushState({}, '', '/priser');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -672,6 +789,7 @@ export default function App() {
   const gaaInfo = () => {
     setSide('info');
     setAnimKey(k => k + 1);
+    setMobilMenyAapen(false);
     window.history.pushState({}, '', '/om-verktoyet');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -686,12 +804,28 @@ export default function App() {
     </div>
   );
 
+  const MobilMeny = () => (
+    <div className={`nav-mobil-meny ${mobilMenyAapen ? 'synlig' : ''}`}>
+      <span className="nav-mobil-link" onClick={() => { gaaHjem(); setTimeout(() => document.getElementById('bransjer')?.scrollIntoView({ behavior: 'smooth' }), 300); }}>Bransjer</span>
+      <span className="nav-mobil-link" onClick={gaaInfo}>Om verktøyet</span>
+      <span className="nav-mobil-link" onClick={gaaPriser}>Priser</span>
+      <span className="nav-mobil-link" onClick={gaaOmOss}>Om oss</span>
+      <span className="nav-mobil-link" onClick={gaaBudsjettark}>Budsjettark</span>
+      {bruker ? (
+        <span className="nav-mobil-link" onClick={() => { supabase.auth.signOut(); setMobilMenyAapen(false); }} style={{ color: '#c84040', fontSize: '16px' }}>Logg ut</span>
+      ) : (
+        <span className="nav-mobil-link" onClick={() => { setVisLogin(true); setMobilMenyAapen(false); }} style={{ color: 'var(--gold)' }}>Logg inn</span>
+      )}
+    </div>
+  );
+
   // PRISSIDE
   if (side === 'priser') {
     return (
       <div className="app">
         <style>{styles}</style>
         {visLogin && <LoginModal onLogin={setBruker} onLukk={() => setVisLogin(false)} />}
+        <MobilMeny />
         <nav className="nav"><NavLogo onClick={gaaHjem} /><NavLinks aktivSide="priser" /><NavKnapper /></nav>
         <div className="side-innhold" key={animKey}>
           <PrisSeksjon onKomIgang={() => { gaaHjem(); setTimeout(() => aapneBransje(bransjer[0]), 300); }} bruker={bruker} tilgang={tilgang} onVisLogin={() => setVisLogin(true)} erEgenSide={true} />
@@ -707,6 +841,7 @@ export default function App() {
       <div className="app">
         <style>{styles}</style>
         {visLogin && <LoginModal onLogin={setBruker} onLukk={() => setVisLogin(false)} />}
+        <MobilMeny />
         <nav className="nav"><NavLogo onClick={gaaHjem} /><NavLinks aktivSide="info" /><NavKnapper /></nav>
         <div className="side-innhold" key={animKey}>
           <div className="om-oss-hero">
@@ -725,7 +860,7 @@ export default function App() {
                 <span style={{ display: 'inline-block', width: '24px', height: '1px', background: 'var(--brg)' }}></span>
                 Hva kalkulatorene gjør
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1px', background: 'var(--cream-dark)' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1px', background: 'var(--cream-dark)' }}>
                 {[
                   { ikon: '🏠', tittel: 'Eiendom privat', desc: 'Kontantstrøm, gjeldsgrad, stresstest og 10-års prognose for utleie i eget navn.' },
                   { ikon: '🏢', tittel: 'Eiendom via AS', desc: 'Næringslån, EK-krav, refinansiering og veien til porteføljeinvestor.' },
@@ -750,7 +885,7 @@ export default function App() {
               <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '28px', color: 'var(--cream)', marginBottom: '20px', lineHeight: '1.2' }}>Dette er starten,<br />ikke slutten</div>
               <p style={{ fontSize: '14px', color: '#4a6a4e', lineHeight: '1.8', marginBottom: '20px', maxWidth: '600px' }}>Invest Tools er lansert tidlig med vilje. Vi tror på å bygge i det åpne, med tilbakemelding fra de som faktisk bruker verktøyet. Kalkulatorene fungerer og er basert på gjeldende norske regler, men det er mye vi ønsker å legge til.</p>
               <p style={{ fontSize: '14px', color: '#4a6a4e', lineHeight: '1.8', maxWidth: '600px' }}>Vi jobber kontinuerlig med nye bransjer, bedre beregninger og mer funksjonalitet. Det du ser i dag er bare et utgangspunkt.</p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2px', background: 'rgba(31,78,46,0.3)', marginTop: '32px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '2px', background: 'rgba(31,78,46,0.3)', marginTop: '32px' }}>
                 {[{ num: '5', lbl: 'Kalkulatorer i dag' }, { num: '2+', lbl: 'Nye bransjer på vei' }, { num: '∞', lbl: 'Forbedringer planlagt' }].map((s, i) => (
                   <div key={i} style={{ background: '#0a1a0c', padding: '24px', textAlign: 'center' }}>
                     <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '36px', color: 'var(--gold)' }}>{s.num}</div>
@@ -766,7 +901,7 @@ export default function App() {
               </div>
               <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '28px', color: 'var(--dark)', marginBottom: '16px', lineHeight: '1.2' }}>Din bransje mangler?<br />Si ifra.</div>
               <p className="om-oss-tekst">Vi ønsker innspill på nye bransjer, mangler i eksisterende kalkulatorer og alt som kan gjøre verktøyet mer nyttig for deg. Ingen tilbakemelding er for liten, og alle henvendelser leses.</p>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1px', background: 'var(--cream-dark)', marginTop: '32px', marginBottom: '32px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1px', background: 'var(--cream-dark)', marginTop: '32px', marginBottom: '32px' }}>
                 {[
                   { ikon: '🏗️', tekst: 'Ønsker du en ny bransje? Send oss navnet og hva du vil vite.' },
                   { ikon: '🔧', tekst: 'Noe som ikke stemmer eller mangler i en kalkulator? Fortell oss.' },
@@ -820,6 +955,7 @@ export default function App() {
       <div className="app">
         <style>{styles}</style>
         {visLogin && <LoginModal onLogin={setBruker} onLukk={() => setVisLogin(false)} />}
+        <MobilMeny />
         <nav className="nav"><NavLogo onClick={gaaHjem} /><NavLinks aktivSide="budsjettark" /><NavKnapper /></nav>
         <div className="side-innhold" key={animKey} style={{ padding: '100px 80px 80px', maxWidth: '1200px', margin: '0 auto' }}>
           <button className="kalkulator-back" onClick={gaaHjem}>← Tilbake</button>
@@ -836,6 +972,7 @@ export default function App() {
       <div className="app">
         <style>{styles}</style>
         {visLogin && <LoginModal onLogin={setBruker} onLukk={() => setVisLogin(false)} />}
+        <MobilMeny />
         <nav className="nav"><NavLogo onClick={gaaHjem} /><NavLinks aktivSide="om-oss" /><NavKnapper /></nav>
         <div className="side-innhold" key={animKey}>
           <div className="om-oss-hero">
@@ -890,6 +1027,7 @@ export default function App() {
       <div className="app">
         <style>{styles}</style>
         {visLogin && <LoginModal onLogin={setBruker} onLukk={() => setVisLogin(false)} />}
+        <MobilMeny />
         <nav className="nav"><NavLogo onClick={gaaHjem} /><NavLinks aktivSide="" /><NavKnapper /></nav>
         <div className="side-innhold" key={animKey}>
           <div className="kalkulator-view">
@@ -919,6 +1057,7 @@ export default function App() {
     <div className="app">
       <style>{styles}</style>
       {visLogin && <LoginModal onLogin={setBruker} onLukk={() => setVisLogin(false)} />}
+      <MobilMeny />
       <nav className="nav"><NavLogo onClick={gaaHjem} /><NavLinks aktivSide="bransjer" /><NavKnapper /></nav>
       <div className="side-innhold" key={animKey}>
         <section className="hero">
