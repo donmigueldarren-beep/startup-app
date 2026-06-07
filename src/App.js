@@ -434,7 +434,8 @@ const bransjer = [
   { id: 'eiendom-sammenlign', num: '03', navn: 'Privat vs AS', desc: 'Sammenlign begge alternativene side om side med dine egne tall.', tags: ['Sammenligning', 'AS vs privat', 'Analyse'], img: 'https://images.unsplash.com/photo-1554469384-e58fac16e23a?w=800&q=80', kalkulatorImg: 'https://images.unsplash.com/photo-1554469384-e58fac16e23a?w=1200&q=80', coming: false },
   { id: 'bil', num: '04', navn: 'Bilutleie', desc: 'Fra enkeltbil til flåte, finn break-even og avkastning på kapitalen.', tags: ['Flåte', 'ROI', 'Break-even'], img: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&q=80', kalkulatorImg: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=1200&q=80', coming: false },
   { id: 'salong', num: '05', navn: 'Salong', desc: 'Frisør, negler, hudpleie, finn lønnsomheten før du signerer leiekontrakten.', tags: ['Frisør', 'Negler', 'Break-even'], img: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&q=80', kalkulatorImg: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1200&q=80', coming: false },
-  { id: 'korttid', num: '06', navn: 'Korttidsutleie', desc: 'Airbnb og korttidsutleie, sammenlign mot langtidsleie og finn beste strategi.', tags: ['Airbnb', 'Sesong'], img: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80', coming: true }
+  { id: 'korttid', num: '06', navn: 'Korttidsutleie', desc: 'Airbnb og korttidsutleie, sammenlign mot langtidsleie og finn beste strategi.', tags: ['Airbnb', 'Sesong'], img: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80', coming: true },
+  { id: 'pt', num: '07', navn: 'Personlig trener', desc: 'ENK eller AS? Finn den beste strukturen for din PT-virksomhet og se hva du sitter igjen med.', tags: ['ENK', 'AS', 'Skatt'], img: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80', coming: true },
 ];
 
 function getSideFromUrl() {
@@ -858,7 +859,7 @@ export default function App() {
             ))}
           </div>
           <div className="bransje-more reveal">
-            <div className="bransje-more-text">Korttidsutleie, franchise, konsulent og mer kommer snart</div>
+            <div className="bransje-more-text">Korttidsutleie, PT, franchise og mer kommer snart</div>
             <span style={{ color: 'var(--cream-dark)', fontSize: '20px' }}>→</span>
           </div>
         </section>
