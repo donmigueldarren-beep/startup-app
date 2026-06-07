@@ -441,7 +441,7 @@ const bransjer = [
 function getSideFromUrl() {
   const path = window.location.pathname;
   if (path === '/om-oss') return 'om-oss';
-  if (path === '/om-verktøyet' || path === '/om-verktoyet') return 'info';
+  if (path === '/om-verktoyet') return 'info';
   if (path === '/priser') return 'priser';
   if (path === '/budsjettark') return 'budsjettark';
   if (path.startsWith('/kalkulator/')) return 'kalkulator';
@@ -479,35 +479,22 @@ function PrisSeksjon({ onKomIgang, bruker, tilgang, onVisLogin, erEgenSide = fal
 
   const planer = [
     {
-      plan: 'Gratis',
-      pris: '0',
-      desc: 'Kom i gang og regn på tallene dine.',
-      populær: false,
+      plan: 'Gratis', pris: '0', desc: 'Kom i gang og regn på tallene dine.', populær: false,
       funksjoner: ['Alle 5 kalkulatorer', 'Månedlig kontantstrøm', 'Oppstartskostnader'],
       ikkeInkludert: ['10-års prognose', 'Neste bolig kalkulator', 'Banksjekk og stresstest', 'AI-assistent (Marcel, Colette, René)', 'Budsjettark med eksport'],
       knappTekst: 'Start gratis', knappType: 'standard', knappPlan: null,
     },
     {
-      plan: 'Basis',
-      pris: '49',
-      desc: 'For deg som vil planlegge langsiktig.',
-      populær: false,
+      plan: 'Basis', pris: '49', desc: 'For deg som vil planlegge langsiktig.', populær: false,
       funksjoner: ['Alt i gratis', '10-års prognose', 'Neste bolig kalkulator', 'Banksjekk og stresstest', 'Tidlig tilgang til nye bransjer'],
       ikkeInkludert: ['AI-assistent (Marcel, Colette, René)', 'Budsjettark med eksport'],
-      knappTekst: tilgang === 'basis' ? 'Din nåværende plan' : 'Velg Basis',
-      knappType: 'standard',
-      knappPlan: 'basis',
+      knappTekst: tilgang === 'basis' ? 'Din nåværende plan' : 'Velg Basis', knappType: 'standard', knappPlan: 'basis',
     },
     {
-      plan: 'Pro',
-      pris: '99',
-      desc: 'Alt du trenger for å ta gode investeringsbeslutninger.',
-      populær: true,
+      plan: 'Pro', pris: '99', desc: 'Alt du trenger for å ta gode investeringsbeslutninger.', populær: true,
       funksjoner: ['Alt i Basis', 'AI-assistent Marcel for eiendom', 'AI-assistent Colette for salong', 'AI-assistent René for bilutleie', 'Budsjettark forhåndsutfylt med dine tall', 'Eksport til Excel og PDF', 'Tidlig tilgang til nye bransjer'],
       ikkeInkludert: [],
-      knappTekst: tilgang === 'pro' ? 'Din nåværende plan' : 'Velg Pro',
-      knappType: 'gull',
-      knappPlan: 'pro',
+      knappTekst: tilgang === 'pro' ? 'Din nåværende plan' : 'Velg Pro', knappType: 'gull', knappPlan: 'pro',
     },
   ];
 
@@ -552,10 +539,7 @@ function PrisSeksjon({ onKomIgang, bruker, tilgang, onVisLogin, erEgenSide = fal
             <button
               className={`pris-knapp ${p.knappType === 'gull' ? 'gull' : ''}`}
               disabled={lasterBetaling !== null || (p.knappPlan && tilgang === p.knappPlan)}
-              onClick={() => {
-                if (!p.knappPlan) { onKomIgang(); return; }
-                startBetaling(p.knappPlan);
-              }}
+              onClick={() => { if (!p.knappPlan) { onKomIgang(); return; } startBetaling(p.knappPlan); }}
             >
               {lasterBetaling === p.knappPlan ? 'Laster...' : p.knappTekst}
             </button>
@@ -593,11 +577,7 @@ export default function App() {
   }, []);
 
   async function hentTilgang(epost) {
-    const { data } = await supabase
-      .from('brukere')
-      .select('tilgang')
-      .eq('epost', epost)
-      .single();
+    const { data } = await supabase.from('brukere').select('tilgang').eq('epost', epost).single();
     if (data) setTilgang(data.tilgang);
     else setTilgang('gratis');
   }
@@ -685,6 +665,7 @@ export default function App() {
       <span className="nav-link" onClick={gaaInfo} style={aktivSide === 'info' ? { color: 'var(--gold)' } : {}}>Om verktøyet</span>
       <span className="nav-link" onClick={gaaPriser} style={aktivSide === 'priser' ? { color: 'var(--gold)' } : {}}>Priser</span>
       <span className="nav-link" onClick={gaaOmOss} style={aktivSide === 'om-oss' ? { color: 'var(--gold)' } : {}}>Om oss</span>
+      <span className="nav-link" onClick={gaaBudsjettark} style={aktivSide === 'budsjettark' ? { color: 'var(--gold)' } : {}}>Budsjettark</span>
     </div>
   );
 
@@ -694,23 +675,10 @@ export default function App() {
       <div className="app">
         <style>{styles}</style>
         {visLogin && <LoginModal onLogin={setBruker} onLukk={() => setVisLogin(false)} />}
-        <nav className="nav">
-          <NavLogo onClick={gaaHjem} />
-          <NavLinks aktivSide="priser" />
-          <NavKnapper />
-        </nav>
+        <nav className="nav"><NavLogo onClick={gaaHjem} /><NavLinks aktivSide="priser" /><NavKnapper /></nav>
         <div className="side-innhold" key={animKey}>
-          <PrisSeksjon
-            onKomIgang={() => { gaaHjem(); setTimeout(() => aapneBransje(bransjer[0]), 300); }}
-            bruker={bruker}
-            tilgang={tilgang}
-            onVisLogin={() => setVisLogin(true)}
-            erEgenSide={true}
-          />
-          <footer>
-            <FooterLogo />
-            <div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning.</div>
-          </footer>
+          <PrisSeksjon onKomIgang={() => { gaaHjem(); setTimeout(() => aapneBransje(bransjer[0]), 300); }} bruker={bruker} tilgang={tilgang} onVisLogin={() => setVisLogin(true)} erEgenSide={true} />
+          <footer><FooterLogo /><div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning.</div></footer>
         </div>
       </div>
     );
@@ -722,13 +690,8 @@ export default function App() {
       <div className="app">
         <style>{styles}</style>
         {visLogin && <LoginModal onLogin={setBruker} onLukk={() => setVisLogin(false)} />}
-        <nav className="nav">
-          <NavLogo onClick={gaaHjem} />
-          <NavLinks aktivSide="info" />
-          <NavKnapper />
-        </nav>
+        <nav className="nav"><NavLogo onClick={gaaHjem} /><NavLinks aktivSide="info" /><NavKnapper /></nav>
         <div className="side-innhold" key={animKey}>
-          {/* Hero */}
           <div className="om-oss-hero">
             <div className="om-oss-hero-accent"></div>
             <div className="om-oss-inner">
@@ -736,14 +699,10 @@ export default function App() {
               <h1 className="om-oss-title reveal reveal-delay-1">Tallene du trenger,<br />før du bestemmer deg</h1>
             </div>
           </div>
-
-          {/* Hva er Invest Tools */}
           <div className="om-oss-body">
             <p className="om-oss-tekst reveal">Invest Tools er et norsk verktøy for deg som vurderer å starte en bedrift eller investere i eiendom. Du fyller inn tallene dine, og kalkulatoren viser deg hva du faktisk sitter igjen med, om du klarer bankens krav, og om ideen din er lønnsom.</p>
             <p className="om-oss-tekst reveal">Vi dekker i dag eiendomsinvestering (privat og via AS), bilutleie og salong. Nye bransjer kommer løpende.</p>
             <div className="om-oss-sitat reveal">Dette er en tidlig versjon. Vi er langt fra ferdige, og det er poenget.</div>
-
-            {/* Hva kalkulatorene gjør */}
             <div style={{ margin: '48px 0' }}>
               <div style={{ fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--brg)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <span style={{ display: 'inline-block', width: '24px', height: '1px', background: 'var(--brg)' }}></span>
@@ -768,8 +727,6 @@ export default function App() {
                 ))}
               </div>
             </div>
-
-            {/* Tidlig versjon / beta */}
             <div style={{ background: 'var(--dark)', padding: '48px', margin: '48px 0', position: 'relative', overflow: 'hidden' }}>
               <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: 'var(--gold)' }}></div>
               <div style={{ fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '16px' }}>Tidlig versjon</div>
@@ -777,11 +734,7 @@ export default function App() {
               <p style={{ fontSize: '14px', color: '#4a6a4e', lineHeight: '1.8', marginBottom: '20px', maxWidth: '600px' }}>Invest Tools er lansert tidlig med vilje. Vi tror på å bygge i det åpne, med tilbakemelding fra de som faktisk bruker verktøyet. Kalkulatorene fungerer og er basert på gjeldende norske regler, men det er mye vi ønsker å legge til.</p>
               <p style={{ fontSize: '14px', color: '#4a6a4e', lineHeight: '1.8', maxWidth: '600px' }}>Vi jobber kontinuerlig med nye bransjer, bedre beregninger og mer funksjonalitet. Det du ser i dag er bare et utgangspunkt.</p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2px', background: 'rgba(31,78,46,0.3)', marginTop: '32px' }}>
-                {[
-                  { num: '5', lbl: 'Kalkulatorer i dag' },
-                  { num: '2+', lbl: 'Nye bransjer på vei' },
-                  { num: '∞', lbl: 'Forbedringer planlagt' },
-                ].map((s, i) => (
+                {[{ num: '5', lbl: 'Kalkulatorer i dag' }, { num: '2+', lbl: 'Nye bransjer på vei' }, { num: '∞', lbl: 'Forbedringer planlagt' }].map((s, i) => (
                   <div key={i} style={{ background: '#0a1a0c', padding: '24px', textAlign: 'center' }}>
                     <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '36px', color: 'var(--gold)' }}>{s.num}</div>
                     <div style={{ fontSize: '10px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#3a6a46', marginTop: '6px' }}>{s.lbl}</div>
@@ -789,8 +742,6 @@ export default function App() {
                 ))}
               </div>
             </div>
-
-            {/* Send inn ønsker */}
             <div style={{ margin: '48px 0' }}>
               <div style={{ fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--brg)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <span style={{ display: 'inline-block', width: '24px', height: '1px', background: 'var(--brg)' }}></span>
@@ -810,12 +761,9 @@ export default function App() {
                   </div>
                 ))}
               </div>
-              <button className="btn-primary" onClick={() => window.location.href = 'mailto:kontakt@addoninvest.no'}>
-                Send oss en e-post
-              </button>
+              <button className="btn-primary" onClick={() => window.location.href = 'mailto:kontakt@addoninvest.no'}>Send oss en e-post</button>
               <span style={{ fontSize: '13px', color: 'var(--muted)', marginLeft: '16px' }}>kontakt@addoninvest.no</span>
             </div>
-
             <div className="om-oss-verdier">
               {[
                 { num: '01', tittel: 'Gratis å starte', desc: 'Alle kalkulatorer er gratis. Betalte funksjoner er tillegg, ikke krav.' },
@@ -829,12 +777,8 @@ export default function App() {
                 </div>
               ))}
             </div>
-
-            <button className="btn-primary reveal" onClick={() => aapneBransje(bransjer[0])}>
-              Start en beregning
-            </button>
+            <button className="btn-primary reveal" onClick={() => aapneBransje(bransjer[0])}>Start en beregning</button>
           </div>
-
           <div className="om-oss-kontakt">
             <div className="om-oss-kontakt-inner">
               <div>
@@ -847,48 +791,35 @@ export default function App() {
               </div>
             </div>
           </div>
-
-          <footer>
-            <FooterLogo />
-            <div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning.</div>
-          </footer>
+          <footer><FooterLogo /><div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning.</div></footer>
         </div>
       </div>
     );
   }
 
+  // BUDSJETTARK
   if (side === 'budsjettark') {
     return (
       <div className="app">
         <style>{styles}</style>
         {visLogin && <LoginModal onLogin={setBruker} onLukk={() => setVisLogin(false)} />}
-        <nav className="nav">
-          <NavLogo onClick={gaaHjem} />
-          <NavLinks aktivSide="" />
-          <NavKnapper />
-        </nav>
+        <nav className="nav"><NavLogo onClick={gaaHjem} /><NavLinks aktivSide="budsjettark" /><NavKnapper /></nav>
         <div className="side-innhold" key={animKey} style={{ padding: '100px 80px 80px', maxWidth: '1200px', margin: '0 auto' }}>
           <button className="kalkulator-back" onClick={gaaHjem}>← Tilbake</button>
           <Budsjettark tilgang={tilgang} onVisLogin={() => setVisLogin(true)} onTilbake={gaaHjem} />
         </div>
-        <footer>
-          <FooterLogo />
-          <div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning.</div>
-        </footer>
+        <footer><FooterLogo /><div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning.</div></footer>
       </div>
     );
   }
 
+  // OM OSS
   if (side === 'om-oss') {
     return (
       <div className="app">
         <style>{styles}</style>
         {visLogin && <LoginModal onLogin={setBruker} onLukk={() => setVisLogin(false)} />}
-        <nav className="nav">
-          <NavLogo onClick={gaaHjem} />
-          <NavLinks aktivSide="om-oss" />
-          <NavKnapper />
-        </nav>
+        <nav className="nav"><NavLogo onClick={gaaHjem} /><NavLinks aktivSide="om-oss" /><NavKnapper /></nav>
         <div className="side-innhold" key={animKey}>
           <div className="om-oss-hero">
             <div className="om-oss-hero-accent"></div>
@@ -929,25 +860,19 @@ export default function App() {
               </div>
             </div>
           </div>
-          <footer>
-            <FooterLogo />
-            <div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning.</div>
-          </footer>
+          <footer><FooterLogo /><div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning.</div></footer>
         </div>
       </div>
     );
   }
 
+  // KALKULATOR
   if (side === 'kalkulator' && aktivBransje) {
     return (
       <div className="app">
         <style>{styles}</style>
         {visLogin && <LoginModal onLogin={setBruker} onLukk={() => setVisLogin(false)} />}
-        <nav className="nav">
-          <NavLogo onClick={gaaHjem} />
-          <NavLinks aktivSide="" />
-          <NavKnapper />
-        </nav>
+        <nav className="nav"><NavLogo onClick={gaaHjem} /><NavLinks aktivSide="" /><NavKnapper /></nav>
         <div className="side-innhold" key={animKey}>
           <div className="kalkulator-view">
             <button className="kalkulator-back" onClick={gaaHjem}>← Tilbake</button>
@@ -965,15 +890,13 @@ export default function App() {
             {aktivBransje.id === 'bil' && <BilKalkulator tilgang={tilgang} onVisLogin={() => setVisLogin(true)} />}
             {aktivBransje.id === 'salong' && <SalongKalkulator tilgang={tilgang} onVisLogin={() => setVisLogin(true)} />}
           </div>
-          <footer>
-            <FooterLogo />
-            <div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning.</div>
-          </footer>
+          <footer><FooterLogo /><div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning.</div></footer>
         </div>
       </div>
     );
   }
 
+  // HJEM
   return (
     <div className="app">
       <style>{styles}</style>
@@ -1003,11 +926,7 @@ export default function App() {
             <div className="hero-scroll-text">Scroll</div>
           </div>
           <div className="hero-stats">
-            {[
-              { slutt: 5, suffix: '', lbl: 'Bransjer' },
-              { slutt: 49, suffix: ' kr', lbl: 'Fra/mnd' },
-              { slutt: 100, suffix: '%', lbl: 'Konfidensielt' }
-            ].map((s, i) => (
+            {[{ slutt: 5, suffix: '', lbl: 'Bransjer' }, { slutt: 49, suffix: ' kr', lbl: 'Fra/mnd' }, { slutt: 100, suffix: '%', lbl: 'Konfidensielt' }].map((s, i) => (
               <div className="hero-stat" key={i}>
                 <span className="hero-stat-num"><Teller slutt={s.slutt} suffix={s.suffix} /></span>
                 <span className="hero-stat-lbl">{s.lbl}</span>
@@ -1041,12 +960,7 @@ export default function App() {
             <span style={{ color: 'var(--cream-dark)', fontSize: '20px' }}>→</span>
           </div>
         </section>
-        <PrisSeksjon
-          onKomIgang={() => aapneBransje(bransjer[0])}
-          bruker={bruker}
-          tilgang={tilgang}
-          onVisLogin={() => setVisLogin(true)}
-        />
+        <PrisSeksjon onKomIgang={() => aapneBransje(bransjer[0])} bruker={bruker} tilgang={tilgang} onVisLogin={() => setVisLogin(true)} />
         <section className="hvorfor-section">
           <div className="hvorfor-img-wrap reveal-left">
             <img className="hvorfor-img" src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80" alt="Investor" />
