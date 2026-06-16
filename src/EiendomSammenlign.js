@@ -15,15 +15,7 @@ function LaasBoks({ krever, onVisLogin }) {
           ? 'Denne seksjonen krever Basis (49 kr/mnd) eller Pro (99 kr/mnd).'
           : 'Denne seksjonen krever Pro (99 kr/mnd).'}
       </div>
-      <button
-        onClick={onVisLogin}
-        style={{
-          background: '#c9a84c', color: '#0f1a12', border: 'none',
-          padding: '12px 28px', fontFamily: 'Inter, sans-serif',
-          fontSize: '11px', letterSpacing: '0.1em',
-          textTransform: 'uppercase', cursor: 'pointer', fontWeight: '500'
-        }}
-      >
+      <button onClick={onVisLogin} style={{ background: '#c9a84c', color: '#0f1a12', border: 'none', padding: '12px 28px', fontFamily: 'Inter, sans-serif', fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', fontWeight: '500' }}>
         Logg inn / Oppgrader
       </button>
     </div>
@@ -157,6 +149,32 @@ const styles = `
   .marcel-chat-send { background: var(--brg); color: var(--cream); border: none; padding: 10px 20px; font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; }
   .marcel-chat-send:hover { background: #2a6640; }
   .marcel-chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* ===================== MOBILE ===================== */
+  @media (max-width: 768px) {
+    .es-step { padding: 20px 16px; }
+    .es-grid { grid-template-columns: 1fr; }
+    .es-compare { grid-template-columns: 1fr; }
+    .ep-kapital-grid { grid-template-columns: 1fr; }
+    .ep-neste-bolig-input-wrap { grid-template-columns: 1fr; }
+    .ep-neste-sammenlign { grid-template-columns: 1fr; }
+    .ep-graf-metrics { grid-template-columns: 1fr 1fr; }
+    .ep-neste-bolig { padding: 20px 16px; }
+    .ep-graf-wrap { padding: 20px 16px; }
+    .marcel-seksjon { padding: 20px 16px; }
+    .ep-table th, .ep-table td { padding: 8px 6px; font-size: 11px; }
+    .ep-aar-tabell th, .ep-aar-tabell td { padding: 6px 4px; font-size: 11px; }
+    .es-line { font-size: 12px; }
+    .es-line .k { font-size: 11px; max-width: 55%; }
+    .es-result { font-size: 22px; }
+  }
+
+  @media (max-width: 480px) {
+    .es-step { padding: 16px 12px; }
+    .ep-graf-metrics { grid-template-columns: 1fr; }
+    .ep-neste-bolig { padding: 16px 12px; }
+    .marcel-seksjon { padding: 16px 12px; }
+  }
 `;
 
 function fmt(n) {
@@ -654,12 +672,12 @@ export default function EiendomSammenlign({ tilgang = 'gratis', onVisLogin = () 
               <thead>
                 <tr>
                   <th>År</th>
-                  <th style={{color:'#7a5a1e'}}>Privat: Egenkapital</th>
-                  <th style={{color:'#7a5a1e'}}>Privat: Total kapital</th>
-                  <th style={{color:'#7a5a1e'}}>Privat: Refinansiering</th>
-                  <th style={{color:'var(--brg)'}}>AS: Egenkapital</th>
-                  <th style={{color:'var(--brg)'}}>AS: Total kapital</th>
-                  <th style={{color:'var(--brg)'}}>AS: Refinansiering</th>
+                  <th style={{color:'#7a5a1e'}}>Privat: EK</th>
+                  <th style={{color:'#7a5a1e'}}>Privat: Kapital</th>
+                  <th style={{color:'#7a5a1e'}}>Privat: Refi</th>
+                  <th style={{color:'var(--brg)'}}>AS: EK</th>
+                  <th style={{color:'var(--brg)'}}>AS: Kapital</th>
+                  <th style={{color:'var(--brg)'}}>AS: Refi</th>
                 </tr>
               </thead>
               <tbody>
@@ -730,35 +748,37 @@ export default function EiendomSammenlign({ tilgang = 'gratis', onVisLogin = () 
               </div>
             </div>
           </div>
-          <table className="ep-aar-tabell">
-            <thead>
-              <tr>
-                <th>År</th>
-                <th style={{color:'#c9a84c'}}>Privat tilgjengelig</th>
-                <th style={{color:'#c9a84c'}}>Privat trenger</th>
-                <th style={{color:'#c9a84c'}}>Privat status</th>
-                <th style={{color:'#9fc9a8'}}>AS tilgjengelig</th>
-                <th style={{color:'#9fc9a8'}}>AS trenger</th>
-                <th style={{color:'#9fc9a8'}}>AS status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {raderPrivat.map((rP, i) => {
-                const rA = raderAS[i];
-                return (
-                  <tr key={rP.aar} className={rP.harRaadNeste || rA.harRaadNeste ? 'kan' : ''}>
-                    <td>År {rP.aar}</td>
-                    <td style={{color: rP.harRaadNeste ? '#9fc9a8' : '#6a9a6e'}}>{fmt(rP.totalTilgjengelig)}</td>
-                    <td>{fmt(nesteTotaltPrivat)}</td>
-                    <td style={{color: rP.harRaadNeste ? '#9fc9a8' : '#c84040'}}>{rP.harRaadNeste ? '✓ Har råd' : fmt(nesteTotaltPrivat - rP.totalTilgjengelig) + ' mangler'}</td>
-                    <td style={{color: rA.harRaadNeste ? '#9fc9a8' : '#6a9a6e'}}>{fmt(rA.totalTilgjengelig)}</td>
-                    <td>{fmt(nesteTotaltAS)}</td>
-                    <td style={{color: rA.harRaadNeste ? '#9fc9a8' : '#c84040'}}>{rA.harRaadNeste ? '✓ Har råd' : fmt(nesteTotaltAS - rA.totalTilgjengelig) + ' mangler'}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <div style={{overflowX:'auto'}}>
+            <table className="ep-aar-tabell">
+              <thead>
+                <tr>
+                  <th>År</th>
+                  <th style={{color:'#c9a84c'}}>Privat tilgjengelig</th>
+                  <th style={{color:'#c9a84c'}}>Privat trenger</th>
+                  <th style={{color:'#c9a84c'}}>Privat status</th>
+                  <th style={{color:'#9fc9a8'}}>AS tilgjengelig</th>
+                  <th style={{color:'#9fc9a8'}}>AS trenger</th>
+                  <th style={{color:'#9fc9a8'}}>AS status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {raderPrivat.map((rP, i) => {
+                  const rA = raderAS[i];
+                  return (
+                    <tr key={rP.aar} className={rP.harRaadNeste || rA.harRaadNeste ? 'kan' : ''}>
+                      <td>År {rP.aar}</td>
+                      <td style={{color: rP.harRaadNeste ? '#9fc9a8' : '#6a9a6e'}}>{fmt(rP.totalTilgjengelig)}</td>
+                      <td>{fmt(nesteTotaltPrivat)}</td>
+                      <td style={{color: rP.harRaadNeste ? '#9fc9a8' : '#c84040'}}>{rP.harRaadNeste ? '✓ Har råd' : fmt(nesteTotaltPrivat - rP.totalTilgjengelig) + ' mangler'}</td>
+                      <td style={{color: rA.harRaadNeste ? '#9fc9a8' : '#6a9a6e'}}>{fmt(rA.totalTilgjengelig)}</td>
+                      <td>{fmt(nesteTotaltAS)}</td>
+                      <td style={{color: rA.harRaadNeste ? '#9fc9a8' : '#c84040'}}>{rA.harRaadNeste ? '✓ Har råd' : fmt(nesteTotaltAS - rA.totalTilgjengelig) + ' mangler'}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       ) : null}
 

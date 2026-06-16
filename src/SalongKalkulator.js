@@ -115,6 +115,28 @@ const styles = `
   .ai-chat-send:hover { background: #2a6640; }
   .ai-chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
   .ai-spark { font-size: 16px; }
+
+  /* ===================== MOBILE ===================== */
+  @media (max-width: 768px) {
+    .sal-step { padding: 20px 16px; }
+    .sal-grid { grid-template-columns: 1fr; }
+    .sal-two-col { grid-template-columns: 1fr; }
+    .sal-metrics { grid-template-columns: 1fr 1fr; }
+    .sal-type-grid { grid-template-columns: repeat(3, 1fr); }
+    .sal-enk-as { grid-template-columns: 1fr; }
+    .ai-seksjon { padding: 20px 16px; }
+    .sal-table th, .sal-table td { padding: 8px 6px; font-size: 11px; }
+    .sal-line { font-size: 12px; }
+    .sal-line .k { font-size: 11px; max-width: 60%; }
+  }
+
+  @media (max-width: 480px) {
+    .sal-step { padding: 16px 12px; }
+    .sal-metrics { grid-template-columns: 1fr; }
+    .sal-type-grid { grid-template-columns: repeat(2, 1fr); }
+    .ai-seksjon { padding: 16px 12px; }
+    .sal-result { font-size: 20px; }
+  }
 `;
 
 const SALONG_TYPER = {
@@ -354,9 +376,7 @@ export default function SalongKalkulator({ tilgang = 'gratis', onVisLogin = () =
       inntekt: omsetning,
       totalKost: totalKost,
       skattSats: skattSats,
-      inntektLinjer: [
-        { navn: `${type.navn} (${behandlingerMnd} behandlinger)`, verdi: omsetning },
-      ],
+      inntektLinjer: [{ navn: `${type.navn} (${behandlingerMnd} behandlinger)`, verdi: omsetning }],
       kostnadLinjer: [
         { navn: 'Husleie', verdi: husleie },
         { navn: `Produkter (${type.produktProsent}%)`, verdi: produktKost },
