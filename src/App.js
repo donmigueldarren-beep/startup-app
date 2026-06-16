@@ -7,6 +7,8 @@ import EiendomSammenlign from './EiendomSammenlign';
 import BilKalkulator from './BilKalkulator';
 import SalongKalkulator from './SalongKalkulator';
 import Budsjettark from './Budsjettark';
+import CookieBanner from './CookieBanner';
+import Personvern from './Personvern';
 import './App.css';
 
 const styles = `
@@ -36,8 +38,6 @@ const styles = `
   .reveal-delay-4 { transition-delay: 0.32s; }
   .reveal-delay-5 { transition-delay: 0.40s; }
   .reveal-delay-6 { transition-delay: 0.48s; }
-
-  /* NAV */
   .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(15,26,18,0.85); backdrop-filter: blur(20px); padding: 18px 48px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(31,78,46,0.25); transition: all 0.4s cubic-bezier(0.4,0,0.2,1); }
   .nav.scrolled { padding: 12px 48px; background: rgba(8,14,9,0.97); border-bottom-color: rgba(201,168,76,0.15); }
   .nav-logo { display: flex; align-items: center; gap: 14px; cursor: pointer; }
@@ -60,8 +60,6 @@ const styles = `
   .nav-cta:hover::before { transform: scaleX(1); }
   .nav-cta:hover { color: var(--dark); border-color: var(--gold); }
   .nav-cta span { position: relative; z-index: 1; }
-
-  /* HAMBURGER MENY */
   .nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; background: none; border: none; }
   .nav-hamburger span { display: block; width: 22px; height: 1px; background: var(--cream); transition: all 0.3s; }
   .nav-hamburger.aapen span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
@@ -71,8 +69,6 @@ const styles = `
   .nav-mobil-meny.synlig { display: flex; }
   .nav-mobil-link { font-size: 22px; color: var(--cream); letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; font-family: 'Playfair Display', serif; transition: color 0.3s; }
   .nav-mobil-link:hover { color: var(--gold); }
-
-  /* LOGIN */
   .login-side { position: fixed; inset: 0; z-index: 200; background: rgba(8,14,9,0.97); display: flex; align-items: center; justify-content: center; animation: fadeInn 0.3s ease; }
   @keyframes fadeInn { from { opacity: 0; } to { opacity: 1; } }
   .login-boks { background: #0a1a0c; border: 1px solid rgba(31,78,46,0.4); padding: 56px 48px; width: 100%; max-width: 440px; position: relative; }
@@ -94,8 +90,6 @@ const styles = `
   .login-bytt:hover { color: var(--cream); }
   .login-bruker { font-size: 11px; color: #3a6a46; letter-spacing: 0.06em; }
   .tilgang-badge { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; background: rgba(201,168,76,0.15); color: var(--gold); padding: 3px 8px; border: 1px solid rgba(201,168,76,0.3); }
-
-  /* HERO */
   .hero { position: relative; height: 100vh; min-height: 600px; overflow: hidden; display: flex; align-items: center; }
   .hero-bg { position: absolute; inset: -20%; background: url('https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1600&q=80') center/cover no-repeat; will-change: transform; }
   .hero-grain { position: absolute; inset: 0; opacity: 0.04; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); background-size: 256px; pointer-events: none; animation: grain 0.8s steps(1) infinite; z-index: 3; }
@@ -127,8 +121,6 @@ const styles = `
   .hero-scroll-line { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--gold), transparent); animation: scrollLine 2s ease-in-out infinite; }
   @keyframes scrollLine { 0%,100% { transform: scaleY(1); opacity: 1; } 50% { transform: scaleY(0.5); opacity: 0.4; } }
   .hero-scroll-text { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: #3a5a3e; writing-mode: vertical-rl; }
-
-  /* BRANSJER */
   .bransjer-section { padding: 140px 80px; background: var(--cream); position: relative; }
   .bransjer-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(to right, transparent, var(--gold), transparent); opacity: 0.3; }
   .section-tag { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--brg); margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
@@ -158,8 +150,6 @@ const styles = `
   .bransje-card:not(.coming):hover .bransje-tag { background: #c8deca; }
   .bransje-more { background: white; padding: 22px 28px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--cream-dark); }
   .bransje-more-text { font-family: 'Playfair Display', serif; font-size: 14px; color: var(--muted); font-style: italic; }
-
-  /* PRISER */
   .pris-section { padding: 120px 80px; background: var(--dark); position: relative; overflow: hidden; }
   .pris-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(to right, transparent, rgba(201,168,76,0.4), transparent); }
   .pris-section::after { content: ''; position: absolute; bottom: -300px; left: 50%; transform: translateX(-50%); width: 800px; height: 600px; background: radial-gradient(circle, rgba(31,78,46,0.08) 0%, transparent 70%); pointer-events: none; }
@@ -193,8 +183,6 @@ const styles = `
   .pris-slik-ikon { font-size: 28px; margin-bottom: 16px; }
   .pris-slik-tittel { font-size: 14px; font-weight: 500; color: var(--cream); margin-bottom: 8px; }
   .pris-slik-desc { font-size: 13px; color: #3a6a46; line-height: 1.65; }
-
-  /* HVORFOR */
   .hvorfor-section { background: var(--dark); padding: 140px 80px; display: grid; grid-template-columns: 1fr 1fr; gap: 100px; align-items: center; position: relative; overflow: hidden; }
   .hvorfor-section::before { content: ''; position: absolute; bottom: -200px; right: -200px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(31,78,46,0.12) 0%, transparent 70%); pointer-events: none; }
   .hvorfor-img-wrap { position: relative; height: 520px; }
@@ -219,8 +207,6 @@ const styles = `
   .hvorfor-item-title { font-size: 14px; font-weight: 500; color: var(--cream); margin-bottom: 4px; transition: color 0.3s; }
   .hvorfor-item:hover .hvorfor-item-title { color: var(--gold); }
   .hvorfor-item-desc { font-size: 13px; color: rgba(90,110,94,0.9); line-height: 1.65; }
-
-  /* OM OSS */
   .om-oss-hero { background: var(--dark); padding: 140px 80px 100px; position: relative; overflow: hidden; }
   .om-oss-hero::before { content: ''; position: absolute; top: -100px; right: -100px; width: 700px; height: 700px; background: radial-gradient(circle, rgba(201,168,76,0.04) 0%, transparent 65%); pointer-events: none; }
   .om-oss-hero-accent { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent 0%, var(--gold) 30%, var(--brg-light) 70%, transparent 100%); background-size: 200% 100%; animation: shimmer 4s linear infinite; }
@@ -246,8 +232,6 @@ const styles = `
   .om-oss-kontakt-desc { font-size: 14px; color: rgba(159,201,168,0.8); line-height: 1.7; }
   .om-oss-kontakt-epost { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--gold); text-decoration: none; display: block; margin-top: 10px; transition: letter-spacing 0.3s; }
   .om-oss-kontakt-epost:hover { letter-spacing: 0.04em; }
-
-  /* KALKULATOR */
   .kalkulator-view { padding: 100px 80px 80px; max-width: 980px; margin: 0 auto; }
   .kalkulator-back { display: flex; align-items: center; gap: 10px; font-size: 11px; color: var(--muted); cursor: pointer; margin-bottom: 36px; background: none; border: none; font-family: 'Inter', sans-serif; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.3s; }
   .kalkulator-back:hover { color: var(--text); gap: 16px; }
@@ -259,8 +243,6 @@ const styles = `
   .kalkulator-hero-tag { font-size: 10px; text-transform: uppercase; letter-spacing: 0.25em; color: var(--gold); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
   .kalkulator-hero-tag::before { content: ''; display: inline-block; width: 20px; height: 1px; background: var(--gold); }
   .kalkulator-hero-title { font-family: 'Playfair Display', serif; font-size: 48px; color: var(--cream); }
-
-  /* FOOTER */
   footer { border-top: 1px solid rgba(26,46,30,0.8); padding: 32px 80px; display: flex; justify-content: space-between; align-items: center; background: var(--dark2); }
   .footer-logo { display: flex; align-items: center; gap: 12px; cursor: pointer; }
   .footer-logo-icon { position: relative; width: 28px; height: 28px; }
@@ -273,10 +255,7 @@ const styles = `
   .footer-disclaimer { font-size: 11px; color: #2a3a2e; max-width: 400px; text-align: right; }
   .teller { display: inline-block; }
 
-  /* ===================== MOBILE MEDIA QUERIES ===================== */
-
   @media (max-width: 768px) {
-    /* NAV */
     .nav { padding: 16px 20px; }
     .nav.scrolled { padding: 12px 20px; }
     .nav-links { display: none; }
@@ -285,8 +264,6 @@ const styles = `
     .nav-logo-by { display: none; }
     .login-bruker { display: none; }
     .tilgang-badge { display: none; }
-
-    /* HERO */
     .hero-content { padding: 0 24px; max-width: 100%; }
     .hero-sub { font-size: 14px; }
     .hero-btns { flex-direction: column; gap: 10px; }
@@ -295,27 +272,19 @@ const styles = `
     .hero-stat { padding: 16px 12px; border-left: none; border-top: 1px solid rgba(31,78,46,0.3); }
     .hero-stat-num { font-size: 24px; }
     .hero-scroll { display: none; }
-
-    /* BRANSJER */
     .bransjer-section { padding: 60px 20px; }
     .section-title { font-size: 32px; margin-bottom: 32px; }
     .bransje-grid { grid-template-columns: 1fr; gap: 16px; }
     .bransje-img-wrap { height: 180px; }
-
-    /* PRISER */
     .pris-section { padding: 60px 20px; }
     .pris-grid { grid-template-columns: 1fr; }
     .pris-slik { grid-template-columns: 1fr; }
     .pris-kort { padding: 32px 24px; }
-
-    /* HVORFOR */
     .hvorfor-section { padding: 60px 20px; grid-template-columns: 1fr; gap: 40px; }
     .hvorfor-img-wrap { height: 280px; }
     .hvorfor-img-frame { display: none; }
     .hvorfor-img-frame2 { display: none; }
     .hvorfor-title { font-size: 28px; }
-
-    /* OM OSS */
     .om-oss-hero { padding: 100px 24px 60px; }
     .om-oss-body { padding: 40px 24px; }
     .om-oss-sitat { font-size: 18px; padding: 16px 20px; }
@@ -323,18 +292,12 @@ const styles = `
     .om-oss-kontakt { padding: 40px 24px; }
     .om-oss-kontakt-inner { flex-direction: column; align-items: flex-start; }
     .om-oss-kontakt-epost { font-size: 16px; }
-
-    /* KALKULATOR */
     .kalkulator-view { padding: 80px 16px 40px; }
     .kalkulator-hero { height: 180px; }
     .kalkulator-hero-content { padding: 0 24px; }
     .kalkulator-hero-title { font-size: 28px; }
-
-    /* FOOTER */
     footer { padding: 24px 20px; flex-direction: column; gap: 16px; text-align: center; }
     .footer-disclaimer { text-align: center; max-width: 100%; }
-
-    /* LOGIN MODAL */
     .login-boks { padding: 40px 24px; margin: 16px; }
     .login-tittel { font-size: 26px; }
   }
@@ -348,20 +311,15 @@ const styles = `
   }
 `;
 
-// Hjelpefunksjoner for å lese/skrive kalkulator-state til sessionStorage
 function lesKalkulatorState(id) {
   try {
     const lagret = sessionStorage.getItem('addon_kalk_' + id);
     return lagret ? JSON.parse(lagret) : null;
-  } catch (e) {
-    return null;
-  }
+  } catch (e) { return null; }
 }
 
 function skrivKalkulatorState(id, state) {
-  try {
-    sessionStorage.setItem('addon_kalk_' + id, JSON.stringify(state));
-  } catch (e) {}
+  try { sessionStorage.setItem('addon_kalk_' + id, JSON.stringify(state)); } catch (e) {}
 }
 
 const NavLogo = ({ onClick }) => (
@@ -378,8 +336,8 @@ const NavLogo = ({ onClick }) => (
   </div>
 );
 
-const FooterLogo = () => (
-  <div className="footer-logo">
+const FooterLogo = ({ onClick }) => (
+  <div className="footer-logo" onClick={onClick}>
     <div className="footer-logo-icon">
       <span className="footer-logo-d">D</span>
       <span className="footer-logo-a">A</span>
@@ -400,9 +358,7 @@ function LoginModal({ onLogin, onLukk }) {
   const [erNyBruker, setErNyBruker] = useState(false);
 
   async function handleSubmit() {
-    setLaster(true);
-    setMelding('');
-    setFeil(false);
+    setLaster(true); setMelding(''); setFeil(false);
     if (erNyBruker) {
       const { error } = await supabase.auth.signUp({ email: epost, password: passord });
       if (error) { setMelding(error.message); setFeil(true); }
@@ -563,6 +519,7 @@ function getSideFromUrl() {
   if (path === '/om-verktoyet') return 'info';
   if (path === '/priser') return 'priser';
   if (path === '/budsjettark') return 'budsjettark';
+  if (path === '/personvern') return 'personvern';
   if (path.startsWith('/kalkulator/')) return 'kalkulator';
   return 'hjem';
 }
@@ -590,31 +547,14 @@ function PrisSeksjon({ onKomIgang, bruker, tilgang, onVisLogin, erEgenSide = fal
       });
       const data = await res.json();
       if (data.url) window.location.href = data.url;
-    } catch (e) {
-      alert('Noe gikk galt. Prøv igjen.');
-    }
+    } catch (e) { alert('Noe gikk galt. Prøv igjen.'); }
     setLasterBetaling(null);
   };
 
   const planer = [
-    {
-      plan: 'Gratis', pris: '0', desc: 'Kom i gang og regn på tallene dine.', populær: false,
-      funksjoner: ['Alle 5 kalkulatorer', 'Månedlig kontantstrøm', 'Oppstartskostnader'],
-      ikkeInkludert: ['10-års prognose', 'Neste bolig kalkulator', 'Banksjekk og stresstest', 'AI-assistent (Marcel, Colette, René)', 'Budsjettark med eksport'],
-      knappTekst: 'Start gratis', knappType: 'standard', knappPlan: null,
-    },
-    {
-      plan: 'Basis', pris: '49', desc: 'For deg som vil planlegge langsiktig.', populær: false,
-      funksjoner: ['Alt i gratis', '10-års prognose', 'Neste bolig kalkulator', 'Banksjekk og stresstest', 'Tidlig tilgang til nye bransjer'],
-      ikkeInkludert: ['AI-assistent (Marcel, Colette, René)', 'Budsjettark med eksport'],
-      knappTekst: tilgang === 'basis' ? 'Din nåværende plan' : 'Velg Basis', knappType: 'standard', knappPlan: 'basis',
-    },
-    {
-      plan: 'Pro', pris: '99', desc: 'Alt du trenger for å ta gode investeringsbeslutninger.', populær: true,
-      funksjoner: ['Alt i Basis', 'AI-assistent Marcel for eiendom', 'AI-assistent Colette for salong', 'AI-assistent René for bilutleie', 'Budsjettark forhåndsutfylt med dine tall', 'Eksport til Excel og PDF', 'Tidlig tilgang til nye bransjer'],
-      ikkeInkludert: [],
-      knappTekst: tilgang === 'pro' ? 'Din nåværende plan' : 'Velg Pro', knappType: 'gull', knappPlan: 'pro',
-    },
+    { plan: 'Gratis', pris: '0', desc: 'Kom i gang og regn på tallene dine.', populær: false, funksjoner: ['Alle 5 kalkulatorer', 'Månedlig kontantstrøm', 'Oppstartskostnader'], ikkeInkludert: ['10-års prognose', 'Neste bolig kalkulator', 'Banksjekk og stresstest', 'AI-assistent (Marcel, Colette, René)', 'Budsjettark med eksport'], knappTekst: 'Start gratis', knappType: 'standard', knappPlan: null },
+    { plan: 'Basis', pris: '49', desc: 'For deg som vil planlegge langsiktig.', populær: false, funksjoner: ['Alt i gratis', '10-års prognose', 'Neste bolig kalkulator', 'Banksjekk og stresstest', 'Tidlig tilgang til nye bransjer'], ikkeInkludert: ['AI-assistent (Marcel, Colette, René)', 'Budsjettark med eksport'], knappTekst: tilgang === 'basis' ? 'Din nåværende plan' : 'Velg Basis', knappType: 'standard', knappPlan: 'basis' },
+    { plan: 'Pro', pris: '99', desc: 'Alt du trenger for å ta gode investeringsbeslutninger.', populær: true, funksjoner: ['Alt i Basis', 'AI-assistent Marcel for eiendom', 'AI-assistent Colette for salong', 'AI-assistent René for bilutleie', 'Budsjettark forhåndsutfylt med dine tall', 'Eksport til Excel og PDF', 'Tidlig tilgang til nye bransjer'], ikkeInkludert: [], knappTekst: tilgang === 'pro' ? 'Din nåværende plan' : 'Velg Pro', knappType: 'gull', knappPlan: 'pro' },
   ];
 
   return (
@@ -731,68 +671,25 @@ export default function App() {
       ) : (
         <button className="nav-cta" onClick={() => setVisLogin(true)}><span>Logg inn</span></button>
       )}
-      <button
-        className={`nav-hamburger ${mobilMenyAapen ? 'aapen' : ''}`}
-        onClick={() => setMobilMenyAapen(!mobilMenyAapen)}
-        aria-label="Meny"
-      >
-        <span></span>
-        <span></span>
-        <span></span>
+      <button className={`nav-hamburger ${mobilMenyAapen ? 'aapen' : ''}`} onClick={() => setMobilMenyAapen(!mobilMenyAapen)} aria-label="Meny">
+        <span></span><span></span><span></span>
       </button>
     </div>
   );
 
   const aapneBransje = (bransje) => {
     if (bransje.coming) return;
-    setAktivBransje(bransje);
-    setSide('kalkulator');
-    setAnimKey(k => k + 1);
-    setMobilMenyAapen(false);
+    setAktivBransje(bransje); setSide('kalkulator'); setAnimKey(k => k + 1); setMobilMenyAapen(false);
     window.history.pushState({}, '', `/kalkulator/${bransje.id}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const gaaHjem = () => {
-    setSide('hjem');
-    setAktivBransje(null);
-    setAnimKey(k => k + 1);
-    setMobilMenyAapen(false);
-    window.history.pushState({}, '', '/');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const gaaOmOss = () => {
-    setSide('om-oss');
-    setAnimKey(k => k + 1);
-    setMobilMenyAapen(false);
-    window.history.pushState({}, '', '/om-oss');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const gaaBudsjettark = () => {
-    setSide('budsjettark');
-    setAnimKey(k => k + 1);
-    setMobilMenyAapen(false);
-    window.history.pushState({}, '', '/budsjettark');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const gaaPriser = () => {
-    setSide('priser');
-    setAnimKey(k => k + 1);
-    setMobilMenyAapen(false);
-    window.history.pushState({}, '', '/priser');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const gaaInfo = () => {
-    setSide('info');
-    setAnimKey(k => k + 1);
-    setMobilMenyAapen(false);
-    window.history.pushState({}, '', '/om-verktoyet');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  const gaaHjem = () => { setSide('hjem'); setAktivBransje(null); setAnimKey(k => k + 1); setMobilMenyAapen(false); window.history.pushState({}, '', '/'); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const gaaOmOss = () => { setSide('om-oss'); setAnimKey(k => k + 1); setMobilMenyAapen(false); window.history.pushState({}, '', '/om-oss'); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const gaaBudsjettark = () => { setSide('budsjettark'); setAnimKey(k => k + 1); setMobilMenyAapen(false); window.history.pushState({}, '', '/budsjettark'); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const gaaPriser = () => { setSide('priser'); setAnimKey(k => k + 1); setMobilMenyAapen(false); window.history.pushState({}, '', '/priser'); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const gaaInfo = () => { setSide('info'); setAnimKey(k => k + 1); setMobilMenyAapen(false); window.history.pushState({}, '', '/om-verktoyet'); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const gaaPersonvern = () => { setSide('personvern'); setAnimKey(k => k + 1); setMobilMenyAapen(false); window.history.pushState({}, '', '/personvern'); window.scrollTo({ top: 0, behavior: 'smooth' }); };
 
   const NavLinks = ({ aktivSide }) => (
     <div className="nav-links">
@@ -819,17 +716,46 @@ export default function App() {
     </div>
   );
 
+  const FooterMedPersonvern = () => (
+    <footer>
+      <FooterLogo onClick={gaaHjem} />
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
+        <div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning. Konsulter en regnskapsfører.</div>
+        <button onClick={gaaPersonvern} style={{ background: 'none', border: 'none', color: '#2a4a2e', fontFamily: 'Inter, sans-serif', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>
+          Personvernerklæring
+        </button>
+      </div>
+    </footer>
+  );
+
+  // PERSONVERN
+  if (side === 'personvern') {
+    return (
+      <div className="app">
+        <style>{styles}</style>
+        <CookieBanner onVisPersonvern={gaaPersonvern} />
+        <MobilMeny />
+        <nav className="nav"><NavLogo onClick={gaaHjem} /><NavLinks aktivSide="" /><NavKnapper /></nav>
+        <div className="side-innhold" key={animKey}>
+          <Personvern onTilbake={gaaHjem} />
+          <FooterMedPersonvern />
+        </div>
+      </div>
+    );
+  }
+
   // PRISSIDE
   if (side === 'priser') {
     return (
       <div className="app">
         <style>{styles}</style>
+        <CookieBanner onVisPersonvern={gaaPersonvern} />
         {visLogin && <LoginModal onLogin={setBruker} onLukk={() => setVisLogin(false)} />}
         <MobilMeny />
         <nav className="nav"><NavLogo onClick={gaaHjem} /><NavLinks aktivSide="priser" /><NavKnapper /></nav>
         <div className="side-innhold" key={animKey}>
           <PrisSeksjon onKomIgang={() => { gaaHjem(); setTimeout(() => aapneBransje(bransjer[0]), 300); }} bruker={bruker} tilgang={tilgang} onVisLogin={() => setVisLogin(true)} erEgenSide={true} />
-          <footer><FooterLogo /><div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning.</div></footer>
+          <FooterMedPersonvern />
         </div>
       </div>
     );
@@ -840,6 +766,7 @@ export default function App() {
     return (
       <div className="app">
         <style>{styles}</style>
+        <CookieBanner onVisPersonvern={gaaPersonvern} />
         {visLogin && <LoginModal onLogin={setBruker} onLukk={() => setVisLogin(false)} />}
         <MobilMeny />
         <nav className="nav"><NavLogo onClick={gaaHjem} /><NavLinks aktivSide="info" /><NavKnapper /></nav>
@@ -879,43 +806,6 @@ export default function App() {
                 ))}
               </div>
             </div>
-            <div style={{ background: 'var(--dark)', padding: '48px', margin: '48px 0', position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: 'var(--gold)' }}></div>
-              <div style={{ fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '16px' }}>Tidlig versjon</div>
-              <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '28px', color: 'var(--cream)', marginBottom: '20px', lineHeight: '1.2' }}>Dette er starten,<br />ikke slutten</div>
-              <p style={{ fontSize: '14px', color: '#4a6a4e', lineHeight: '1.8', marginBottom: '20px', maxWidth: '600px' }}>Invest Tools er lansert tidlig med vilje. Vi tror på å bygge i det åpne, med tilbakemelding fra de som faktisk bruker verktøyet. Kalkulatorene fungerer og er basert på gjeldende norske regler, men det er mye vi ønsker å legge til.</p>
-              <p style={{ fontSize: '14px', color: '#4a6a4e', lineHeight: '1.8', maxWidth: '600px' }}>Vi jobber kontinuerlig med nye bransjer, bedre beregninger og mer funksjonalitet. Det du ser i dag er bare et utgangspunkt.</p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '2px', background: 'rgba(31,78,46,0.3)', marginTop: '32px' }}>
-                {[{ num: '5', lbl: 'Kalkulatorer i dag' }, { num: '2+', lbl: 'Nye bransjer på vei' }, { num: '∞', lbl: 'Forbedringer planlagt' }].map((s, i) => (
-                  <div key={i} style={{ background: '#0a1a0c', padding: '24px', textAlign: 'center' }}>
-                    <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '36px', color: 'var(--gold)' }}>{s.num}</div>
-                    <div style={{ fontSize: '10px', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#3a6a46', marginTop: '6px' }}>{s.lbl}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div style={{ margin: '48px 0' }}>
-              <div style={{ fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--brg)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span style={{ display: 'inline-block', width: '24px', height: '1px', background: 'var(--brg)' }}></span>
-                Hjelp oss bli bedre
-              </div>
-              <div style={{ fontFamily: 'Playfair Display, serif', fontSize: '28px', color: 'var(--dark)', marginBottom: '16px', lineHeight: '1.2' }}>Din bransje mangler?<br />Si ifra.</div>
-              <p className="om-oss-tekst">Vi ønsker innspill på nye bransjer, mangler i eksisterende kalkulatorer og alt som kan gjøre verktøyet mer nyttig for deg. Ingen tilbakemelding er for liten, og alle henvendelser leses.</p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1px', background: 'var(--cream-dark)', marginTop: '32px', marginBottom: '32px' }}>
-                {[
-                  { ikon: '🏗️', tekst: 'Ønsker du en ny bransje? Send oss navnet og hva du vil vite.' },
-                  { ikon: '🔧', tekst: 'Noe som ikke stemmer eller mangler i en kalkulator? Fortell oss.' },
-                  { ikon: '💡', tekst: 'Har du en idé til en funksjon? Vi vil høre om den.' },
-                ].map((t, i) => (
-                  <div key={i} style={{ background: 'white', padding: '28px', textAlign: 'center' }}>
-                    <div style={{ fontSize: '28px', marginBottom: '12px' }}>{t.ikon}</div>
-                    <div style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: '1.65' }}>{t.tekst}</div>
-                  </div>
-                ))}
-              </div>
-              <button className="btn-primary" onClick={() => window.location.href = 'mailto:kontakt@addoninvest.no'}>Send oss en e-post</button>
-              <span style={{ fontSize: '13px', color: 'var(--muted)', marginLeft: '16px' }}>kontakt@addoninvest.no</span>
-            </div>
             <div className="om-oss-verdier">
               {[
                 { num: '01', tittel: 'Gratis å starte', desc: 'Alle kalkulatorer er gratis. Betalte funksjoner er tillegg, ikke krav.' },
@@ -943,7 +833,7 @@ export default function App() {
               </div>
             </div>
           </div>
-          <footer><FooterLogo /><div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning.</div></footer>
+          <FooterMedPersonvern />
         </div>
       </div>
     );
@@ -954,6 +844,7 @@ export default function App() {
     return (
       <div className="app">
         <style>{styles}</style>
+        <CookieBanner onVisPersonvern={gaaPersonvern} />
         {visLogin && <LoginModal onLogin={setBruker} onLukk={() => setVisLogin(false)} />}
         <MobilMeny />
         <nav className="nav"><NavLogo onClick={gaaHjem} /><NavLinks aktivSide="budsjettark" /><NavKnapper /></nav>
@@ -961,7 +852,7 @@ export default function App() {
           <button className="kalkulator-back" onClick={gaaHjem}>← Tilbake</button>
           <Budsjettark tilgang={tilgang} onVisLogin={() => setVisLogin(true)} onTilbake={gaaHjem} />
         </div>
-        <footer><FooterLogo /><div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning.</div></footer>
+        <FooterMedPersonvern />
       </div>
     );
   }
@@ -971,6 +862,7 @@ export default function App() {
     return (
       <div className="app">
         <style>{styles}</style>
+        <CookieBanner onVisPersonvern={gaaPersonvern} />
         {visLogin && <LoginModal onLogin={setBruker} onLukk={() => setVisLogin(false)} />}
         <MobilMeny />
         <nav className="nav"><NavLogo onClick={gaaHjem} /><NavLinks aktivSide="om-oss" /><NavKnapper /></nav>
@@ -995,156 +887,4 @@ export default function App() {
               ].map((v, i) => (
                 <div className={`om-oss-verdi reveal-scale reveal-delay-${i + 1}`} key={i}>
                   <div className="om-oss-verdi-num">{v.num}</div>
-                  <div className="om-oss-verdi-title">{v.tittel}</div>
-                  <div className="om-oss-verdi-desc">{v.desc}</div>
-                </div>
-              ))}
-            </div>
-            <button className="btn-primary reveal" onClick={() => aapneBransje(bransjer[0])}>Start beregning</button>
-          </div>
-          <div className="om-oss-kontakt">
-            <div className="om-oss-kontakt-inner">
-              <div>
-                <div className="om-oss-kontakt-title">Mangler din bransje?</div>
-                <div className="om-oss-kontakt-desc">Ta kontakt hvis du ønsker en kalkulator for en bransje som ikke er her ennå.</div>
-              </div>
-              <div>
-                <div style={{ fontSize: '11px', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(159,201,168,0.7)', marginBottom: '10px' }}>Send oss en e-post</div>
-                <a href="mailto:kontakt@addoninvest.no" className="om-oss-kontakt-epost">kontakt@addoninvest.no</a>
-              </div>
-            </div>
-          </div>
-          <footer><FooterLogo /><div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning.</div></footer>
-        </div>
-      </div>
-    );
-  }
-
-  // KALKULATOR
-  if (side === 'kalkulator' && aktivBransje) {
-    const lagretState = lesKalkulatorState(aktivBransje.id);
-    return (
-      <div className="app">
-        <style>{styles}</style>
-        {visLogin && <LoginModal onLogin={setBruker} onLukk={() => setVisLogin(false)} />}
-        <MobilMeny />
-        <nav className="nav"><NavLogo onClick={gaaHjem} /><NavLinks aktivSide="" /><NavKnapper /></nav>
-        <div className="side-innhold" key={animKey}>
-          <div className="kalkulator-view">
-            <button className="kalkulator-back" onClick={gaaHjem}>← Tilbake</button>
-            <div className="kalkulator-hero">
-              <div className="kalkulator-hero-bg" style={{ backgroundImage: `url('${aktivBransje.kalkulatorImg}')` }}></div>
-              <div className="kalkulator-hero-overlay"></div>
-              <div className="kalkulator-hero-content">
-                <div className="kalkulator-hero-tag">Kalkulator</div>
-                <div className="kalkulator-hero-title">{aktivBransje.navn}</div>
-              </div>
-            </div>
-            {aktivBransje.id === 'eiendom-privat' && <EiendomPrivat tilgang={tilgang} onVisLogin={() => setVisLogin(true)} lagretState={lagretState} onStateChange={(s) => skrivKalkulatorState('eiendom-privat', s)} />}
-            {aktivBransje.id === 'eiendom-as' && <EiendomAS tilgang={tilgang} onVisLogin={() => setVisLogin(true)} lagretState={lagretState} onStateChange={(s) => skrivKalkulatorState('eiendom-as', s)} />}
-            {aktivBransje.id === 'eiendom-sammenlign' && <EiendomSammenlign tilgang={tilgang} onVisLogin={() => setVisLogin(true)} lagretState={lagretState} onStateChange={(s) => skrivKalkulatorState('eiendom-sammenlign', s)} />}
-            {aktivBransje.id === 'bil' && <BilKalkulator tilgang={tilgang} onVisLogin={() => setVisLogin(true)} lagretState={lagretState} onStateChange={(s) => skrivKalkulatorState('bil', s)} />}
-            {aktivBransje.id === 'salong' && <SalongKalkulator tilgang={tilgang} onVisLogin={() => setVisLogin(true)} lagretState={lagretState} onStateChange={(s) => skrivKalkulatorState('salong', s)} />}
-          </div>
-          <footer><FooterLogo /><div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning.</div></footer>
-        </div>
-      </div>
-    );
-  }
-
-  // HJEM
-  return (
-    <div className="app">
-      <style>{styles}</style>
-      {visLogin && <LoginModal onLogin={setBruker} onLukk={() => setVisLogin(false)} />}
-      <MobilMeny />
-      <nav className="nav"><NavLogo onClick={gaaHjem} /><NavLinks aktivSide="bransjer" /><NavKnapper /></nav>
-      <div className="side-innhold" key={animKey}>
-        <section className="hero">
-          <div className="hero-bg" id="hero-bg"></div>
-          <div className="hero-grain"></div>
-          <div className="hero-overlay"></div>
-          <Partikler />
-          <div className="hero-content">
-            <div className="hero-tag">Kalkulatorer gratis · Fra 49 kr/mnd</div>
-            <h1 className="hero-title">Finn ut om ideen din<br /><em>faktisk</em> er lønnsom</h1>
-            <p className="hero-sub">Invest Tools gir deg tallene du trenger før du investerer tid og penger i din neste bedrift.</p>
-            <div className="hero-btns">
-              <button className="btn-primary" onClick={() => aapneBransje(bransjer[0])}>Start beregning</button>
-              <button className="btn-secondary" onClick={() => document.getElementById('bransjer')?.scrollIntoView({ behavior: 'smooth' })}>Se alle bransjer</button>
-            </div>
-          </div>
-          <div className="hero-scroll"><div className="hero-scroll-line"></div><div className="hero-scroll-text">Scroll</div></div>
-          <div className="hero-stats">
-            {[{ slutt: 5, suffix: '', lbl: 'Bransjer' }, { slutt: 49, suffix: ' kr', lbl: 'Fra/mnd' }, { slutt: 100, suffix: '%', lbl: 'Konfidensielt' }].map((s, i) => (
-              <div className="hero-stat" key={i}>
-                <span className="hero-stat-num"><Teller slutt={s.slutt} suffix={s.suffix} /></span>
-                <span className="hero-stat-lbl">{s.lbl}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-        <section className="bransjer-section" id="bransjer">
-          <div className="section-tag reveal">Velg bransje</div>
-          <div className="section-title reveal reveal-delay-1">Hva vil du starte?</div>
-          <div className="bransje-grid">
-            {bransjer.map((b, i) => (
-              <div key={b.id} className={`bransje-card ${b.coming ? 'coming' : ''} reveal reveal-delay-${(i % 3) + 1}`} onClick={() => aapneBransje(b)}>
-                <div className="bransje-img-wrap">
-                  <img className="bransje-img" src={b.img} alt={b.navn} />
-                  <div className="bransje-img-overlay"></div>
-                  <div className="bransje-num-overlay">{b.num}</div>
-                  {b.coming && <div className="coming-pill">Kommer snart</div>}
-                </div>
-                <div className="bransje-body">
-                  <div className="bransje-num">{b.num}</div>
-                  <div className="bransje-name">{b.navn}{!b.coming && <span className="bransje-arrow">↗</span>}</div>
-                  <div className="bransje-desc">{b.desc}</div>
-                  <div className="bransje-tags">{b.tags.map(t => <span key={t} className="bransje-tag">{t}</span>)}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="bransje-more reveal">
-            <div className="bransje-more-text">Korttidsutleie, PT, franchise og mer kommer snart</div>
-            <span style={{ color: 'var(--cream-dark)', fontSize: '20px' }}>→</span>
-          </div>
-        </section>
-        <PrisSeksjon onKomIgang={() => aapneBransje(bransjer[0])} bruker={bruker} tilgang={tilgang} onVisLogin={() => setVisLogin(true)} />
-        <section className="hvorfor-section">
-          <div className="hvorfor-img-wrap reveal-left">
-            <img className="hvorfor-img" src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80" alt="Investor" />
-            <div className="hvorfor-img-frame"></div>
-            <div className="hvorfor-img-frame2"></div>
-          </div>
-          <div className="hvorfor-content reveal-right">
-            <div className="hvorfor-tag">Hvorfor Invest Tools</div>
-            <h2 className="hvorfor-title">Bygget av en gründer,<br />for <em>gründere</em></h2>
-            <div className="hvorfor-items">
-              {[
-                { tittel: 'Helt konfidensielt', desc: 'Tallene du legger inn forblir hos deg. Vi lagrer ingenting.' },
-                { tittel: 'Oppdatert informasjon', desc: 'Gjeldende skatteregler, renter og lovkrav.' },
-                { tittel: 'Konkrete anbefalinger', desc: 'Ikke bare tall, men hva som lønner seg for deg.' },
-                { tittel: 'Langsiktig perspektiv', desc: 'Se porteføljen vokse over 10 år.' },
-                { tittel: 'Ta kontakt', desc: 'Mangler din bransje? Send oss en e-post på kontakt@addoninvest.no' }
-              ].map((p, i) => (
-                <div className="hvorfor-item" key={i}>
-                  <div className="hvorfor-dot"></div>
-                  <div>
-                    <div className="hvorfor-item-title">{p.tittel}</div>
-                    <div className="hvorfor-item-desc">{p.desc}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-        <footer>
-          <FooterLogo />
-          <div className="footer-disclaimer">Alle beregninger er estimater og ikke finansiell rådgivning. Konsulter en regnskapsfører.</div>
-        </footer>
-      </div>
-      <Analytics />
-    </div>
-  );
-}
+                  <div className="om-oss-verdi-ti
