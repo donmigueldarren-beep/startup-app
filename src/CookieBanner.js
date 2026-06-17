@@ -28,13 +28,6 @@ const styles = `
     line-height: 1.6;
     max-width: 680px;
   }
-  .cookie-tekst a {
-    color: #c9a84c;
-    text-decoration: none;
-    border-bottom: 1px solid rgba(201,168,76,0.3);
-    transition: border-color 0.2s;
-  }
-  .cookie-tekst a:hover { border-color: #c9a84c; }
   .cookie-knapper {
     display: flex;
     gap: 10px;
@@ -109,7 +102,12 @@ export default function CookieBanner({ onVisPersonvern }) {
         <div className="cookie-tekst">
           Vi bruker nødvendige informasjonskapsler for innlogging (Supabase) og betaling (Stripe).
           Ingen reklamecookies. Les mer i vår{' '}
-          <a href="#" onClick={e => { e.preventDefault(); onVisPersonvern(); }}>personvernerklæring</a>.
+          <button
+            onClick={onVisPersonvern}
+            style={{ background: 'none', border: 'none', color: '#c9a84c', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'inherit', padding: 0, borderBottom: '1px solid rgba(201,168,76,0.3)', lineHeight: 'inherit' }}
+          >
+            personvernerklæring
+          </button>.
         </div>
         <div className="cookie-knapper">
           <button className="cookie-les-mer" onClick={() => { onVisPersonvern(); aksepter(); }}>Les mer</button>
